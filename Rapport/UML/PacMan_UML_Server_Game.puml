@@ -1,0 +1,213 @@
+@startuml
+' Mise en page horizontale plus lisible
+left to right direction
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+skinparam ArrowColor #333333
+skinparam ArrowThickness 1
+skinparam ClassFontSize 12
+skinparam ClassFontName Arial
+skinparam ClassBackgroundColor #fdfdfd
+skinparam ClassBorderColor #444444
+
+' =======================
+' Classes principales
+' =======================
+class Room {
+    - id : int
+    - network : ServerNetwork
+    - players : Set
+    - inputQueue : InputQueue
+    - room : Room
+    - game : Game
+    - hostName : string
+    - botManager : BotManager
+    - settings : RoomSettings
+    - preGamePlayers : Map
+
+    + Room()
+    + addPlayer()
+    + removePlayer()
+    + handlePacket()
+    + broadcastState()
+    + broadcastRoomPlayers()
+    + broadcastRoomSettings()
+    + broadcastPreGame()
+    + allPlayersReady()
+    + handleClientChange()
+    + handleClientReady()
+    + handleClientMove()
+    + handleClientChangeRoomSettings()
+    + isFull()
+    + endGame()
+    + notifyGameEnded()
+    + cleanupGame()
+    + onGameStopped()
+    + notifyGameEndedAsync()
+    - startGame()
+    - generateBotId()
+    - resetPlayersState()
+}
+
+class Game {
+    - board : Board
+    - players : Map
+    - chronoStart : TimePoint
+    - preGameStart : TimePoint
+    - preGameElapsed : double
+    - gameElapsed : double
+    - preGameDelay : int
+    - tickMs : int
+    - gameThread : Thread
+    - running : bool
+    - gameStarted : bool
+    - room : Room
+    - botManager : BotManager
+    - chronoMutex : Mutex
+
+    + Game()
+    + requestMove()
+    + addPlayer()
+    + removePlayer()
+    + canMove()
+    + spawnPlayer()
+    + startChrono()
+    + resetChrono()
+    + startGameLoop()
+    + stopGameLoop()
+    + isGameStarted()
+    + isPreGame()
+    + isGameOver()
+    + stopGameLoopSignal()
+    + joinGameLoop()
+    - processInputs()
+}
+
+class Board {
+    - width : int
+    - height : int
+    - grid : Grid
+    - pacgommes : Map
+    - holeLinks : Map
+
+    + Board()
+    + isWalkable()
+    + isOccupied()
+    + isInside()
+    + placeRandomPacGommes()
+    + print()
+    + printWithPlayers()
+    + hasPacgomme()
+    + removePacgomme()
+    + takePacGomme()
+    + toCommonData()
+    + openBorderExits()
+    + isHole()
+    + linkHoles()
+    - generateTestMaze()
+    - generateMaze()
+    - generatePrimMaze()
+    - placeHut()
+    - connectHut()
+    - openCorners()
+    - addLoops()
+    - fillDeadEnds()
+    - isHutWall()
+}
+
+class Case {
+    - type : CellType
+
+    + Case()
+    + Case(type)
+    + isWalkable()
+    + toCommonData()
+}
+
+class Player {
+    - id : int
+    - role : PlayerRole
+    - x : float
+    - y : float
+    - color : int
+    - socket : Socket
+    - score : int
+    - isBot : bool
+    - ready : bool
+
+    + Player()
+    + setRole()
+    + setState()
+    + eat()
+}
+
+class BotManager {
+    - game : Game
+    - inputQueue : InputQueue
+    - bots : Map
+    - graph : List
+    - traceMap : GraphTraceMap
+
+    + BotManager()
+    + generateGraph()
+    + registerBot()
+    + unregisterBot()
+    + update()
+    + updateTraces()
+}
+
+class BotController {
+    - playerId : int
+
+    + BotController()
+    + update()
+    - getDirectionTowards()
+}
+
+class GraphTraceMap {
+    - traces : Map
+
+    + add()
+    + decay()
+}
+
+class InputQueue {
+    - queue : Queue
+    - mtx : Mutex
+
+    + push()
+    + pop()
+}
+
+class PlayerInput {
+    - playerId : int
+    - dir : Direction
+}
+
+class PacketContext {
+    - senderId : int
+    - packet : Packet
+}
+' =======================
+' Relations
+' =======================
+
+' Composition (l’objet appartient au parent)
+Room *-- Game
+Room *-- BotManager
+Room *-- InputQueue
+Game *-- Board
+Game *-- Player
+BotManager *-- BotController
+BotManager *-- GraphTraceMap
+Board *-- Case
+InputQueue *-- PlayerInput
+
+
+
+' Association / dépendance
+BotController --> Game
+Room --> PacketContext
+
+
+@enduml

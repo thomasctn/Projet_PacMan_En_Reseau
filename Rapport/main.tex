@@ -174,10 +174,27 @@ Benoît Litampha a assuré la communication entre le serveur et le client, parti
 
 Description de l’architecture client-serveur, diagrammes éventuels.
 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{UML/PacMan_UML_Server_Reseau.png}
+    \caption{Diagrammes de classe de l'architecture réseau}
+    \caption*{Vue côté serveur - Gestion des packets, des parties, des salles (sans geter et seter)}
+
+\end{figure}
+
 \section{Structure du serveur}
 
 Gestion des joueurs, des parties, des salles (lobby),
 synchronisation de l’état du jeu.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{UML/PacMan_UML_Server_Game.png}
+
+    \caption{Diagramme de classes de l'architecture de jeu}
+    \caption*{Vue côté serveur - synchronisation, rooms et logique de jeu (sans geter et seter)}
+\end{figure}
+
 
 \section{Structure du client}
 

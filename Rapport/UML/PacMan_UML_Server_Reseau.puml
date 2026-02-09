@@ -1,0 +1,124 @@
+@startuml
+' Mise en page horizontale plus lisible
+left to right direction
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+skinparam ArrowColor #333333
+skinparam ArrowThickness 1
+skinparam ClassFontSize 12
+skinparam ClassFontName Arial
+skinparam ClassBackgroundColor #fdfdfd
+skinparam ClassBorderColor #444444
+
+' =======================
+' Classes principales
+' =======================
+class ServerNetwork {
+    - listener : Listener
+    - selector : Selector
+    - connections : Map
+    - nextId : int
+    - running : bool
+    - lobby : Lobby
+
+    + ServerNetwork()
+    + run()
+    + send()
+    + stop()
+    - handleNewClient()
+    - handleClientData()
+    - disconnectPlayer()
+}
+
+class Lobby {
+    - network : ServerNetwork
+    - rooms : Map
+    - playerRoom : Map
+    - nextRoomId : int
+    - defaultRoom : int
+
+    + Lobby()
+    + onPlayerConnected()
+    + onPlayerDisconnected()
+    + handlePacket()
+    + handleClientJoinRoom()
+    + handleClientCreateRoom()
+    + handleClientLeaveRoom()
+    + broadcastRoomsList()
+    + sendRoomsList()
+    - createRoom()
+    - destroyRoom()
+}
+
+class Room {
+    - id : int
+    - network : ServerNetwork
+    - players : Set
+    - inputQueue : InputQueue
+    - room : Room
+    - game : Game
+    - hostName : string
+    - botManager : BotManager
+    - settings : RoomSettings
+    - preGamePlayers : Map
+
+    + Room()
+    + addPlayer()
+    + removePlayer()
+    + handlePacket()
+    + broadcastState()
+    + broadcastRoomPlayers()
+    + broadcastRoomSettings()
+    + broadcastPreGame()
+    + allPlayersReady()
+    + handleClientChange()
+    + handleClientReady()
+    + handleClientMove()
+    + handleClientChangeRoomSettings()
+    + isFull()
+    + endGame()
+    + notifyGameEnded()
+    + cleanupGame()
+    + onGameStopped()
+    + notifyGameEndedAsync()
+    - startGame()
+    - generateBotId()
+    - resetPlayersState()
+}
+
+class InputQueue {
+    - queue : Queue
+    - mtx : Mutex
+
+    + push()
+    + pop()
+}
+
+class PlayerInput {
+    - playerId : int
+    - dir : Direction
+}
+
+class PacketContext {
+    - senderId : int
+    - packet : Packet
+}
+' =======================
+' Relations
+' =======================
+
+' Composition (l’objet appartient au parent)
+ServerNetwork *-- Lobby
+Lobby *-- Room
+
+Room *-- InputQueue
+InputQueue *-- PlayerInput
+
+
+
+' Association / dépendance
+Room --> PacketContext
+Lobby --> PacketContext
+
+
+@enduml
