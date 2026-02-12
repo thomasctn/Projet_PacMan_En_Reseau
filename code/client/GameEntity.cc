@@ -44,6 +44,22 @@ GameEntity::GameEntity()
     m_pacmanSprite.setAnimation(m_pacmanRightAnim);
     m_pacmanSprite.setOrigin({0.f, 0.f});
     m_pacmanDir = 'R';
+
+    wall_texture_rectF.insert({0,gf::RectF::fromPositionSize({0.8f,0.f},{0.2f,0.25f})});
+    wall_texture_rectF.insert({1,gf::RectF::fromPositionSize({0.6f,0.f},{0.2f,0.25f})});
+    wall_texture_rectF.insert({2,gf::RectF::fromPositionSize({0.2f,0.f},{0.2f,0.25f})});
+    wall_texture_rectF.insert({3,gf::RectF::fromPositionSize({0.4f,0.f},{0.2f,0.25f})});
+    wall_texture_rectF.insert({4,gf::RectF::fromPositionSize({0.f,0.50f},{0.2f,0.25f})});
+    wall_texture_rectF.insert({5,gf::RectF::fromPositionSize({0.4f,0.50f},{0.2f,0.25f})});
+    wall_texture_rectF.insert({6,gf::RectF::fromPositionSize({0.2f,0.5f},{0.2f,0.25f})});
+    wall_texture_rectF.insert({7,gf::RectF::fromPositionSize({0.8f,0.25f},{0.2f,0.25f})});
+    wall_texture_rectF.insert({8,gf::RectF::fromPositionSize({0.f,0.f},{0.2f,0.25f})});
+    wall_texture_rectF.insert({9,gf::RectF::fromPositionSize({0.4f,0.25f},{0.2f,0.25f})});
+    wall_texture_rectF.insert({10,gf::RectF::fromPositionSize({0.2f,0.25f},{0.2f,0.25f})});
+    wall_texture_rectF.insert({11,gf::RectF::fromPositionSize({0.6f,0.25f},{0.2f,0.25f})});
+    wall_texture_rectF.insert({12,gf::RectF::fromPositionSize({0.f,0.25f},{0.2f,0.25f})});
+    wall_texture_rectF.insert({13,gf::RectF::fromPositionSize({0.8f,0.50f},{0.2f,0.25f})});
+    wall_texture_rectF.insert({14,gf::RectF::fromPositionSize({0.6f,0.50f},{0.2f,0.25f})});
 }
 
 void GameEntity::setGameState(const std::vector<PlayerData> &states)
@@ -125,27 +141,32 @@ void GameEntity::renderMap(gf::RenderTarget &target, const gf::RenderStates &sta
             {
                 tile.setColor(gf::Color::Black);
             }
-            else
+            else if (cell.celltype == CellType::Wall)
             {
-
-                switch (cell.celltype)
-                {
-                case CellType::Wall:
-                    tile.setColor(gf::Color::White);
-                    break;
-                case CellType::Hut:
-                    tile.setColor(gf::Color::Red);
-                    break;
-                case CellType::Floor:
-                    tile.setColor(gf::Color::fromRgb(0.3f, 0.3f, 0.3f));
-                    break;
-                default:
+                gf::Texture tex = gf::Texture("../client/assets/board/tiles_set_simplified.png");
+                unsigned int res = 0;
+                if ((x != 0) && map.grid({x-1, y}).celltype == CellType::Wall)
+                    res += 1;
+                if ((x != map.width -1) && map.grid({x+1, y}).celltype == CellType::Wall)
+                    res += 2;
+                if ((y != 0) && map.grid({x, y-1}).celltype == CellType::Wall)
+                    res += 4;
+                if ((y != map.height -1) && map.grid({x, y+1}).celltype == CellType::Wall)
+                    res += 8;
+                if (res < 15) {
+                    tile.setTexture(tex,wall_texture_rectF.at(res));
+                    target.draw(tile, states);
+                } else {
                     tile.setColor(gf::Color::Black);
-                    break;
+                    target.draw(tile, states);
                 }
+            } else if (cell.celltype == CellType::Floor){
+                tile.setColor(gf::Color::Black);
+                target.draw(tile, states);
+            } else {
+                tile.setColor(gf::Color::Red);
+                target.draw(tile, states);
             }
-
-            target.draw(tile, states);
         }
     }
 

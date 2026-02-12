@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <map>
+#include <array>
 #include <gf/Entity.h>
 #include <gf/Font.h>
 #include <gf/Texture.h>
@@ -70,4 +71,6 @@ private:
     float m_lastPacmanX = 0.f;
     float m_lastPacmanY = 0.f;
     bool m_hasLastPacmanPos = false;
+
+    std::map<int,const gf::RectF> wall_texture_rectF;
 };
