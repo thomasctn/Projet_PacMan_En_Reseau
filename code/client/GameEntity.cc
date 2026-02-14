@@ -6,6 +6,7 @@
 #include <gf/RenderStates.h>
 #include <gf/Shapes.h>
 #include <algorithm>
+#include <cmath>
 
 GameEntity::GameEntity()
     : m_font("../common/fonts/arial.ttf")
@@ -45,26 +46,43 @@ GameEntity::GameEntity()
     m_pacmanSprite.setOrigin({0.f, 0.f});
     m_pacmanDir = 'R';
 
-    wall_texture_rectF.insert({0,gf::RectF::fromPositionSize({0.8f,0.f},{0.2f,0.25f})});
-    wall_texture_rectF.insert({1,gf::RectF::fromPositionSize({0.6f,0.f},{0.2f,0.25f})});
-    wall_texture_rectF.insert({2,gf::RectF::fromPositionSize({0.2f,0.f},{0.2f,0.25f})});
-    wall_texture_rectF.insert({3,gf::RectF::fromPositionSize({0.4f,0.f},{0.2f,0.25f})});
-    wall_texture_rectF.insert({4,gf::RectF::fromPositionSize({0.f,0.50f},{0.2f,0.25f})});
-    wall_texture_rectF.insert({5,gf::RectF::fromPositionSize({0.4f,0.50f},{0.2f,0.25f})});
-    wall_texture_rectF.insert({6,gf::RectF::fromPositionSize({0.2f,0.5f},{0.2f,0.25f})});
-    wall_texture_rectF.insert({7,gf::RectF::fromPositionSize({0.8f,0.25f},{0.2f,0.25f})});
-    wall_texture_rectF.insert({8,gf::RectF::fromPositionSize({0.f,0.f},{0.2f,0.25f})});
-    wall_texture_rectF.insert({9,gf::RectF::fromPositionSize({0.4f,0.25f},{0.2f,0.25f})});
-    wall_texture_rectF.insert({10,gf::RectF::fromPositionSize({0.2f,0.25f},{0.2f,0.25f})});
-    wall_texture_rectF.insert({11,gf::RectF::fromPositionSize({0.6f,0.25f},{0.2f,0.25f})});
-    wall_texture_rectF.insert({12,gf::RectF::fromPositionSize({0.f,0.25f},{0.2f,0.25f})});
-    wall_texture_rectF.insert({13,gf::RectF::fromPositionSize({0.8f,0.50f},{0.2f,0.25f})});
-    wall_texture_rectF.insert({14,gf::RectF::fromPositionSize({0.6f,0.50f},{0.2f,0.25f})});
+    wall_texture_rectF.insert({0, gf::RectF::fromPositionSize({0.8f, 0.f}, {0.2f, 0.25f})});
+    wall_texture_rectF.insert({1, gf::RectF::fromPositionSize({0.6f, 0.f}, {0.2f, 0.25f})});
+    wall_texture_rectF.insert({2, gf::RectF::fromPositionSize({0.2f, 0.f}, {0.2f, 0.25f})});
+    wall_texture_rectF.insert({3, gf::RectF::fromPositionSize({0.4f, 0.f}, {0.2f, 0.25f})});
+    wall_texture_rectF.insert({4, gf::RectF::fromPositionSize({0.f, 0.50f}, {0.2f, 0.25f})});
+    wall_texture_rectF.insert({5, gf::RectF::fromPositionSize({0.4f, 0.50f}, {0.2f, 0.25f})});
+    wall_texture_rectF.insert({6, gf::RectF::fromPositionSize({0.2f, 0.5f}, {0.2f, 0.25f})});
+    wall_texture_rectF.insert({7, gf::RectF::fromPositionSize({0.8f, 0.25f}, {0.2f, 0.25f})});
+    wall_texture_rectF.insert({8, gf::RectF::fromPositionSize({0.f, 0.f}, {0.2f, 0.25f})});
+    wall_texture_rectF.insert({9, gf::RectF::fromPositionSize({0.4f, 0.25f}, {0.2f, 0.25f})});
+    wall_texture_rectF.insert({10, gf::RectF::fromPositionSize({0.2f, 0.25f}, {0.2f, 0.25f})});
+    wall_texture_rectF.insert({11, gf::RectF::fromPositionSize({0.6f, 0.25f}, {0.2f, 0.25f})});
+    wall_texture_rectF.insert({12, gf::RectF::fromPositionSize({0.f, 0.25f}, {0.2f, 0.25f})});
+    wall_texture_rectF.insert({13, gf::RectF::fromPositionSize({0.8f, 0.50f}, {0.2f, 0.25f})});
+    wall_texture_rectF.insert({14, gf::RectF::fromPositionSize({0.6f, 0.50f}, {0.2f, 0.25f})});
 }
 
 void GameEntity::setGameState(const std::vector<PlayerData> &states)
 {
     m_states = states;
+    if (pos.empty())
+    {
+        for (auto &s : states)
+        {
+            pos.insert({s.id, {{{s.x, s.y}, {s.x, s.y}}, std::chrono::steady_clock::now()}});
+        }
+    }
+    else
+    {
+        for (auto &s : states)
+        {
+            if (pos.at(s.id).first.second != gf::Vector2f({s.x, s.y}))
+            {
+                pos[s.id] = {{pos.at(s.id).first.second, {s.x, s.y}}, std::chrono::steady_clock::now()};
+            }
+        }
+    }
 }
 
 void GameEntity::setBoard(const BoardCommon &board)
@@ -145,25 +163,32 @@ void GameEntity::renderMap(gf::RenderTarget &target, const gf::RenderStates &sta
             {
                 gf::Texture tex = gf::Texture("../client/assets/board/tiles_set_simplified.png");
                 unsigned int res = 0;
-                if ((x != 0) && map.grid({x-1, y}).celltype == CellType::Wall)
+                if ((x != 0) && map.grid({x - 1, y}).celltype == CellType::Wall)
                     res += 1;
-                if ((x != map.width -1) && map.grid({x+1, y}).celltype == CellType::Wall)
+                if ((x != map.width - 1) && map.grid({x + 1, y}).celltype == CellType::Wall)
                     res += 2;
-                if ((y != 0) && map.grid({x, y-1}).celltype == CellType::Wall)
+                if ((y != 0) && map.grid({x, y - 1}).celltype == CellType::Wall)
                     res += 4;
-                if ((y != map.height -1) && map.grid({x, y+1}).celltype == CellType::Wall)
+                if ((y != map.height - 1) && map.grid({x, y + 1}).celltype == CellType::Wall)
                     res += 8;
-                if (res < 15) {
-                    tile.setTexture(tex,wall_texture_rectF.at(res));
+                if (res < 15)
+                {
+                    tile.setTexture(tex, wall_texture_rectF.at(res));
                     target.draw(tile, states);
-                } else {
+                }
+                else
+                {
                     tile.setColor(gf::Color::Black);
                     target.draw(tile, states);
                 }
-            } else if (cell.celltype == CellType::Floor){
+            }
+            else if (cell.celltype == CellType::Floor)
+            {
                 tile.setColor(gf::Color::Black);
                 target.draw(tile, states);
-            } else {
+            }
+            else
+            {
                 tile.setColor(gf::Color::Red);
                 target.draw(tile, states);
             }
@@ -223,6 +248,7 @@ void GameEntity::renderPacGommes(gf::RenderTarget &target, const gf::RenderState
 
 void GameEntity::render(gf::RenderTarget &target, const gf::RenderStates &states)
 {
+
     const float LOGICAL_W = 1280.f;
     const float LOGICAL_H = 720.f;
 
@@ -305,11 +331,32 @@ void GameEntity::render(gf::RenderTarget &target, const gf::RenderStates &states
     int posY = abs(floor(client.y)) / 50;
     for (const auto &s : m_states)
     {
+
         float px = mapOriginX + (s.x / 50.f) * logicalTileSize;
         float py = mapOriginY + (s.y / 50.f) * logicalTileSize;
 
         int s_posX = abs(floor(s.x)) / 50;
         int s_posY = abs(floor(s.y)) / 50;
+
+        float elapsed_seconds = (std::chrono::steady_clock::now() - pos.at(s.id).second).count(); //En nanosecondes
+        // 1.e9 nanosecondes = 1 seconde, donc en une seconde le personnage se déplace d'une case à l'autre
+        //Ben faut modifer ça du coup
+        float t = std::min(elapsed_seconds / (float) 1.e9, 1.f);
+        if (t < 1.f)
+        {
+            float pr_px = pos.at(s.id).first.first.x;
+            float pr_py = pos.at(s.id).first.first.y;
+            float dest_px = pos.at(s.id).first.second.x;
+            float dest_py = pos.at(s.id).first.second.y;
+            float lerp_x = pr_px + std::round((dest_px - pr_px) * t);
+            float lerp_y = pr_py + std::round((dest_py - pr_py) * t);
+
+            px = mapOriginX + (lerp_x / 50.f) * logicalTileSize;
+            py = mapOriginY + (lerp_y / 50.f) * logicalTileSize;
+
+            s_posX = abs(floor(lerp_x)) / 50;
+            s_posY = abs(floor(lerp_y)) / 50;
+        }
 
         if (s.role == PlayerRole::PacMan)
         {

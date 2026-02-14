@@ -2,6 +2,7 @@
 #include <vector>
 #include <map>
 #include <array>
+#include <cmath>
 #include <gf/Entity.h>
 #include <gf/Font.h>
 #include <gf/Texture.h>
@@ -73,4 +74,5 @@ private:
     bool m_hasLastPacmanPos = false;
 
     std::map<int,const gf::RectF> wall_texture_rectF;
+    std::map<uint32_t,std::pair<std::pair<gf::Vector2f, gf::Vector2f>,std::chrono::_V2::steady_clock::time_point>> pos;
 };
