@@ -3,6 +3,9 @@
 
 #include <gf/Log.h>
 
+bool firstFrame_LobbyScene = true;
+
+
 LobbyScene::LobbyScene(ClientGame& game)
 : gf::Scene(gf::vec(1280, 720))
 , m_game(game)
@@ -62,6 +65,12 @@ void LobbyScene::doProcessEvent(gf::Event& event) {
 }
 
 void LobbyScene::doUpdate(gf::Time) {
+
+    if (firstFrame_LobbyScene) {
+        resizeYourself();
+        firstFrame_LobbyScene = false;
+    }
+
     gf::Packet packet;
 
     // --- Réception réseau ---

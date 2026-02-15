@@ -2,6 +2,8 @@
 #include "WelcomeScene.h"
 #include "ClientGame.h"
 
+bool firstFrame_WelcomeScene = true;
+
 
 WelcomeScene::WelcomeScene(ClientGame& game)
 : gf::Scene(gf::vec(1280,720))  
@@ -44,6 +46,12 @@ void WelcomeScene::doProcessEvent(gf::Event& event) {
 }
 
 void WelcomeScene::doUpdate(gf::Time time) {
+    if (firstFrame_WelcomeScene) {
+        resizeYourself();
+        firstFrame_WelcomeScene = false;
+    }
+
+
     gf::Packet packet;
     while (m_game.tryPopPacket(packet)) {
         switch (packet.getType()) {

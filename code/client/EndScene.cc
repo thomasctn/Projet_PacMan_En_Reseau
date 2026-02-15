@@ -2,6 +2,9 @@
 #include "ClientGame.h"
 #include <gf/Log.h>
 
+bool firstFrame_EndScene = true;
+
+
 EndScene::EndScene(ClientGame& game)
 : gf::Scene(gf::vec(1280, 720))
 , m_game(game)
@@ -46,6 +49,11 @@ void EndScene::doProcessEvent(gf::Event& event) {
 }
 
 void EndScene::doUpdate(gf::Time){
+    if (firstFrame_EndScene) {
+        resizeYourself();
+        firstFrame_EndScene = false;
+    }
+    
     EndAction act = m_entity.getAndResetLastAction();
     if (act == EndAction::BackToLobby) {
         m_game.requestScene(SceneRequest::GoToLobby);

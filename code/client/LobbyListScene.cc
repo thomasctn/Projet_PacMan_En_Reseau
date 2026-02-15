@@ -2,6 +2,9 @@
 #include "ClientGame.h"
 #include <gf/Log.h>
 
+bool firstFrame_LobbyListScene = true;
+
+
 LobbyListScene::LobbyListScene(ClientGame& game)
 : gf::Scene(gf::vec(1280, 720))
 , m_game(game)
@@ -44,6 +47,12 @@ void LobbyListScene::doProcessEvent(gf::Event& event) {
 
 
 void LobbyListScene::doUpdate(gf::Time time) {
+    if (firstFrame_LobbyListScene) {
+        resizeYourself();
+        firstFrame_LobbyListScene = false;
+    }
+
+
     (void) time;
 
     gf::Packet packet;

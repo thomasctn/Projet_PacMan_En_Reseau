@@ -166,7 +166,6 @@ void ClientGame::run(const std::string& host, const std::string& port) {
 
 
     pushScene(welcomeScene); //premiere scene
-    welcomeScene.resizeYourself();//resize des qu'une scene est appelée! essentiel!
 
     gf::SceneManager::run(); //on run
 
