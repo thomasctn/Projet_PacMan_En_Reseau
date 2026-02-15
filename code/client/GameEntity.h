@@ -12,6 +12,14 @@
 #include "../common/Protocol.h"
 #include "../common/Constants.h"
 
+struct MovementState {
+    gf::Vector2f startPos;
+    gf::Vector2f destPos;
+    std::chrono::steady_clock::time_point startTime;
+    float expectedDuration = 0.1f;
+    std::chrono::steady_clock::time_point lastServerUpdate;
+};
+
 class GameEntity : public gf::Entity {
 public:
     GameEntity();
@@ -74,5 +82,5 @@ private:
     bool m_hasLastPacmanPos = false;
 
     std::map<int,const gf::RectF> wall_texture_rectF;
-    std::map<uint32_t,std::pair<std::pair<gf::Vector2f, gf::Vector2f>,std::chrono::_V2::steady_clock::time_point>> pos;
+    std::map<uint32_t, MovementState> pos;
 };

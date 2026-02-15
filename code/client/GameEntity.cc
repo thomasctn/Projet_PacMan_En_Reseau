@@ -8,6 +8,9 @@
 #include <algorithm>
 #include <cmath>
 
+
+
+
 GameEntity::GameEntity()
     : m_font("../common/fonts/arial.ttf")
 {
@@ -63,27 +66,41 @@ GameEntity::GameEntity()
     wall_texture_rectF.insert({14, gf::RectF::fromPositionSize({0.6f, 0.50f}, {0.2f, 0.25f})});
 }
 
-void GameEntity::setGameState(const std::vector<PlayerData> &states)
+void GameEntity::setGameState(const std::vector<PlayerData>& states)
 {
+    auto now = std::chrono::steady_clock::now();
+
+    for (auto& s : states)
+    {
+        auto it = pos.find(s.id);
+
+        if (it == pos.end())
+        {
+            MovementState m;
+            m.startPos = {s.x, s.y};
+            m.destPos = {s.x, s.y};
+            m.startTime = now;
+            m.lastServerUpdate = now;
+            m.expectedDuration = 0.2f;
+            pos[s.id] = m;
+            continue;
+        }
+
+        MovementState& m = it->second;
+
+        m.destPos = {s.x, s.y};
+
+        float timeSinceLast = std::chrono::duration<float>(now - m.lastServerUpdate).count();
+        m.expectedDuration = 0.8f * m.expectedDuration + 0.2f * timeSinceLast;
+
+        m.lastServerUpdate = now;
+    }
+
     m_states = states;
-    if (pos.empty())
-    {
-        for (auto &s : states)
-        {
-            pos.insert({s.id, {{{s.x, s.y}, {s.x, s.y}}, std::chrono::steady_clock::now()}});
-        }
-    }
-    else
-    {
-        for (auto &s : states)
-        {
-            if (pos.at(s.id).first.second != gf::Vector2f({s.x, s.y}))
-            {
-                pos[s.id] = {{pos.at(s.id).first.second, {s.x, s.y}}, std::chrono::steady_clock::now()};
-            }
-        }
-    }
 }
+
+
+
 
 void GameEntity::setBoard(const BoardCommon &board)
 {
@@ -329,62 +346,50 @@ void GameEntity::render(gf::RenderTarget &target, const gf::RenderStates &states
     }
     int posX = abs(floor(client.x)) / 50;
     int posY = abs(floor(client.y)) / 50;
+
     for (const auto &s : m_states)
     {
+        auto &m = pos.at(s.id);
 
-        float px = mapOriginX + (s.x / 50.f) * logicalTileSize;
-        float py = mapOriginY + (s.y / 50.f) * logicalTileSize;
+        auto now = std::chrono::steady_clock::now();
+        float elapsed = std::chrono::duration<float>(now - m.startTime).count();
 
-        int s_posX = abs(floor(s.x)) / 50;
-        int s_posY = abs(floor(s.y)) / 50;
+        float speedFactor = 0.3f; // 0.5 = moitié de vitesse
+        float t = std::clamp(elapsed / m.expectedDuration * speedFactor, 0.f, 1.f);
+        gf::Vector2f currentPos = m.startPos + (m.destPos - m.startPos) * t;
 
-        float elapsed_seconds = (std::chrono::steady_clock::now() - pos.at(s.id).second).count(); //En nanosecondes
-        // 1.e9 nanosecondes = 1 seconde, donc en une seconde le personnage se déplace d'une case à l'autre
-        //Ben faut modifer ça du coup
-        float t = std::min(elapsed_seconds / (float) 1.e9, 1.f);
-        if (t < 1.f)
-        {
-            float pr_px = pos.at(s.id).first.first.x;
-            float pr_py = pos.at(s.id).first.first.y;
-            float dest_px = pos.at(s.id).first.second.x;
-            float dest_py = pos.at(s.id).first.second.y;
-            float lerp_x = pr_px + std::round((dest_px - pr_px) * t);
-            float lerp_y = pr_py + std::round((dest_py - pr_py) * t);
+        float px = mapOriginX + (currentPos.x / 50.f) * logicalTileSize;
+        float py = mapOriginY + (currentPos.y / 50.f) * logicalTileSize;
 
-            px = mapOriginX + (lerp_x / 50.f) * logicalTileSize;
-            py = mapOriginY + (lerp_y / 50.f) * logicalTileSize;
+        int s_posX = static_cast<int>(currentPos.x / 50.f);
+        int s_posY = static_cast<int>(currentPos.y / 50.f);
 
-            s_posX = abs(floor(lerp_x)) / 50;
-            s_posY = abs(floor(lerp_y)) / 50;
-        }
 
+        // --- rendu Pac-Man / fantômes ---
         if (s.role == PlayerRole::PacMan)
         {
             if (posIsInRange(posX, posY, s_posX, s_posY, VISION_RANGE_PLAYER) || client.role == PlayerRole::PacMan)
             {
-                if (m_hasLastPacmanPos)
-                {
-                    if (px > m_lastPacmanX && m_pacmanDir != 'R')
-                    {
+                gf::Vector2f moveVec = m.destPos - m.startPos;
+
+                if (std::abs(moveVec.x) > std::abs(moveVec.y)) {
+                    if (moveVec.x > 0 && m_pacmanDir != 'R') {
                         m_pacmanDir = 'R';
                         m_pacmanSprite.setAnimation(m_pacmanRightAnim);
-                    }
-                    else if (px < m_lastPacmanX && m_pacmanDir != 'L')
-                    {
+                    } else if (moveVec.x < 0 && m_pacmanDir != 'L') {
                         m_pacmanDir = 'L';
                         m_pacmanSprite.setAnimation(m_pacmanLeftAnim);
                     }
-                    else if (py > m_lastPacmanY && m_pacmanDir != 'D')
-                    {
+                } else if (std::abs(moveVec.y) > 0.001f) {
+                    if (moveVec.y > 0 && m_pacmanDir != 'D') {
                         m_pacmanDir = 'D';
                         m_pacmanSprite.setAnimation(m_pacmanDownAnim);
-                    }
-                    else if (py < m_lastPacmanY && m_pacmanDir != 'U')
-                    {
+                    } else if (moveVec.y < 0 && m_pacmanDir != 'U') {
                         m_pacmanDir = 'U';
                         m_pacmanSprite.setAnimation(m_pacmanUpAnim);
                     }
                 }
+
 
                 m_pacmanSprite.setPosition({px, py});
                 target.draw(m_pacmanSprite, states);
@@ -429,5 +434,10 @@ void GameEntity::render(gf::RenderTarget &target, const gf::RenderStates &states
             }
             ++ghostIndex;
         }
+
+        m.startPos = currentPos;
+        m.startTime = now;
     }
+
+
 }
