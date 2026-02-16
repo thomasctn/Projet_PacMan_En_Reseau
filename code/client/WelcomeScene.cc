@@ -77,10 +77,20 @@ void WelcomeScene::doUpdate(gf::Time time) {
     //logique du bouton
     if (m_entity.wasClicked()) {
         m_entity.resetClick();
+
+        gf::Log::info("lobby clicked!\n");
         //faut envoyer en reseau notre requete et changer la scene...
         //enft non ici y a pas besoin de reseau, juste demander le schangement de scene et donc recup et affichage lobbylist
         //mais pr dautres scene ici y aura surement besoin de dire a scenemanager/gamemamaner d'envoyer des trucs!!!
         m_game.requestScene(SceneRequest::GoToLobbyList);
+    }
+
+
+    if (m_entity.wasRulesClicked()) {
+        gf::Log::info("rules clicked!\n");
+
+        m_entity.resetRulesClick();
+        m_game.requestScene(SceneRequest::GoToRules); 
     }
 }
 
