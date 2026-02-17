@@ -191,7 +191,7 @@ void LobbyScene::doUpdate(gf::Time) {
             break;
 
         case LobbyAction::PacmanHPInc:
-            if (m_roomSettings.gameDuration < MAX_HP_PACMAN) {
+            if (m_roomSettings.nbLifePacman < MAX_HP_PACMAN) {
                 RoomSettings s = m_roomSettings;
                 s.nbLifePacman += 1;
                 gf::Packet p; p.is(ClientChangeRoomSettings{s});
@@ -199,7 +199,7 @@ void LobbyScene::doUpdate(gf::Time) {
             }
             break;
         case LobbyAction::GhostHPDec:
-            if (m_roomSettings.nbLifePacman > MIN_HP_GHOST) {
+            if (m_roomSettings.nbLifeGhost > MIN_HP_GHOST) {
                 RoomSettings s = m_roomSettings;
                 s.nbLifeGhost -= 1;
                 gf::Packet p; p.is(ClientChangeRoomSettings{s});
@@ -208,7 +208,7 @@ void LobbyScene::doUpdate(gf::Time) {
             break;
 
         case LobbyAction::GhostHPInc:
-            if (m_roomSettings.gameDuration < MAX_HP_GHOST) {
+            if (m_roomSettings.nbLifeGhost < MAX_HP_GHOST) {
                 RoomSettings s = m_roomSettings;
                 s.nbLifeGhost += 1;
                 gf::Packet p; p.is(ClientChangeRoomSettings{s});
