@@ -17,6 +17,7 @@ ClientGame::ClientGame()
 , lobbyScene(*this)
 , gameScene(*this)
 , endScene(*this)
+, rulesScene(*this)
 , m_running(false)
 , roomSettings{ unsigned(MAX_PLAYERS), unsigned(NB_BOTS), unsigned(T_GAME)  }
 , m_view(gf::vec(1280.f/2.f, 720.f/2.f), gf::vec(1280.f, 720.f))
@@ -76,6 +77,18 @@ void ClientGame::requestScene(SceneRequest req) {
         case SceneRequest::GoToLobby:
             replaceAllScenes(lobbyScene);
             lobbyScene.resizeYourself();
+            break;
+
+        case SceneRequest::GoToWelcome:
+            replaceAllScenes(welcomeScene);
+            welcomeScene.resizeYourself();
+            break;
+
+        case SceneRequest::GoToRules:
+            gf::Log::info("go go go to rules!\n");
+
+            replaceAllScenes(rulesScene);
+            rulesScene.resizeYourself();
             break;
 
           

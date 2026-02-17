@@ -16,6 +16,7 @@
 #include "LobbyListScene.h"
 #include "GameScene.h"
 #include "EndScene.h"
+#include "RulesScene.h"
 #include "ClientNetworkHandler.h"
 
 
@@ -55,6 +56,7 @@ public:
     LobbyScene lobbyScene;
     GameScene gameScene;
     EndScene endScene;
+    RulesScene rulesScene;
     void setMyId(uint32_t id);
     uint32_t getMyId() const;
     void requestScene(SceneRequest req);

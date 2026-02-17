@@ -38,6 +38,8 @@ add_executable(client
     client/LobbyListScene.cc
     client/LobbyListEntity.cc
     client/ClientGame.cc
+    client/RulesScene.cc
+    client/RulesEntity.cc
 )
 
 target_link_libraries(client PRIVATE gf::core gf::graphics gf::net)
