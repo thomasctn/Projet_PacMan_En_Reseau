@@ -188,6 +188,10 @@ void Room::startGame() {
 
         }
     }
+    //gf::Log::info("---- APRES AJOUT HUMAINS ----\n");
+    for (auto& [id, p] : game->getPlayers()) {
+        //gf::Log::info("Game contient player %u\n", id);
+    }
 
 
 
@@ -208,6 +212,12 @@ void Room::startGame() {
         auto botCtrl = std::make_unique<BotController>(botId);
         botManager->registerBot(botId, std::move(botCtrl));
     }
+
+    //gf::Log::info("---- APRES AJOUT BOTS ----\n");
+    for (auto& [id, p] : game->getPlayers()) {
+        //gf::Log::info("Game contient player %u\n", id);
+    }
+
 
     // --- Générer le graphe global pour tous les bots ---
     botManager->generateGraph(game->getBoard());
@@ -441,7 +451,6 @@ void Room::broadcastState() {
         gs.clientStates.push_back(playerPtr->getState());
     }
 
-
     std::sort(
         gs.clientStates.begin(),
         gs.clientStates.end(),
@@ -453,15 +462,25 @@ void Room::broadcastState() {
     if (game->isGameStarted()) {
         unsigned int duration = 0;
         if (settings.roomSize > 0) {
-            duration = settings.gameDuration; // durée de la partie depuis la room
+            duration = settings.gameDuration;
         }
         int elapsed = static_cast<int>(game->getElapsedSeconds());
         gs.timeLeft = (elapsed >= duration) ? 0 : (duration - elapsed);
     } else {
         gs.timeLeft = settings.gameDuration;
     }
-
-        //gf::Log::info("[Room %u] Mises à jour : temps : %u\n",id, gs.timeLeft);
+/*
+    // ==========================
+    // LOG DEBUG JOUEURS
+    // ==========================
+    gf::Log::info("[Room %u] ===== BroadcastState =====\n", id);
+    gf::Log::info("[Room %u] TimeLeft: %u | Players: %zu\n",
+                  id, gs.timeLeft, gs.clientStates.size());
+*/
+    for (const auto& p : gs.clientStates)
+    {
+        //gf::Log::info("[Room %u] Player %u | Role=%d | Pos=(%.2f, %.2f) | Score=%d | HP=%d\n",id,p.id,static_cast<int>(p.role),p.x,p.y,p.score,p.hp);
+    }
 
     gf::Packet packet;
     packet.is(gs);
@@ -470,6 +489,7 @@ void Room::broadcastState() {
         network.send(pid, packet);
     }
 }
+
 
 void Room::broadcastRoomPlayers() {
     ServerListRoomPlayers list;
