@@ -396,6 +396,7 @@ void Room::broadcastState() {
         gs.clientStates.push_back(playerPtr->getState());
     }
 
+
     std::sort(
         gs.clientStates.begin(),
         gs.clientStates.end(),

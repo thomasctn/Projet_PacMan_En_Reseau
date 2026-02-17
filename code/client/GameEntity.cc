@@ -349,6 +349,8 @@ void GameEntity::render(gf::RenderTarget &target, const gf::RenderStates &states
 
     for (const auto &s : m_states)
     {
+        if (s.x == 0.f && s.y == 0.f) continue;
+        
         auto &m = pos.at(s.id);
 
         auto now = std::chrono::steady_clock::now();

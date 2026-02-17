@@ -42,8 +42,12 @@ public:
     bool isVunerable;
     double powerTimeRemaining;
     void update(double dt);
+    bool isAlive() const {return alive;}
+    bool justDied = false;
 
-
+    bool hasJustDied() const { return justDied; }
+    void clearDeathFlag() { justDied = false; }
+    
 public:
     uint32_t id;
     PlayerRole role;
@@ -54,6 +58,8 @@ public:
     std::string name;
     Controller* controller = nullptr;
     bool isBot = false;
+    unsigned int hp;
+    bool alive = true;
 
 private:
     bool ready = false;

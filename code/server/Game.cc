@@ -66,83 +66,149 @@ bool Game::canMove(uint32_t playerId, float newX, float newY) const {
 
 
 
-bool Game::requestMove(uint32_t playerId, Direction dir) {
-    if (!gameStarted) return false;
+bool Game::requestMove(uint32_t playerId, Direction dir)
+{
+    if (!gameStarted)
+        return false;
 
     constexpr float step = 50.0f;
 
     auto it = players.find(playerId);
-    if (it == players.end()) return false;
+    if (it == players.end())
+        return false;
 
     Player& p = *it->second;
+
+    if (!p.alive)
+        return false;
 
     float newX = p.x;
     float newY = p.y;
 
-    int X = static_cast<int>(p.x) / 50;
-    int Y = static_cast<int>(p.y) / 50;
+    // --- Gestion des trous (téléportation) ---
+    int curGridX = static_cast<int>(p.x) / 50;
+    int curGridY = static_cast<int>(p.y) / 50;
 
-    if (board.isHole(X, Y))
+    if (board.isHole(curGridX, curGridY))
     {
-        Position target = board.getLinkedHole(X, Y);
+        Position target = board.getLinkedHole(curGridX, curGridY);
         p.x = target.x * step;
         p.y = target.y * step;
     }
 
-
-    switch (dir) {
+    // --- Calcul nouvelle position ---
+    switch (dir)
+    {
         case Direction::Up:    newY -= step; break;
         case Direction::Down:  newY += step; break;
         case Direction::Left:  newX -= step; break;
         case Direction::Right: newX += step; break;
     }
 
-    if (!canMove(playerId, newX, newY)) return false;
+    if (!canMove(playerId, newX, newY))
+        return false;
 
+    // --- Applique le mouvement ---
     p.x = newX;
     p.y = newY;
 
     int gridX = static_cast<int>(p.x) / 50;
     int gridY = static_cast<int>(p.y) / 50;
 
-    if (p.getRole() == PlayerRole::PacMan && board.hasPacgomme(gridX, gridY)) {
+    // =====================================================
+    // Pac-gommes
+    // =====================================================
+    if (p.getRole() == PlayerRole::PacMan &&
+        board.hasPacgomme(gridX, gridY))
+    {
         PacGommeType type = board.getPacGommeType(gridX, gridY);
-        p.eat(type, nullptr); // type de pac-gomme
+        p.eat(type, nullptr);
         board.removePacgomme(gridX, gridY);
-    } else if (p.getRole() == PlayerRole::Ghost) {
-        for (auto& [otherId, otherPtr] : players) {
-            Player& other = *otherPtr;
-            if (other.getRole() == PlayerRole::PacMan) {
-                int otherX = static_cast<int>(other.x) / 50;
-                int otherY = static_cast<int>(other.y) / 50;
-                if (otherX == gridX && otherY == gridY) {
-                    p.eat(std::nullopt, &other); // pas de pac-gomme, interaction joueur
+    }
+
+    // =====================================================
+    // Collision JOUEURS (symétrique)
+    // =====================================================
+    for (auto& [otherId, otherPtr] : players)
+    {
+        if (otherId == playerId)
+            continue;
+
+        Player& other = *otherPtr;
+
+        if (!other.alive)
+            continue;
+
+        int otherX = static_cast<int>(other.x) / 50;
+        int otherY = static_cast<int>(other.y) / 50;
+
+        if (otherX == gridX && otherY == gridY)
+        {
+            // Appel des deux côtés (IMPORTANT)
+            p.eat(std::nullopt, &other);
+            other.eat(std::nullopt, &p);
+
+            // --- Gestion mort other ---
+            if (other.hasJustDied())
+            {
+                if (other.isAlive())
+                {
+                    spawnPlayer(other);
                 }
+                else
+                {
+                    other.x = 0.f;
+                    other.y = 0.f;
+                    gf::Log::info("Player %d est définitivement mort\n", other.getId());
+                }
+
+                other.clearDeathFlag();
+            }
+
+            // --- Gestion mort p ---
+            if (p.hasJustDied())
+            {
+                if (p.isAlive())
+                {
+                    spawnPlayer(p);
+                }
+                else
+                {
+                    p.x = 0.f;
+                    p.y = 0.f;
+                    gf::Log::info("Player %d est définitivement mort\n", p.getId());
+                }
+
+                p.clearDeathFlag();
             }
         }
     }
 
-
-
-    // --- Ajout de trace ---
-    if (botManager) {
+    // =====================================================
+    // Traces bots
+    // =====================================================
+    if (botManager)
+    {
         int nodeX = static_cast<int>(p.x / 50);
         int nodeY = static_cast<int>(p.y / 50);
 
         Node* node = botManager->getNode(nodeX, nodeY);
-        if (node) {
+        if (node)
+        {
             Trace t;
             t.ownerId   = playerId;
-            t.type      = (p.getRole() == PlayerRole::PacMan) ? TraceType::PacMan : TraceType::Ghost;
+            t.type      = (p.getRole() == PlayerRole::PacMan)
+                            ? TraceType::PacMan
+                            : TraceType::Ghost;
             t.intensity = 1.0f;
 
             botManager->getTraces().add(node, t);
         }
     }
 
-
     return true;
 }
+
 
 
 
@@ -276,6 +342,8 @@ void Game::stopGameLoop() {
 
 
 void Game::spawnPlayer(Player& p) {
+
+
     if (p.getRole() == PlayerRole::Ghost) {
         int centerX = board.getWidth() / 2;
         int centerY = board.getHeight() / 2;
@@ -354,6 +422,9 @@ void Game::updateMovement(double dt) {
 
     for (auto& [id, playerPtr] : players) {
         Player& p = *playerPtr;
+
+        if (!p.alive)
+            continue;
 
         p.update(dt);
 
