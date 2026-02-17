@@ -232,6 +232,20 @@ Archive &operator|(Archive &ar, ServerChangeRoomSettings &data)
   return ar;
 }
 
+// Refus du lancement de la partie
+struct ServerStartGameRefused
+{
+  static constexpr gf::Id type = "ServerStartGameRefused"_id;
+
+  std::string reason;
+};
+
+template <typename Archive>
+Archive &operator|(Archive &ar, ServerStartGameRefused &data)
+{
+  return ar | data.reason;
+}
+
 // Réponse à tous les clients sur les changement de paramètre de la room
 struct ServerRoomSettings
 {

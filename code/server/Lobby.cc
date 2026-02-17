@@ -159,16 +159,24 @@ void Lobby::handleClientLeaveRoom(PacketContext &ctx)
 
 ServerListRooms Lobby::getRoomsList() const {
     ServerListRooms msg;
+
     for (auto& [id, roomPtr] : rooms) {
+
+        if (roomPtr->isGameRunning())
+            continue;
+
         RoomData data;
-        data.roomID = id;
+        data.roomID   = id;
         data.roomSize = roomPtr->getMaxPlayers();
         data.nbPlayer = roomPtr->getPlayerCount();
         data.hostName = roomPtr->getHostName();
+
         msg.rooms.push_back(data);
     }
+
     return msg;
 }
+
 
 void Lobby::sendRoomsList(uint32_t playerId) {
     ServerListRooms msg = getRoomsList();

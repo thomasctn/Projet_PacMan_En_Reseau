@@ -23,18 +23,6 @@ void Room::addPlayer(uint32_t playerId) {
     if (!game) {
         PlayerRole role = PlayerRole::Ghost;
 
-        // Vérifier si un PacMan existe déjà
-        bool hasPacMan = false;
-        for (auto& [_, pdata] : preGamePlayers) {
-            if (pdata.role == PlayerRole::PacMan) {
-                hasPacMan = true;
-                break;
-            }
-        }
-
-        if (!hasPacMan)
-            role = PlayerRole::PacMan;
-
         PlayerData pdata;
         pdata.id = playerId;
         pdata.role = role;
@@ -98,6 +86,57 @@ bool Room::allPlayersReady() const {
 void Room::startGame() {
     if (game)
         return;
+
+    // ==========================
+    // VALIDATION DES ROLES
+    // ==========================
+
+    int pacmanCount = 0;
+    int ghostCount  = settings.nbBot;
+
+    for (auto& [id, pdata] : preGamePlayers)
+    {
+        if (pdata.role == PlayerRole::PacMan)
+            pacmanCount++;
+        else if (pdata.role == PlayerRole::Ghost)
+            ghostCount++;
+    }
+
+
+    std::string errorMessage;
+
+    if (pacmanCount == 0)
+    {
+        errorMessage = "Impossible de lancer la partie : aucun PacMan sélectionné.";
+    }
+    else if (pacmanCount > 1)
+    {
+        errorMessage = "Impossible de lancer la partie : plus d'un PacMan sélectionné.";
+    }
+    else if (ghostCount == 0)
+    {
+        errorMessage = "Impossible de lancer la partie : aucun Fantôme sélectionné.";
+    }
+
+    if (!errorMessage.empty())
+    {
+        gf::Log::warning("[Room %u] Start refusé : %s\n",
+                        id, errorMessage.c_str());
+
+        ServerStartGameRefused msg;
+        msg.reason = errorMessage;
+
+        gf::Packet packet;
+        packet.is(msg);
+
+        for (uint32_t pid : players)
+            network.send(pid, packet);
+
+        return;
+    }
+
+
+
 
     constexpr int boardWidth = 27;
     constexpr int boardHeight = 27;
@@ -320,48 +359,24 @@ void Room::handleClientReady(PacketContext& ctx) {
     }
 }
 
-void Room::handleClientChange(PacketContext& ctx) {
+void Room::handleClientChange(PacketContext& ctx)
+{
     if (game) return;
 
     auto it = preGamePlayers.find(ctx.senderId);
-    if (it == preGamePlayers.end()) {
-        gf::Log::warning("[Room %u] Joueur %u non trouvé pour changement de rôle\n", id, ctx.senderId);
+    if (it == preGamePlayers.end())
         return;
-    }
 
     PlayerData& pdata = it->second;
-    PlayerRole currentRole = pdata.role;
 
-    // Vérifier qu'au moins un PacMan reste
-    if (currentRole == PlayerRole::PacMan) {
-        bool otherPacManExists = false;
-        for (auto& [id, p] : preGamePlayers) {
-            if (id != ctx.senderId && p.role == PlayerRole::PacMan) {
-                otherPacManExists = true;
-                break;
-            }
-        }
-        if (!otherPacManExists) {
-            gf::Log::info("[Room %u] Changement de rôle refusé pour joueur %u : au moins un PacMan requis\n",
-                          id, ctx.senderId);
-            return;
-        }
-    }
-
-    // Changer le rôle
-    pdata.role = (currentRole == PlayerRole::PacMan) ? PlayerRole::Ghost : PlayerRole::PacMan;
-
-    gf::Log::info("[Room %u] Joueur %u choisit rôle pré-game : %s\n",
-                  id, ctx.senderId,
-                  (pdata.role == PlayerRole::PacMan ? "PacMan" : "Ghost"));
-
-    ServerChangeRoomCharacterData msg;
-    gf::Packet answer;
-    answer.is(msg);
-    network.send(ctx.senderId, answer);
+    // Toggle libre
+    pdata.role = (pdata.role == PlayerRole::PacMan)
+                 ? PlayerRole::Ghost
+                 : PlayerRole::PacMan;
 
     broadcastRoomPlayers();
 }
+
 
 void Room::handleClientChangeRoomSettings(PacketContext& ctx) {
     auto data = ctx.packet.as<ClientChangeRoomSettings>();
@@ -530,13 +545,7 @@ void Room::setSettings(const RoomSettings& newSettings){
     broadcastRoomSettings();
 }
 
-
-
-
-
-
-
-
-
-
-
+bool Room::isGameRunning() const
+{
+    return game != nullptr;
+}

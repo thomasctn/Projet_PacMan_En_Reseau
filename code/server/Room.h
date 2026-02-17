@@ -50,6 +50,7 @@ public:
     unsigned int getMaxPlayers() const {return settings.roomSize;}
     unsigned int getGameDuration() const { return settings.gameDuration; }
     BotManager* getBotManager() { return botManager.get(); }
+    bool isGameRunning() const;
 
 
     void setSettings(const RoomSettings& newSettings);
