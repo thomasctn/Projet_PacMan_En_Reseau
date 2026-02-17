@@ -579,9 +579,23 @@ void Room::setSettings(const RoomSettings& newSettings){
         return;
     }
 
+    if ((newSettings.nbLifePacman < MIN_HP_PACMAN) || (newSettings.nbLifePacman > MAX_HP_PACMAN)){
+        gf::Log::warning("[Room %u] Les valeurs demandées sont incorects\n",id);
+        broadcastRoomSettings();
+        return;
+    }
+
+    if ((newSettings.nbLifeGhost < MIN_HP_GHOST) || (newSettings.nbLifeGhost > MAX_HP_GHOST)){
+        gf::Log::warning("[Room %u] Les valeurs demandées sont incorects\n",id);
+        broadcastRoomSettings();
+        return;
+    }
+
     settings.roomSize = newSettings.roomSize;
     settings.nbBot = newSettings.nbBot;
     settings.gameDuration = newSettings.gameDuration;
+    settings.nbLifePacman = newSettings.nbLifePacman;
+    settings.nbLifeGhost = newSettings.nbLifeGhost;
 
     gf::Log::info(
         "[Room %u] Règles mises à jour : roomSize=%u nbBot=%u duration=%u\n",
