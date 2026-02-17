@@ -42,6 +42,8 @@ private:
     void calculateMovement(gf::RenderTarget& target, const BoardCommon &map, float &tileSize, float &offsetX, float &offsetY);
     void renderMap(gf::RenderTarget& target, const gf::RenderStates& states, const BoardCommon& map, float logicalTileSize, float mapOriginX, float mapOriginY);
     void renderPacGommes(gf::RenderTarget& target, const gf::RenderStates& states, const std::vector<std::pair<Position, PacGommeType>>& pacgommes, float logicalTileSize, float mapOriginX, float mapOriginY);
+    void renderMyLife(gf::RenderTarget& target, const gf::RenderStates& states,float logicalTileSize, float mapOriginX, float mapOriginY);
+    void renderPacmanLife(gf::RenderTarget& target, const gf::RenderStates& states,float logicalTileSize, float mapOriginX, float mapOriginY);
 
 private:
     //etat du jeu
@@ -52,6 +54,10 @@ private:
     unsigned int m_timeLeft = 0;
     std::map<Position, Position> m_holeLinks;
     uint32_t m_clientId = 0;
+
+    int m_myHp = 2;
+    int m_pacmanHp = 3;
+    PlayerRole m_myRole;
     
     gf::Font m_font;
     

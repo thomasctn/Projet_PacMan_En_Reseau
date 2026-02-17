@@ -98,6 +98,24 @@ void GameEntity::setGameState(const std::vector<PlayerData>& states)
     }
 
     m_states = states;
+
+    //pour les vies!
+    //m_myHp = 0;
+    //m_pacmanHp = 0;
+    m_myRole = PlayerRole::Spectator; //par defaut
+
+    for (const auto &p : m_states) {
+        if (p.role == PlayerRole::PacMan) {
+            m_pacmanHp = p.hp;
+        }
+        if (p.id == m_clientId) {
+            m_myHp = p.hp;
+            m_myRole = p.role;
+        }
+        gf::Log::info("Player id=%u role=%d hp=%d\n",p.id, static_cast<int>(p.role), p.hp);
+
+    }
+
 }
 
 
@@ -263,6 +281,34 @@ void GameEntity::renderPacGommes(gf::RenderTarget &target, const gf::RenderState
         target.draw(pacGomme, states);
     }
 }
+
+void GameEntity::renderMyLife(gf::RenderTarget& target, const gf::RenderStates& states,float logicalTileSize, float mapOriginX, float mapOriginY)
+{
+    float x_logical = mapOriginX + m_board.width * logicalTileSize + 8.f; 
+    float y_logical = mapOriginY + 8.f; 
+
+    gf::Text t;
+    t.setFont(m_font);
+    t.setCharacterSize(18u);
+    t.setColor(gf::Color::White);
+    t.setString("Vie perso restantes : " + std::to_string(m_myHp));
+    t.setPosition({ x_logical, y_logical });
+    target.draw(t, states);
+}
+
+void GameEntity::renderPacmanLife(gf::RenderTarget& target, const gf::RenderStates& states,float logicalTileSize, float mapOriginX, float mapOriginY)
+{
+    float x_logical = mapOriginX + m_board.width * logicalTileSize + 8.f;
+    float y_logical = mapOriginY + 8.f + 26.f; 
+    gf::Text t;
+    t.setFont(m_font);
+    t.setCharacterSize(18u);
+    t.setColor(gf::Color::White);
+    t.setString("Vie Pacman restantes : " + std::to_string(m_pacmanHp));
+    t.setPosition({ x_logical, y_logical });
+    target.draw(t, states);
+}
+
 
 void GameEntity::render(gf::RenderTarget &target, const gf::RenderStates &states)
 {
@@ -440,6 +486,17 @@ void GameEntity::render(gf::RenderTarget &target, const gf::RenderStates &states
 
         m.startPos = currentPos;
         m.startTime = now;
+    }
+
+    //les vies
+
+    if (m_myRole == PlayerRole::Ghost) {
+        renderMyLife(target, states, logicalTileSize, mapOriginX, mapOriginY);
+        renderPacmanLife(target, states, logicalTileSize, mapOriginX, mapOriginY);
+    } else if (m_myRole == PlayerRole::PacMan) {
+        renderPacmanLife(target, states, logicalTileSize, mapOriginX, mapOriginY);
+    } else {
+        renderPacmanLife(target, states, logicalTileSize, mapOriginX, mapOriginY);
     }
 
 
