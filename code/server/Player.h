@@ -42,6 +42,9 @@ public:
     bool isVunerable;
     double powerTimeRemaining;
     void update(double dt);
+    std::function<void(Player&, const std::string&, int)> onPowerModeEvent;
+
+
     bool isAlive() const {return alive;}
     bool justDied = false;
 

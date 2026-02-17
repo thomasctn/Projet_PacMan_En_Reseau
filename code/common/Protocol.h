@@ -344,6 +344,38 @@ Archive &operator|(Archive &ar, ServerGamePreStart &data)
   return ar | data.timeLeft;
 }
 
+// PacMan devient chasseur
+struct ServerPacManPowerStart {
+    static constexpr gf::Id type = "ServerPacManPowerStart"_id;
+    uint32_t playerId;
+};
+template <typename Archive>
+Archive& operator|(Archive& ar, ServerPacManPowerStart& data) {
+    return ar | data.playerId;
+}
+
+// Tick chaque seconde
+struct ServerPacManPowerTick {
+    static constexpr gf::Id type = "ServerPacManPowerTick"_id;
+    uint32_t playerId;
+    int timeLeft; // secondes restantes
+};
+template <typename Archive>
+Archive& operator|(Archive& ar, ServerPacManPowerTick& data) {
+    return ar | data.playerId | data.timeLeft;
+}
+
+// Fin du mode chasseur
+struct ServerPacManPowerEnd {
+    static constexpr gf::Id type = "ServerPacManPowerEnd"_id;
+    uint32_t playerId;
+};
+template <typename Archive>
+Archive& operator|(Archive& ar, ServerPacManPowerEnd& data) {
+    return ar | data.playerId;
+}
+
+
 inline gf::v1::Serializer &operator|(gf::v1::Serializer &ar, const std::pair<Position, PacGommeType> &pg)
 {
   ar | pg.first.x | pg.first.y | (uint8_t &)pg.second;
@@ -357,6 +389,8 @@ inline gf::v1::Deserializer &operator|(gf::v1::Deserializer &ar, std::pair<Posit
   pg.second = static_cast<PacGommeType>(typeVal);
   return ar;
 }
+
+
 
 // Client -> serveur
 
@@ -468,3 +502,4 @@ Archive &operator|(Archive &ar, ClientMove &data)
 {
   return ar | data.moveDir;
 }
+

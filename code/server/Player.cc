@@ -86,12 +86,19 @@ bool Player::eat(std::optional<PacGommeType> pacGommeType, Player* otherPlayer)
                     gf::Log::info("PacMan %d a mangé une pac-gomme normale. Score=%d\n", id, score);
                 }
                 else if (pacGommeType.value() == PacGommeType::Power)
-                {
-                    score += 50;
-                    isVunerable = false; // devient chasseur
-                    powerTimeRemaining = CHASSEUR_MODE_TIME;
-                    gf::Log::info("PacMan %d a mangé une PAC-GOMME POWER !\n", id);
-                }
+                    {
+                        score += 50;
+                        isVunerable = false; // devient chasseur
+                        powerTimeRemaining = CHASSEUR_MODE_TIME;
+
+                        gf::Log::info("PacMan %d a mangé une PAC-GOMME POWER !\n", id);
+
+                        // --- Callback ---
+                        if (onPowerModeEvent) {
+                            onPowerModeEvent(*this, "start", static_cast<int>(powerTimeRemaining));
+                        }
+                    }
+
                 return true;
             }
 
@@ -153,12 +160,27 @@ bool Player::eat(std::optional<PacGommeType> pacGommeType, Player* otherPlayer)
 
 void Player::update(double dt) {
     if (!isVunerable) {
+        double oldTime = powerTimeRemaining;
         powerTimeRemaining -= dt;
+
+        // --- Tick chaque seconde ---
+        int oldSec = static_cast<int>(oldTime);
+        int newSec = static_cast<int>(powerTimeRemaining);
+        if (oldSec != newSec && onPowerModeEvent) {
+            onPowerModeEvent(*this, "tick", newSec);
+        }
+
+        // --- Fin du mode chasseur ---
         if (powerTimeRemaining <= 0.0) {
             isVunerable = true;
             powerTimeRemaining = 0.0;
             gf::Log::info("PacMan %d n'est plus en mode chasseur !\n", id);
+
+            if (onPowerModeEvent) {
+                onPowerModeEvent(*this, "end", 0);
+            }
         }
     }
 }
+
 

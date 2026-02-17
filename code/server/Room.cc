@@ -156,6 +156,36 @@ void Room::startGame() {
                 role = it->second.role;
 
             game->addPlayer(playerId, 100.0f, 100.0f, role);
+
+            Player& p = game->getPlayerInfo(playerId);
+
+            // --- Attacher le callback pour le mode chasseur ---
+            if (p.getRole() == PlayerRole::PacMan) {
+                p.onPowerModeEvent = [this](Player& player, const std::string& event, int secondsLeft) {
+                    
+                    gf::Packet packet;
+
+                    if (event == "start") {
+                        ServerPacManPowerStart msg{ player.getId() };
+                        packet.is(msg);
+
+                    } else if (event == "tick") {
+                        ServerPacManPowerTick msg{ player.getId(), secondsLeft };
+                        packet.is(msg);
+
+                    } else if (event == "end") {
+                        ServerPacManPowerEnd msg{ player.getId() };
+                        packet.is(msg);
+                    }
+
+                    // --- Envoi manuel à tous les joueurs de la room ---
+                    for (uint32_t pid : players) {
+                        network.send(pid, packet);
+                    }
+                };
+
+            }
+
         }
     }
 
