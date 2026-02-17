@@ -55,10 +55,10 @@ void Player::setRole(PlayerRole r) {
 PlayerData Player::getState() const {
 
     if (!alive) {
-        return { id, 0.0f, 0.0f, color, "moi", role, score, false };
+        return { id, 0.0f, 0.0f, color, "moi", role, score, true, 0 };
     }
 
-    return { id, x, y, color, "moi", role, score, true };
+    return { id, x, y, color, "moi", role, score, true, hp };
 }
 
 

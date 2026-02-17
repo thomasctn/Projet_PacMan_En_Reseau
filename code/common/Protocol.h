@@ -126,6 +126,7 @@ struct PlayerData
   PlayerRole role;
   int score;
   bool ready = false;
+  int hp = 0;
 };
 template <typename Archive>
 Archive &operator|(Archive &ar, PlayerData &data)
