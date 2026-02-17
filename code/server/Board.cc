@@ -88,7 +88,7 @@ void Board::generateMaze() {
     connectHut();
     openCorners();
     //addLoops(0.15f);
-    openBorderExits(4);
+    openBorderExits(2);
     linkHoles();
     fillDeadEnds();
 
@@ -381,62 +381,56 @@ bool Board::isHutWall(unsigned int x, unsigned int y) {
             y >= cy - 1 && y <= cy + 1);
 }
 
-void Board::openBorderExits(unsigned int count)
+void Board::openBorderExits(unsigned int pairCount)
 {
     std::random_device rd;
     std::mt19937 gen(rd());
 
-    std::vector<std::pair<unsigned int,unsigned int>> candidates;
-    std::vector<std::pair<unsigned int,unsigned int>> selected;
+    std::uniform_int_distribution<> sideDist(0, 1); // 0 = LR, 1 = TB
 
-    // Haut et bas
-    for (unsigned int x = 1; x < width - 1; ++x)
+    for (unsigned int i = 0; i < pairCount; ++i)
     {
-        if (grid({x,1}).getType() == CellType::Floor)
-            candidates.emplace_back(x, 0);
+        bool horizontal = sideDist(gen) == 0;
 
-        if (grid({x,height-2}).getType() == CellType::Floor)
-            candidates.emplace_back(x, height-1);
-    }
-
-    // Gauche et droite
-    for (unsigned int y = 1; y < height - 1; ++y)
-    {
-        if (grid({1,y}).getType() == CellType::Floor)
-            candidates.emplace_back(0, y);
-
-        if (grid({width-2,y}).getType() == CellType::Floor)
-            candidates.emplace_back(width-1, y);
-    }
-
-    std::shuffle(candidates.begin(), candidates.end(), gen);
-
-    auto isFarEnough = [&](unsigned int x, unsigned int y)
-    {
-        for (auto& [sx, sy] : selected)
+        if (horizontal)
         {
-            unsigned int dx = std::abs((int)x - (int)sx);
-            unsigned int dy = std::abs((int)y - (int)sy);
+            // GAUCHE ↔ DROITE
+            std::uniform_int_distribution<> yDist(1, height - 2);
 
-            // Distance mini sur le même bord
-            if (dx + dy < 3)
-                return false;
+            for (int tries = 0; tries < 20; ++tries)
+            {
+                unsigned int y = yDist(gen);
+
+                if (grid({1,y}).getType() == CellType::Floor &&
+                    grid({width-2,y}).getType() == CellType::Floor)
+                {
+                    grid({0,y}) = Case(CellType::Floor);
+                    grid({width-1,y}) = Case(CellType::Floor);
+                    break;
+                }
+            }
         }
-        return true;
-    };
+        else
+        {
+            // HAUT ↔ BAS
+            std::uniform_int_distribution<> xDist(1, width - 2);
 
-    for (auto& [x, y] : candidates)
-    {
-        if (selected.size() >= count)
-            break;
+            for (int tries = 0; tries < 20; ++tries)
+            {
+                unsigned int x = xDist(gen);
 
-        if (!isFarEnough(x, y))
-            continue;
-
-        selected.emplace_back(x, y);
-        grid({x,y}) = Case(CellType::Floor);
+                if (grid({x,1}).getType() == CellType::Floor &&
+                    grid({x,height-2}).getType() == CellType::Floor)
+                {
+                    grid({x,0}) = Case(CellType::Floor);
+                    grid({x,height-1}) = Case(CellType::Floor);
+                    break;
+                }
+            }
+        }
     }
 }
+
 
 
 
@@ -599,21 +593,47 @@ BoardCommon Board::toCommonData()
 void Board::linkHoles() {
     auto holes = getHoles();
 
-    if (holes.size() % 2 != 0) {
-        holes.pop_back();
+    std::vector<Position> left;
+    std::vector<Position> right;
+    std::vector<Position> top;
+    std::vector<Position> bottom;
+
+    for (const auto& h : holes) {
+        if (h.x == 0)
+            left.push_back(h);
+        else if (h.x == width - 1)
+            right.push_back(h);
+        else if (h.y == 0)
+            top.push_back(h);
+        else if (h.y == height - 1)
+            bottom.push_back(h);
     }
 
     std::random_device rd;
     std::mt19937 gen(rd());
-    std::shuffle(holes.begin(), holes.end(), gen);
 
-    for (size_t i = 0; i < holes.size(); i += 2) {
-        Position a = holes[i];
-        Position b = holes[i + 1];
-        holeLinks[a] = b;
-        holeLinks[b] = a;
+    std::shuffle(left.begin(), left.end(), gen);
+    std::shuffle(right.begin(), right.end(), gen);
+    std::shuffle(top.begin(), top.end(), gen);
+    std::shuffle(bottom.begin(), bottom.end(), gen);
+
+    holeLinks.clear();
+
+    // Lier gauche <-> droite
+    size_t lrCount = std::min(left.size(), right.size());
+    for (size_t i = 0; i < lrCount; ++i) {
+        holeLinks[left[i]] = right[i];
+        holeLinks[right[i]] = left[i];
+    }
+
+    // Lier haut <-> bas
+    size_t tbCount = std::min(top.size(), bottom.size());
+    for (size_t i = 0; i < tbCount; ++i) {
+        holeLinks[top[i]] = bottom[i];
+        holeLinks[bottom[i]] = top[i];
     }
 }
+
 
 Position Board::getLinkedHole(unsigned int x, unsigned int y) const {
     Position p(x, y);
