@@ -27,6 +27,10 @@ constexpr int MIN_NB_BOTS                       = 0;
 constexpr int MAX_NB_BOTS                       = 8 ;
 constexpr int MIN_DURATION                      = 120; //120 mais 10 pour test
 constexpr int MAX_DURATION                      = 360;
+constexpr unsigned int MIN_HP_PACMAN            = 1u;
+constexpr unsigned int MAX_HP_PACMAN            = 5u;
+constexpr unsigned int MIN_HP_GHOST             = 1U;
+constexpr unsigned int MAX_HP_GHOST             = 5u;
 
 
 static constexpr float PACMAN_ATTRACTION        = 5.0f;

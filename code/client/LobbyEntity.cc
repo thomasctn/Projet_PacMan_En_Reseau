@@ -18,6 +18,10 @@ LobbyEntity::LobbyEntity()
 , m_plusBotBtn("+", m_font)
 , m_minusDurBtn("-", m_font)
 , m_plusDurBtn("+", m_font)
+, m_minusPHPBtn("-", m_font)
+, m_plusPHPBtn("+", m_font)
+, m_minusGHPBtn("-", m_font)
+, m_plusGHPBtn("+", m_font)
 , m_readyBtn("PRÊT", m_font)
 , m_changeRolePreBtn("<", m_font)
 , m_changeRoleNextBtn(">", m_font)
@@ -50,6 +54,22 @@ LobbyEntity::LobbyEntity()
     m_plusDurBtn.setCallback([this]() { 
         m_lastAction = LobbyAction::DurInc; 
     });
+
+    m_minusPHPBtn.setCallback([this]() { 
+        m_lastAction = LobbyAction::PacmanHPDec; 
+    });
+    
+    m_plusPHPBtn.setCallback([this]() { 
+        m_lastAction = LobbyAction::PacmanHPInc; 
+    });
+
+    m_minusGHPBtn.setCallback([this]() { 
+        m_lastAction = LobbyAction::GhostHPDec; 
+    });
+    
+    m_plusGHPBtn.setCallback([this]() { 
+        m_lastAction = LobbyAction::GhostHPInc; 
+    });
     
     m_readyBtn.setCallback([this]() { 
         m_lastAction = LobbyAction::ToggleReady; 
@@ -69,6 +89,10 @@ LobbyEntity::LobbyEntity()
     m_container.addWidget(m_plusBotBtn);
     m_container.addWidget(m_minusDurBtn);
     m_container.addWidget(m_plusDurBtn);
+    m_container.addWidget(m_minusPHPBtn);
+    m_container.addWidget(m_plusPHPBtn);
+    m_container.addWidget(m_minusGHPBtn);
+    m_container.addWidget(m_plusGHPBtn);
     m_container.addWidget(m_readyBtn);
     m_container.addWidget(m_changeRolePreBtn);
     m_container.addWidget(m_changeRoleNextBtn);
@@ -290,10 +314,45 @@ void LobbyEntity::renderRoleSelectionAndReady(gf::RenderTarget& target, const gf
     target.draw(m_leaveBtn, states);
 }
 
-void LobbyEntity::renderSettings(gf::RenderTarget& target, const gf::RenderStates& states, gf::Vector2f position) {
+void LobbyEntity::renderSettingsRow(gf::RenderTarget &target, const gf::RenderStates &states, gf::Vector2f position, std::string stgName, gf::TextButtonWidget& minusBtn, gf::TextButtonWidget& plusBtn, int currentValue)
+{
     const unsigned int MINUS_SIZE = 16u;
     const unsigned int PLUS_SIZE = 14u;
-    const unsigned int SETTINGS_CHARACTER_SIZE = 18u;
+    const float MINUS_BTN_POS_X = 200.f;
+    const float PLUS_BTN_POS_X = 280.f;
+
+
+    gf::Text stgNameLabel;
+    stgNameLabel.setFont(m_font);
+    stgNameLabel.setCharacterSize(SETTINGS_CHARACTER_SIZE);
+    stgNameLabel.setColor(gf::Color::White);
+    stgNameLabel.setString(stgName);
+    stgNameLabel.setPosition(position);
+    target.draw(stgNameLabel, states);
+
+    minusBtn.setCharacterSize(MINUS_SIZE);
+    minusBtn.setPosition({position.x + MINUS_BTN_POS_X,position.y});
+    defaultButtonColor(minusBtn);
+    minusBtn.setPadding(MINUS_SIZE * .65f);
+    target.draw(minusBtn, states);
+
+    plusBtn.setCharacterSize(PLUS_SIZE);
+    plusBtn.setPosition({position.x + PLUS_BTN_POS_X,position.y});
+    defaultButtonColor(plusBtn);
+    plusBtn.setPadding(PLUS_SIZE * .65f);
+    target.draw(plusBtn, states);
+
+    gf::Text valueText;
+    valueText.setFont(m_font);
+    valueText.setCharacterSize(20u);
+    valueText.setColor(gf::Color::White);
+    valueText.setAlignment(gf::Alignment::Center);
+    valueText.setString(std::to_string(currentValue));
+    valueText.setPosition({position.x + (PLUS_BTN_POS_X + MINUS_BTN_POS_X)/2,position.y});
+    target.draw(valueText, states);
+}
+
+void LobbyEntity::renderSettings(gf::RenderTarget& target, const gf::RenderStates& states, gf::Vector2f position) {
     const float margin = 16.f;
 
     //Labels
@@ -308,95 +367,22 @@ void LobbyEntity::renderSettings(gf::RenderTarget& target, const gf::RenderState
     gf::Vector2f maxPlayerTextPos{position.x, position.y + SETTINGS_CHARACTER_SIZE * 2.5f};
     gf::Vector2f nbBotsTextPos{position.x, maxPlayerTextPos.y + SETTINGS_CHARACTER_SIZE * 2.5f};
     gf::Vector2f durationTextPos{position.x, nbBotsTextPos.y + SETTINGS_CHARACTER_SIZE * 2.5f};
+    gf::Vector2f pacmanHpPos{position.x, durationTextPos.y + SETTINGS_CHARACTER_SIZE * 2.5f};
+    gf::Vector2f ghostHpPos{position.x, pacmanHpPos.y + SETTINGS_CHARACTER_SIZE * 2.5f};
 
-    gf::Vector2f minusBtnPos{position.x + 140.f, maxPlayerTextPos.y};
-    gf::Vector2f plusBtnPos{position.x + 220.f, maxPlayerTextPos.y};
-    gf::Vector2f minusBotBtnPos{position.x + 140.f, nbBotsTextPos.y};
-    gf::Vector2f plusBotBtnPos{position.x + 220.f, nbBotsTextPos.y};
-    gf::Vector2f minusDurBtnPos{position.x + 140.f, durationTextPos.y};
-    gf::Vector2f plusDurBtnPos{position.x + 220.f, durationTextPos.y};
 
     //Joueurs max
-    gf::Text roomLabel;
-    roomLabel.setFont(m_font);
-    roomLabel.setCharacterSize(SETTINGS_CHARACTER_SIZE);
-    roomLabel.setColor(gf::Color::White);
-    roomLabel.setString("Joueurs max :");
-    roomLabel.setPosition(maxPlayerTextPos);
-    target.draw(roomLabel, states);
-
-    m_minusBtn.setCharacterSize(MINUS_SIZE);
-    m_minusBtn.setPosition(minusBtnPos);
-    defaultButtonColor(m_minusBtn);
-    m_minusBtn.setPadding(MINUS_SIZE * .65f);
-    target.draw(m_minusBtn, states);
-
-    m_plusBtn.setCharacterSize(PLUS_SIZE);
-    m_plusBtn.setPosition(plusBtnPos);
-    defaultButtonColor(m_plusBtn);
-    m_plusBtn.setPadding(PLUS_SIZE * .65f);
-    target.draw(m_plusBtn, states);
-
-    gf::Text valueText;
-    valueText.setFont(m_font);
-    valueText.setCharacterSize(20u);
-    valueText.setColor(gf::Color::White);
-    valueText.setString(std::to_string(m_roomSettings.roomSize));
-    valueText.setPosition({(minusBtnPos.x + plusBtnPos.x - (valueText.getString().length() * SETTINGS_CHARACTER_SIZE) / 2) / 2,
-                           minusBtnPos.y - 10.f});
-    target.draw(valueText, states);
+    renderSettingsRow(target,states,maxPlayerTextPos,"Joueurs max :",m_minusBtn,m_plusBtn,static_cast<int>(m_roomSettings.roomSize));
 
     //Nb bots
-    gf::Text botLabel;
-    botLabel.setFont(m_font);
-    botLabel.setCharacterSize(SETTINGS_CHARACTER_SIZE);
-    botLabel.setColor(gf::Color::White);
-    botLabel.setString("Nb de bots :");
-    botLabel.setPosition(nbBotsTextPos);
-    target.draw(botLabel, states);
-
-    m_minusBotBtn.setCharacterSize(MINUS_SIZE);
-    m_minusBotBtn.setPosition(minusBotBtnPos);
-    defaultButtonColor(m_minusBotBtn);
-    m_minusBotBtn.setPadding(MINUS_SIZE * .65f);
-    target.draw(m_minusBotBtn, states);
-
-    m_plusBotBtn.setCharacterSize(PLUS_SIZE);
-    m_plusBotBtn.setPosition(plusBotBtnPos);
-    defaultButtonColor(m_plusBotBtn);
-    m_plusBotBtn.setPadding(PLUS_SIZE * .65f);
-    target.draw(m_plusBotBtn, states);
-
-    valueText.setString(std::to_string(m_roomSettings.nbBot));
-    valueText.setPosition({(minusBotBtnPos.x + plusBotBtnPos.x - (valueText.getString().length() * SETTINGS_CHARACTER_SIZE) / 2) / 2,
-                           minusBotBtnPos.y - 10.f});
-    target.draw(valueText, states);
+    renderSettingsRow(target,states,nbBotsTextPos,"Nb de bots :",m_minusBotBtn,m_plusBotBtn,static_cast<int>(m_roomSettings.nbBot));
 
     //Durée
-    gf::Text durationLabel;
-    durationLabel.setFont(m_font);
-    durationLabel.setCharacterSize(SETTINGS_CHARACTER_SIZE);
-    durationLabel.setColor(gf::Color::White);
-    durationLabel.setString("Temps de jeu (secondes) :");
-    durationLabel.setPosition(durationTextPos);
-    target.draw(durationLabel, states);
+    renderSettingsRow(target,states,durationTextPos,"Temps de jeu (secondes) :",m_minusDurBtn,m_plusDurBtn,static_cast<int>(m_roomSettings.gameDuration));
 
-    m_minusDurBtn.setCharacterSize(MINUS_SIZE);
-    m_minusDurBtn.setPosition(minusDurBtnPos);
-    defaultButtonColor(m_minusDurBtn);
-    m_minusDurBtn.setPadding(MINUS_SIZE * .65f);
-    target.draw(m_minusDurBtn, states);
-
-    m_plusDurBtn.setCharacterSize(PLUS_SIZE);
-    m_plusDurBtn.setPosition(plusDurBtnPos);
-    defaultButtonColor(m_plusDurBtn);
-    m_plusDurBtn.setPadding(PLUS_SIZE * .65f);
-    target.draw(m_plusDurBtn, states);
-
-    valueText.setString(std::to_string(m_roomSettings.gameDuration));
-    valueText.setPosition({(minusDurBtnPos.x + plusDurBtnPos.x - (valueText.getString().length() * SETTINGS_CHARACTER_SIZE) / 2) / 2,
-                           minusDurBtnPos.y + 10.f});
-    target.draw(valueText, states);
+    //Vie
+    renderSettingsRow(target,states,pacmanHpPos,"Nb. PV Pacman :",m_minusPHPBtn,m_plusPHPBtn,static_cast<int>(m_roomSettings.nbLifePacman));
+    renderSettingsRow(target,states,ghostHpPos,"Nb. PV Fantômes :",m_minusGHPBtn,m_plusGHPBtn,static_cast<int>(m_roomSettings.nbLifeGhost));
 }
 
 

@@ -6,6 +6,7 @@
 #include <gf/Array2D.h>
 #include <functional>
 #include "Types.h"
+#include "Constants.h"
 
 using namespace gf::literals;
 
@@ -140,11 +141,13 @@ struct RoomSettings
   unsigned int roomSize;
   unsigned int nbBot;
   unsigned int gameDuration;
+  unsigned int nbLifePacman = MIN_HP_PACMAN;
+  unsigned int nbLifeGhost = MIN_HP_GHOST;
 };
 template <typename Archive>
 Archive &operator|(Archive &ar, RoomSettings &data)
 {
-  return ar | data.roomSize | data.nbBot | data.gameDuration;
+  return ar | data.roomSize | data.nbBot | data.gameDuration | data.nbLifePacman | data.nbLifeGhost;
 }
 
 struct RoomData

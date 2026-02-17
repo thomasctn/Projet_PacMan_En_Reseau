@@ -181,6 +181,40 @@ void LobbyScene::doUpdate(gf::Time) {
                 m_game.getSocket().sendPacket(p);
             }
             break;
+        case LobbyAction::PacmanHPDec:
+            if (m_roomSettings.nbLifePacman > MIN_HP_PACMAN) {
+                RoomSettings s = m_roomSettings;
+                s.nbLifePacman -= 1;
+                gf::Packet p; p.is(ClientChangeRoomSettings{s});
+                m_game.getSocket().sendPacket(p);
+            }
+            break;
+
+        case LobbyAction::PacmanHPInc:
+            if (m_roomSettings.gameDuration < MAX_HP_PACMAN) {
+                RoomSettings s = m_roomSettings;
+                s.nbLifePacman += 1;
+                gf::Packet p; p.is(ClientChangeRoomSettings{s});
+                m_game.getSocket().sendPacket(p);
+            }
+            break;
+        case LobbyAction::GhostHPDec:
+            if (m_roomSettings.nbLifePacman > MIN_HP_GHOST) {
+                RoomSettings s = m_roomSettings;
+                s.nbLifeGhost -= 1;
+                gf::Packet p; p.is(ClientChangeRoomSettings{s});
+                m_game.getSocket().sendPacket(p);
+            }
+            break;
+
+        case LobbyAction::GhostHPInc:
+            if (m_roomSettings.gameDuration < MAX_HP_GHOST) {
+                RoomSettings s = m_roomSettings;
+                s.nbLifeGhost += 1;
+                gf::Packet p; p.is(ClientChangeRoomSettings{s});
+                m_game.getSocket().sendPacket(p);
+            }
+            break;
 
         case LobbyAction::ToggleReady: {
             m_amReady = !m_amReady;
