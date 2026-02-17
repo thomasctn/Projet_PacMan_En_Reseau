@@ -140,10 +140,19 @@ void LobbyEntity::render(gf::RenderTarget& target, const gf::RenderStates& state
     float textPosX = margin + uiOffsetX;
     float textStartPosY = margin + uiOffsetY;
 
-    gf::Vector2f settingsPos{textPosX, LOGICAL_H*0.1f};
-    gf::Vector2f playerListPos{textPosX, LOGICAL_H * 0.5f};
-    gf::Vector2f changeRolePos{LOGICAL_W *3/4.f - margin - uiOffsetX, LOGICAL_H*0.075f};
-    gf::Vector2f readyPos{changeRolePos.x + 50.f, LOGICAL_H * 0.75f};
+    gf::Vector2f settingsPos{textPosX, LOGICAL_H*0.125f};
+    gf::Vector2f playerListPos{textPosX, LOGICAL_H * 0.6f};
+    gf::Vector2f changeRolePos{LOGICAL_W *3/4.f - margin - uiOffsetX, LOGICAL_H*0.125f};
+
+    //Nom de la room
+    gf::Text roomName;
+    roomName.setFont(m_font);
+    roomName.setCharacterSize(28U);
+    roomName.setColor(gf::Color::White);
+    roomName.setString("Nom de la room ?");
+    roomName.setPosition({textPosX, LOGICAL_W* .04f});
+    target.draw(roomName, states);
+
 
     //draws
     renderSettings(target, states, settingsPos);
@@ -188,6 +197,16 @@ void LobbyEntity::renderPlayerRow(gf::RenderTarget& target, const gf::RenderStat
 }
 
 void LobbyEntity::renderPlayerList(gf::RenderTarget& target, const gf::RenderStates& states, gf::Vector2f position) {
+    //Rectangle
+    gf::RoundedRectangleShape playBox({ LOGICAL_W/3.f, LOGICAL_H*0.33f}, 14.f);
+    playBox.setPosition(position);
+    playBox.setColor(gf::Color::Transparent);
+    playBox.setOutlineThickness(2.f);
+    playBox.setOutlineColor(gf::Color::White);
+
+    target.draw(playBox, states);
+
+
     gf::Text playerListLabel;
     playerListLabel.setFont(m_font);
     playerListLabel.setCharacterSize(24);
@@ -197,12 +216,12 @@ void LobbyEntity::renderPlayerList(gf::RenderTarget& target, const gf::RenderSta
         std::to_string(m_players.size()) + " / " +
         std::to_string(m_roomSettings.roomSize) + ") :"
     );
-    playerListLabel.setPosition(position);
+    playerListLabel.setPosition({position.x + playBox.getSize().x*.05f, position.y + playBox.getSize().y*.15f});
     target.draw(playerListLabel, states);
 
     float rowSpacing = 32.f; //hauteur fixe par joueur
     for (unsigned int i = 0; i < m_players.size(); i++) {
-        renderPlayerRow(target, states, {position.x, position.y + rowSpacing * (i + 1)}, m_players[i]);
+        renderPlayerRow(target, states, {playerListLabel.getPosition().x, playerListLabel.getPosition().y + rowSpacing * (i + 1)}, m_players[i]);
     }
 }
 
@@ -214,7 +233,7 @@ void LobbyEntity::renderRoleSelectionAndReady(gf::RenderTarget& target, const gf
     const unsigned int CHANGE_ROLE_TEXT_SIZE = 18u;
 
     //Rectangle
-    gf::RoundedRectangleShape playBox({ LOGICAL_W/4.f, LOGICAL_H*0.85f }, 14.f);
+    gf::RoundedRectangleShape playBox({ LOGICAL_W/4.f, LOGICAL_H*0.825f }, 14.f);
     playBox.setPosition(position);
     playBox.setColor(gf::Color::Transparent);
     playBox.setOutlineThickness(2.f);
@@ -318,8 +337,8 @@ void LobbyEntity::renderSettingsRow(gf::RenderTarget &target, const gf::RenderSt
 {
     const unsigned int MINUS_SIZE = 16u;
     const unsigned int PLUS_SIZE = 14u;
-    const float MINUS_BTN_POS_X = 200.f;
-    const float PLUS_BTN_POS_X = 280.f;
+    const float MINUS_BTN_POS_X = 260.f;
+    const float PLUS_BTN_POS_X = 360.f;
 
 
     gf::Text stgNameLabel;
@@ -355,20 +374,31 @@ void LobbyEntity::renderSettingsRow(gf::RenderTarget &target, const gf::RenderSt
 void LobbyEntity::renderSettings(gf::RenderTarget& target, const gf::RenderStates& states, gf::Vector2f position) {
     const float margin = 16.f;
 
+    //Rectangle
+    gf::RoundedRectangleShape playBox({ LOGICAL_W/3.f, LOGICAL_H*0.4f }, 14.f);
+    playBox.setPosition(position);
+    playBox.setColor(gf::Color::Transparent);
+    playBox.setOutlineThickness(2.f);
+    playBox.setOutlineColor(gf::Color::White);
+
+    target.draw(playBox, states);
+
     //Labels
     gf::Text settingsLabel;
     settingsLabel.setFont(m_font);
     settingsLabel.setCharacterSize(24u);
     settingsLabel.setColor(gf::Color::White);
     settingsLabel.setString("Paramètre du jeu");
-    settingsLabel.setPosition(position);
+    settingsLabel.setPosition({position.x + playBox.getSize().x*.05f, position.y + playBox.getSize().y*.1f});
     target.draw(settingsLabel, states);
 
-    gf::Vector2f maxPlayerTextPos{position.x, position.y + SETTINGS_CHARACTER_SIZE * 2.5f};
-    gf::Vector2f nbBotsTextPos{position.x, maxPlayerTextPos.y + SETTINGS_CHARACTER_SIZE * 2.5f};
-    gf::Vector2f durationTextPos{position.x, nbBotsTextPos.y + SETTINGS_CHARACTER_SIZE * 2.5f};
-    gf::Vector2f pacmanHpPos{position.x, durationTextPos.y + SETTINGS_CHARACTER_SIZE * 2.5f};
-    gf::Vector2f ghostHpPos{position.x, pacmanHpPos.y + SETTINGS_CHARACTER_SIZE * 2.5f};
+    float settingsPosX = position.x + playBox.getSize().x*.05f;
+
+    gf::Vector2f maxPlayerTextPos{settingsPosX, settingsLabel.getPosition().y + SETTINGS_CHARACTER_SIZE * 2.5f};
+    gf::Vector2f nbBotsTextPos{settingsPosX, maxPlayerTextPos.y + SETTINGS_CHARACTER_SIZE * 2.5f};
+    gf::Vector2f durationTextPos{settingsPosX, nbBotsTextPos.y + SETTINGS_CHARACTER_SIZE * 2.5f};
+    gf::Vector2f pacmanHpPos{settingsPosX, durationTextPos.y + SETTINGS_CHARACTER_SIZE * 2.5f};
+    gf::Vector2f ghostHpPos{settingsPosX, pacmanHpPos.y + SETTINGS_CHARACTER_SIZE * 2.5f};
 
 
     //Joueurs max
