@@ -48,11 +48,13 @@ public:
 private:
   void renderPlayerRow(gf::RenderTarget& target, const gf::RenderStates& states, gf::Vector2f position, const PlayerData& data);
   void renderPlayerList(gf::RenderTarget& target, const gf::RenderStates& states, gf::Vector2f position);
-  void renderRoleSelection(gf::RenderTarget& target, const gf::RenderStates& states, gf::Vector2f position);
+  void renderRoleSelectionAndReady(gf::RenderTarget& target, const gf::RenderStates& states, gf::Vector2f position);
   void renderSettings(gf::RenderTarget& target, const gf::RenderStates& states, gf::Vector2f position);
   void defaultButtonColor(gf::TextButtonWidget& w);
 
-
+public:
+  const float LOGICAL_W = 1280.f;
+  const float LOGICAL_H = 720.f;
 
 private:
   gf::Font m_font;
@@ -66,12 +68,14 @@ private:
   gf::TextButtonWidget m_minusDurBtn;
   gf::TextButtonWidget m_plusDurBtn;
   gf::TextButtonWidget m_readyBtn;
-  gf::TextButtonWidget m_changeRoleBtn;
+  gf::TextButtonWidget m_changeRolePreBtn;
+  gf::TextButtonWidget m_changeRoleNextBtn;
 
   LobbyAction m_lastAction = LobbyAction::None;
 
   //état affiché
   std::vector<PlayerData> m_players;
+  PlayerData m_client;
   RoomSettings m_roomSettings{};
   uint32_t m_clientId = 0;
 };

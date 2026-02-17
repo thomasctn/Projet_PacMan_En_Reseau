@@ -19,7 +19,8 @@ LobbyEntity::LobbyEntity()
 , m_minusDurBtn("-", m_font)
 , m_plusDurBtn("+", m_font)
 , m_readyBtn("PRÊT", m_font)
-, m_changeRoleBtn("Changer", m_font)
+, m_changeRolePreBtn("<", m_font)
+, m_changeRoleNextBtn(">", m_font)
 , m_lastAction(LobbyAction::None)
 {
     m_leaveBtn.setCallback([this]() { 
@@ -54,7 +55,10 @@ LobbyEntity::LobbyEntity()
         m_lastAction = LobbyAction::ToggleReady; 
     });
     
-    m_changeRoleBtn.setCallback([this]() { 
+    m_changeRolePreBtn.setCallback([this]() { 
+        m_lastAction = LobbyAction::ChangeRole; 
+    });
+    m_changeRoleNextBtn.setCallback([this]() { 
         m_lastAction = LobbyAction::ChangeRole; 
     });
 
@@ -66,7 +70,8 @@ LobbyEntity::LobbyEntity()
     m_container.addWidget(m_minusDurBtn);
     m_container.addWidget(m_plusDurBtn);
     m_container.addWidget(m_readyBtn);
-    m_container.addWidget(m_changeRoleBtn);
+    m_container.addWidget(m_changeRolePreBtn);
+    m_container.addWidget(m_changeRoleNextBtn);
 }
 
 void LobbyEntity::pointTo(gf::Vector2f coords) {
@@ -79,6 +84,11 @@ void LobbyEntity::triggerAction() {
 
 void LobbyEntity::setPlayers(const std::vector<PlayerData>& players) {
     m_players = players;
+    for(auto& p : players) {
+        if(p.id == m_clientId) {
+            m_client = p;
+        }
+    }
 }
 
 void LobbyEntity::setRoomSettings(const RoomSettings& settings) {
@@ -97,8 +107,6 @@ LobbyAction LobbyEntity::getAndResetLastAction(){
 
 void LobbyEntity::render(gf::RenderTarget& target, const gf::RenderStates& states) {
     // ✅ Zone logique fixe
-    const float LOGICAL_W = 1280.f;
-    const float LOGICAL_H = 720.f;
     const float margin = 16.f;
 
     // Calculs logiques pour UI
@@ -108,67 +116,40 @@ void LobbyEntity::render(gf::RenderTarget& target, const gf::RenderStates& state
     float textPosX = margin + uiOffsetX;
     float textStartPosY = margin + uiOffsetY;
 
-    gf::Vector2f settingsPos{textPosX, textStartPosY};
+    gf::Vector2f settingsPos{textPosX, LOGICAL_H*0.1f};
     gf::Vector2f playerListPos{textPosX, LOGICAL_H * 0.5f};
-    gf::Vector2f changeRolePos{LOGICAL_W - (margin + uiOffsetX) - 120.f, textStartPosY + 24.f};
+    gf::Vector2f changeRolePos{LOGICAL_W *3/4.f - margin - uiOffsetX, LOGICAL_H*0.075f};
     gf::Vector2f readyPos{changeRolePos.x + 50.f, LOGICAL_H * 0.75f};
 
     //draws
     renderSettings(target, states, settingsPos);
     renderPlayerList(target, states, playerListPos);
-    renderRoleSelection(target, states, changeRolePos);
-
-    //get client data
-    PlayerData clientData;
-    for (const auto& p : m_players) {
-        if (p.id == m_clientId) {
-            clientData = p;
-            break;
-        }
-    }
-
-    const unsigned int READY_TEXT_SIZE = 18u;
-
-    m_readyBtn.setCharacterSize(READY_TEXT_SIZE);
-    m_readyBtn.setAnchor(gf::Anchor::TopCenter);
-    m_readyBtn.setString(clientData.ready ? "PLUS PRÊT?" : "PRÊT");
-    m_readyBtn.setPosition({readyPos.x, readyPos.y});
-    defaultButtonColor(m_readyBtn);
-    m_readyBtn.setDefaultBackgroundColor(clientData.ready ? gf::Color::Red : gf::Color::Green);
-    m_readyBtn.setPadding(READY_TEXT_SIZE * .5f);
-    target.draw(m_readyBtn, states);
-
-    m_leaveBtn.setCharacterSize(READY_TEXT_SIZE);
-    m_leaveBtn.setAnchor(gf::Anchor::TopCenter);
-    m_leaveBtn.setPosition({readyPos.x, readyPos.y + 50.f});
-    defaultButtonColor(m_leaveBtn);
-    m_leaveBtn.setDefaultBackgroundColor(gf::Color::Red);
-    m_leaveBtn.setPadding(READY_TEXT_SIZE * .5f);
-    target.draw(m_leaveBtn, states);
+    renderRoleSelectionAndReady(target, states, changeRolePos);
 }
 
 void LobbyEntity::renderPlayerRow(gf::RenderTarget& target, const gf::RenderStates& states, gf::Vector2f position, const PlayerData& data) {
-    const float LOGICAL_W = 1280.f;
-    const float ICON_SIZE = 16.f; //taille logique avant scale
-    const float SPRITE_SCALE = 4.f;
+    const float ICON_SIZE = 24.f; //taille logique avant scale
 
+    //Icon
     gf::Texture iconTexture;
+    gf::RectF rectf;
     if (data.role == PlayerRole::PacMan) {
-        iconTexture = gf::Texture("../client/assets/pacman/pacman_icon.png");
+        iconTexture = gf::Texture("../client/assets/pacman/right_pacman_sheet.png");
+        rectf = gf::RectF::fromPositionSize({0.f,0.f},{0.25f,1.f});
     } else {
         iconTexture = gf::Texture("../client/assets/ghosts/inky.png");
+        rectf = gf::RectF::fromSize({1.f,1.f});
     }
-
-    gf::Sprite iconSprite;
-    iconSprite.setAnchor(gf::Anchor::TopLeft);
-    iconSprite.setTexture(iconTexture);
-    iconSprite.setPosition({position.x, position.y - ICON_SIZE});
-    iconSprite.setScale(SPRITE_SCALE);
-    target.draw(iconSprite, states);
+    gf::RectangleShape roleSprite({ICON_SIZE,ICON_SIZE});
+    roleSprite.setAnchor(gf::Anchor::TopLeft);
+    roleSprite.setPosition({position.x,position.y-ICON_SIZE*0.8f});
+    roleSprite.setTexture(iconTexture,rectf);
+    target.draw(roleSprite, states);
 
     gf::Text playerText;
     playerText.setFont(m_font);
-    playerText.setCharacterSize(20);
+    playerText.setCharacterSize(20u);
+    playerText.setAnchor(gf::Anchor::TopLeft);
     playerText.setColor(gf::Color::White);
 
     std::string playerStr = data.name;
@@ -178,13 +159,11 @@ void LobbyEntity::renderPlayerRow(gf::RenderTarget& target, const gf::RenderStat
     playerStr += data.ready ? " (prêt)" : " (pas prêt)";
 
     playerText.setString(playerStr);
-    playerText.setPosition({position.x + ICON_SIZE * SPRITE_SCALE + 8.f, position.y});
+    playerText.setPosition({position.x + roleSprite.getSize().x + 5.f, position.y});
     target.draw(playerText, states);
 }
 
 void LobbyEntity::renderPlayerList(gf::RenderTarget& target, const gf::RenderStates& states, gf::Vector2f position) {
-    const float LOGICAL_H = 720.f;
-
     gf::Text playerListLabel;
     playerListLabel.setFont(m_font);
     playerListLabel.setCharacterSize(24);
@@ -204,20 +183,20 @@ void LobbyEntity::renderPlayerList(gf::RenderTarget& target, const gf::RenderSta
 }
 
 
-void LobbyEntity::renderRoleSelection(gf::RenderTarget& target, const gf::RenderStates& states, gf::Vector2f position) {
-    const float LOGICAL_W = 1280.f;
+void LobbyEntity::renderRoleSelectionAndReady(gf::RenderTarget& target, const gf::RenderStates& states, gf::Vector2f position) {
     const float ICON_SIZE = 16.f;
     const float SPRITE_SCALE = 4.f;
     const unsigned int ROLE_TEXT_SIZE = 20u;
     const unsigned int CHANGE_ROLE_TEXT_SIZE = 18u;
 
-    PlayerData clientData;
-    for (const auto& p : m_players) {
-        if (p.id == m_clientId) {
-            clientData = p;
-            break;
-        }
-    }
+    //Rectangle
+    gf::RoundedRectangleShape playBox({ LOGICAL_W/4.f, LOGICAL_H*0.85f }, 14.f);
+    playBox.setPosition(position);
+    playBox.setColor(gf::Color::Transparent);
+    playBox.setOutlineThickness(2.f);
+    playBox.setOutlineColor(gf::Color::White);
+
+    target.draw(playBox, states);
 
     //Nom
     gf::Text pseudoLabel;
@@ -225,44 +204,90 @@ void LobbyEntity::renderRoleSelection(gf::RenderTarget& target, const gf::Render
     pseudoLabel.setCharacterSize(ROLE_TEXT_SIZE);
     pseudoLabel.setAnchor(gf::Anchor::TopCenter);
     pseudoLabel.setColor(gf::Color::White);
-    pseudoLabel.setString(clientData.name);
-    pseudoLabel.setPosition(position);
+    pseudoLabel.setString(m_client.name);
+    pseudoLabel.setAlignment(gf::Alignment::Center);
+    pseudoLabel.setPosition({position.x + playBox.getSize().x/2.f,position.y+playBox.getSize().y*.075f});
     target.draw(pseudoLabel, states);
 
     //Icon
     gf::Texture iconTexture;
-    if (clientData.role == PlayerRole::PacMan) {
-        iconTexture = gf::Texture("../client/assets/pacman/pacman_icon.png");
+    gf::RectF rectf;
+    if (m_client.role == PlayerRole::PacMan) {
+        iconTexture = gf::Texture("../client/assets/pacman/right_pacman_sheet.png");
+        rectf = gf::RectF::fromPositionSize({0.f,0.f},{0.25f,1.f});
     } else {
         iconTexture = gf::Texture("../client/assets/ghosts/inky.png");
+        rectf = gf::RectF::fromSize({1.f,1.f});
     }
-
-    gf::Sprite iconSprite;
-    iconSprite.setAnchor(gf::Anchor::TopLeft);
-    iconSprite.setTexture(iconTexture);
-    iconSprite.setPosition({position.x, position.y + ROLE_TEXT_SIZE});
-    iconSprite.setScale(SPRITE_SCALE);
-    target.draw(iconSprite, states);
+    gf::RectangleShape roleSprite({64.f,64.f});
+    roleSprite.setPosition({position.x + playBox.getSize().x/2.f - (ICON_SIZE*SPRITE_SCALE/2),position.y+playBox.getSize().y*.125f});
+    roleSprite.setTexture(iconTexture,rectf);
+    target.draw(roleSprite, states);
 
     //Rôle texte
     gf::Text roleLabel;
     roleLabel.setFont(m_font);
     roleLabel.setAnchor(gf::Anchor::TopCenter);
+    roleLabel.setAlignment(gf::Alignment::Center);
+    roleLabel.setParagraphWidth(playBox.getSize().x*0.9f);
     roleLabel.setCharacterSize(ROLE_TEXT_SIZE);
     roleLabel.setColor(gf::Color::White);
-    roleLabel.setString(clientData.role == PlayerRole::PacMan ? "Rôle : Pac-Man" : "Rôle : Fantôme");
-    gf::Vector2f rolePos{ position.x - (roleLabel.getString().length() * ROLE_TEXT_SIZE) / 8,
-                           position.y + ROLE_TEXT_SIZE + ICON_SIZE * SPRITE_SCALE + ROLE_TEXT_SIZE * 1.5f };
-    roleLabel.setPosition(rolePos);
+    roleLabel.setString(m_client.role == PlayerRole::PacMan ? "Rôle : Pac-Man" : "Rôle : Fantôme");
+    roleLabel.setPosition({position.x + playBox.getSize().x/2.f - roleLabel.getParagraphWidth()/2.f, position.y + playBox.getSize().y*.3f});
     target.draw(roleLabel, states);
 
+
+    gf::Text roleDesc;
+    roleDesc.setFont(m_font);
+    roleDesc.setAnchor(gf::Anchor::TopCenter);
+    roleDesc.setAlignment(gf::Alignment::Justify);
+    roleDesc.setParagraphWidth(playBox.getSize().x*0.9f);
+    roleDesc.setCharacterSize(ROLE_TEXT_SIZE);
+    roleDesc.setColor(gf::Color::White);
+    roleDesc.setPosition({position.x + playBox.getSize().x*.05f, position.y + playBox.getSize().y*.375f});
+    roleDesc.setString("Une description de l\'objectif du rôle et de ses pouvoirs.\n voilà...");
+    target.draw(roleDesc, states);
+
+
+
+
     //Bouton changement rôle
-    m_changeRoleBtn.setCharacterSize(CHANGE_ROLE_TEXT_SIZE);
-    m_changeRoleBtn.setPosition({rolePos.x, rolePos.y + ROLE_TEXT_SIZE + CHANGE_ROLE_TEXT_SIZE});
-    m_changeRoleBtn.setAnchor(gf::Anchor::TopLeft);
-    defaultButtonColor(m_changeRoleBtn);
-    m_changeRoleBtn.setPadding(CHANGE_ROLE_TEXT_SIZE * 0.65f);
-    target.draw(m_changeRoleBtn, states);
+    m_changeRolePreBtn.setCharacterSize(CHANGE_ROLE_TEXT_SIZE);
+    m_changeRolePreBtn.setAnchor(gf::Anchor::TopCenter);
+    m_changeRolePreBtn.setAlignment(gf::Alignment::Center);
+    defaultButtonColor(m_changeRolePreBtn);
+    m_changeRolePreBtn.setPadding(CHANGE_ROLE_TEXT_SIZE * 0.65f);
+    m_changeRolePreBtn.setPosition({position.x + playBox.getSize().x/4.f,roleSprite.getPosition().y+(roleSprite.getSize().y/2)});
+    target.draw(m_changeRolePreBtn, states);
+
+    m_changeRoleNextBtn.setCharacterSize(CHANGE_ROLE_TEXT_SIZE);
+    m_changeRoleNextBtn.setAnchor(gf::Anchor::TopCenter);
+    m_changeRoleNextBtn.setAlignment(gf::Alignment::Center);
+    defaultButtonColor(m_changeRoleNextBtn);
+    m_changeRoleNextBtn.setPadding(CHANGE_ROLE_TEXT_SIZE * 0.65f);
+    m_changeRoleNextBtn.setPosition({position.x + playBox.getSize().x*3.f/4.f,roleSprite.getPosition().y+(roleSprite.getSize().y/2)});
+    target.draw(m_changeRoleNextBtn, states);
+
+    
+    const unsigned int READY_TEXT_SIZE = 18u;
+    //Bouton Prêt
+    m_readyBtn.setCharacterSize(READY_TEXT_SIZE);
+    m_readyBtn.setAnchor(gf::Anchor::TopCenter);
+    m_readyBtn.setString(m_client.ready ? "PLUS PRÊT?" : "PRÊT");
+    m_readyBtn.setPosition({position.x + playBox.getSize().x/2.f,position.y+playBox.getSize().y*.825f});
+    defaultButtonColor(m_readyBtn);
+    m_readyBtn.setDefaultBackgroundColor(m_client.ready ? gf::Color::Red : gf::Color::Green);
+    m_readyBtn.setPadding(READY_TEXT_SIZE * .5f);
+    target.draw(m_readyBtn, states);
+
+    //Bouton quitter
+    m_leaveBtn.setCharacterSize(READY_TEXT_SIZE);
+    m_leaveBtn.setAnchor(gf::Anchor::TopCenter);
+    m_leaveBtn.setPosition({position.x + playBox.getSize().x/2.f,position.y+playBox.getSize().y*.9f});
+    defaultButtonColor(m_leaveBtn);
+    m_leaveBtn.setDefaultBackgroundColor(gf::Color::Red);
+    m_leaveBtn.setPadding(READY_TEXT_SIZE * .5f);
+    target.draw(m_leaveBtn, states);
 }
 
 void LobbyEntity::renderSettings(gf::RenderTarget& target, const gf::RenderStates& states, gf::Vector2f position) {
