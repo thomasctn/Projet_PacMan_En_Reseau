@@ -1,4 +1,5 @@
 #include "GameEntity.h"
+#include "../common/Constants.h"
 #include <gf/Text.h>
 #include <gf/Font.h>
 #include <gf/Log.h>
@@ -356,7 +357,7 @@ void GameEntity::render(gf::RenderTarget &target, const gf::RenderStates &states
         auto now = std::chrono::steady_clock::now();
         float elapsed = std::chrono::duration<float>(now - m.startTime).count();
 
-        float speedFactor = 0.3f; // 0.5 = moitié de vitesse
+        float speedFactor = SPEEDFACTOR; // 0.5 = moitié de vitesse
         float t = std::clamp(elapsed / m.expectedDuration * speedFactor, 0.f, 1.f);
         gf::Vector2f currentPos = m.startPos + (m.destPos - m.startPos) * t;
 

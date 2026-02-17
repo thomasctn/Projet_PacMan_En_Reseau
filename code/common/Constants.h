@@ -41,4 +41,4 @@ static constexpr float DEFAULT_SPEED_MOVERATE   = 0.0f;
 
 static constexpr float CHASSEUR_MODE_TIME       = 10.0;
 
-
+static constexpr float SPEEDFACTOR              = 0.5f;
