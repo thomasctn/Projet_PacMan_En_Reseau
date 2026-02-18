@@ -69,6 +69,7 @@ GameEntity::GameEntity()
 
 void GameEntity::setGameState(const std::vector<PlayerData>& states)
 {
+    m_myRole = PlayerRole::Spectator; //par defaut
     auto now = std::chrono::steady_clock::now();
 
     for (auto& s : states)
@@ -95,26 +96,17 @@ void GameEntity::setGameState(const std::vector<PlayerData>& states)
         m.expectedDuration = 0.8f * m.expectedDuration + 0.2f * timeSinceLast;
 
         m.lastServerUpdate = now;
+
+        if (s.role == PlayerRole::PacMan) {
+            m_pacmanHp = s.hp;
+        }
+        if (s.id == m_clientId) {
+            m_myHp = s.hp;
+            m_myRole = s.role;
+        }
     }
 
     m_states = states;
-
-    //pour les vies!
-    //m_myHp = 0;
-    //m_pacmanHp = 0;
-    m_myRole = PlayerRole::Spectator; //par defaut
-
-    for (const auto &p : m_states) {
-        if (p.role == PlayerRole::PacMan) {
-            m_pacmanHp = p.hp;
-        }
-        if (p.id == m_clientId) {
-            m_myHp = p.hp;
-            m_myRole = p.role;
-        }
-        gf::Log::info("Player id=%u role=%d hp=%d\n",p.id, static_cast<int>(p.role), p.hp);
-
-    }
 
 }
 

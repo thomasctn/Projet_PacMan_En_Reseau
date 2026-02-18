@@ -132,7 +132,7 @@ struct PlayerData
 template <typename Archive>
 Archive &operator|(Archive &ar, PlayerData &data)
 {
-  return ar | data.id | data.x | data.y | data.color | data.name | data.role | data.score | data.ready;
+  return ar | data.id | data.x | data.y | data.color | data.name | data.role | data.score | data.ready | data.hp;
 }
 
 struct RoomSettings
