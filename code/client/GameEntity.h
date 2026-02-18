@@ -42,8 +42,8 @@ private:
     void calculateMovement(gf::RenderTarget& target, const BoardCommon &map, float &tileSize, float &offsetX, float &offsetY);
     void renderMap(gf::RenderTarget& target, const gf::RenderStates& states, const BoardCommon& map, float logicalTileSize, float mapOriginX, float mapOriginY);
     void renderPacGommes(gf::RenderTarget& target, const gf::RenderStates& states, const std::vector<std::pair<Position, PacGommeType>>& pacgommes, float logicalTileSize, float mapOriginX, float mapOriginY);
-    void renderMyLife(gf::RenderTarget& target, const gf::RenderStates& states,float logicalTileSize, float mapOriginX, float mapOriginY);
-    void renderPacmanLife(gf::RenderTarget& target, const gf::RenderStates& states,float logicalTileSize, float mapOriginX, float mapOriginY);
+    void renderMyLife(gf::RenderTarget& target, const gf::RenderStates& states,float logicalTileSize, float mapOriginX, float mapOriginY, float topMargin);
+    void renderPacmanLife(gf::RenderTarget& target, const gf::RenderStates& states,float logicalTileSize, float mapOriginX, float mapOriginY, float topMargin);
 
 private:
     //etat du jeu

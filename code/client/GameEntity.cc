@@ -13,7 +13,7 @@
 
 
 GameEntity::GameEntity()
-    : m_font("../common/fonts/arial.ttf")
+    : m_font("../common/fonts/Emulogic-zrEw.ttf")
 {
     m_inkyTexture = gf::Texture("../client/assets/ghosts/inky.png");
     m_inkySprite.setTexture(m_inkyTexture);
@@ -282,9 +282,9 @@ void GameEntity::renderPacGommes(gf::RenderTarget &target, const gf::RenderState
     }
 }
 
-void GameEntity::renderMyLife(gf::RenderTarget& target, const gf::RenderStates& states,float logicalTileSize, float mapOriginX, float mapOriginY)
+void GameEntity::renderMyLife(gf::RenderTarget& target, const gf::RenderStates& states,float logicalTileSize, float mapOriginX, float mapOriginY, float topMargin)
 {
-    float x_logical = mapOriginX + m_board.width * logicalTileSize + 8.f; 
+    /*float x_logical = mapOriginX + m_board.width * logicalTileSize + 8.f; 
     float y_logical = mapOriginY + 8.f; 
 
     gf::Text t;
@@ -293,12 +293,41 @@ void GameEntity::renderMyLife(gf::RenderTarget& target, const gf::RenderStates& 
     t.setColor(gf::Color::White);
     t.setString("Vie perso restantes : " + std::to_string(m_myHp));
     t.setPosition({ x_logical, y_logical });
-    target.draw(t, states);
+    target.draw(t, states);*/
+    unsigned labelSize = 14u;
+    unsigned numberSize = 18u;
+
+    float mapLeft   = mapOriginX;
+    float mapRight  = mapOriginX + m_board.width * logicalTileSize;
+    float mapCenter = (mapLeft + mapRight) * 0.5f;
+
+    float labelY  = topMargin * 0.35f;
+    float numberY = labelY + 20.f;
+
+    gf::Text label;
+    label.setFont(m_font);
+    label.setCharacterSize(labelSize);
+    label.setColor(gf::Color::White);
+    label.setString("PV PERSO");
+
+    gf::RectF bounds = label.getLocalBounds();
+    label.setPosition({ mapCenter - (bounds.max.x - bounds.min.x) * 0.5f, labelY });
+    target.draw(label, states);
+
+    gf::Text value;
+    value.setFont(m_font);
+    value.setCharacterSize(numberSize);
+    value.setColor(gf::Color::White);
+    value.setString(std::to_string(m_myHp));
+
+    gf::RectF valBounds = value.getLocalBounds();
+    value.setPosition({ mapCenter - (valBounds.max.x - valBounds.min.x) * 0.5f, numberY });
+    target.draw(value, states);
 }
 
-void GameEntity::renderPacmanLife(gf::RenderTarget& target, const gf::RenderStates& states,float logicalTileSize, float mapOriginX, float mapOriginY)
+void GameEntity::renderPacmanLife(gf::RenderTarget& target, const gf::RenderStates& states,float logicalTileSize, float mapOriginX, float mapOriginY, float topMargin)
 {
-    float x_logical = mapOriginX + m_board.width * logicalTileSize + 8.f;
+    /*float x_logical = mapOriginX + m_board.width * logicalTileSize + 8.f;
     float y_logical = mapOriginY + 8.f + 26.f; 
     gf::Text t;
     t.setFont(m_font);
@@ -306,7 +335,35 @@ void GameEntity::renderPacmanLife(gf::RenderTarget& target, const gf::RenderStat
     t.setColor(gf::Color::White);
     t.setString("Vie Pacman restantes : " + std::to_string(m_pacmanHp));
     t.setPosition({ x_logical, y_logical });
-    target.draw(t, states);
+    target.draw(t, states);*/
+
+    unsigned labelSize = 14u;
+    unsigned numberSize = 18u;
+
+    float mapRight = mapOriginX + m_board.width * logicalTileSize;
+
+    float labelY  = topMargin * 0.35f;
+    float numberY = labelY + 20.f;
+
+    gf::Text label;
+    label.setFont(m_font);
+    label.setCharacterSize(labelSize);
+    label.setColor(gf::Color::White);
+    label.setString("PV PACMAN");
+
+    gf::RectF bounds = label.getLocalBounds();
+    label.setPosition({ mapRight - (bounds.max.x - bounds.min.x), labelY });
+    target.draw(label, states);
+
+    gf::Text value;
+    value.setFont(m_font);
+    value.setCharacterSize(numberSize);
+    value.setColor(gf::Color::White);
+    value.setString(std::to_string(m_pacmanHp));
+
+    gf::RectF valBounds = value.getLocalBounds();
+    value.setPosition({ mapRight - (valBounds.max.x - valBounds.min.x), numberY });
+    target.draw(value, states);
 }
 
 
@@ -337,7 +394,7 @@ void GameEntity::render(gf::RenderTarget &target, const gf::RenderStates &states
 
     renderMap(target, states, m_board, logicalTileSize, mapOriginX, mapOriginY);
     renderPacGommes(target, states, m_pacgommes, logicalTileSize, mapOriginX, mapOriginY);
-
+/*
     gf::Text timer;
     timer.setFont(m_font);
     timer.setCharacterSize(24u);
@@ -348,7 +405,36 @@ void GameEntity::render(gf::RenderTarget &target, const gf::RenderStates &states
         timer.setString("Temps avant la fin de la partie : " + std::to_string(m_timeLeft));
 
     timer.setPosition({timerX, timerY});
-    target.draw(timer, states);
+    target.draw(timer, states);*/
+    unsigned labelSize = 14u;
+    unsigned numberSize = 18u;
+
+    float mapLeft = mapOriginX;
+
+    float labelY  = topMargin * 0.35f;
+    float numberY = labelY + 20.f;
+
+    gf::Text label;
+    label.setFont(m_font);
+    label.setCharacterSize(labelSize);
+    label.setColor(gf::Color::White);
+    if (m_timeLeftPre != 0)
+        label.setString("TIMER PRE-START : " );
+    else
+        label.setString("TIMER : ");
+
+    label.setPosition({ mapLeft, labelY });
+    target.draw(label, states);
+
+    unsigned timeValue = (m_timeLeftPre != 0) ? m_timeLeftPre : m_timeLeft;
+
+    gf::Text value;
+    value.setFont(m_font);
+    value.setCharacterSize(numberSize);
+    value.setColor(gf::Color::White);
+    value.setString(std::to_string(timeValue));
+    value.setPosition({ mapLeft, numberY });
+    target.draw(value, states);
 
     float tilePx = logicalTileSize; // logique == pixels fixes
 
@@ -491,12 +577,12 @@ void GameEntity::render(gf::RenderTarget &target, const gf::RenderStates &states
     //les vies
 
     if (m_myRole == PlayerRole::Ghost) {
-        renderMyLife(target, states, logicalTileSize, mapOriginX, mapOriginY);
-        renderPacmanLife(target, states, logicalTileSize, mapOriginX, mapOriginY);
+        renderMyLife(target, states, logicalTileSize, mapOriginX, mapOriginY, topMargin);
+        renderPacmanLife(target, states, logicalTileSize, mapOriginX, mapOriginY, topMargin);
     } else if (m_myRole == PlayerRole::PacMan) {
-        renderPacmanLife(target, states, logicalTileSize, mapOriginX, mapOriginY);
+        renderPacmanLife(target, states, logicalTileSize, mapOriginX, mapOriginY, topMargin);
     } else {
-        renderPacmanLife(target, states, logicalTileSize, mapOriginX, mapOriginY);
+        renderPacmanLife(target, states, logicalTileSize, mapOriginX, mapOriginY, topMargin);
     }
 
 
