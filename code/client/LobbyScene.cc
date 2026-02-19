@@ -90,8 +90,8 @@ void LobbyScene::doUpdate(gf::Time) {
                 auto data = packet.as<ServerListRoomPlayers>();
                 m_players = data.players;
                 std::reverse(m_players.begin(), m_players.end());
-                m_entity.setPlayers(m_players);
                 m_entity.setClientId(m_game.getMyId());
+                m_entity.setPlayers(m_players);
                 break;
             }
 
