@@ -35,6 +35,11 @@ public:
         return sqrt(pow(abs(oX-dX),2) + pow(abs(oY-dY),2)) <= range;
     }
     void update(gf::Time time) override;
+
+    void startPacmanPower();
+    void updatePacmanPower(int timeLeft);
+    void endPacmanPower();
+
     
 void render(gf::RenderTarget& target, const gf::RenderStates& states) override;
 
@@ -44,6 +49,9 @@ private:
     void renderPacGommes(gf::RenderTarget& target, const gf::RenderStates& states, const std::vector<std::pair<Position, PacGommeType>>& pacgommes, float logicalTileSize, float mapOriginX, float mapOriginY);
     void renderMyLife(gf::RenderTarget& target, const gf::RenderStates& states,float logicalTileSize, float mapOriginX, float mapOriginY, float topMargin);
     void renderPacmanLife(gf::RenderTarget& target, const gf::RenderStates& states,float logicalTileSize, float mapOriginX, float mapOriginY, float topMargin);
+    void renderPacManPower(gf::RenderTarget& target, const gf::RenderStates& states,float mapOriginX, float logicalTileSize, float topMargin);
+
+
 
 private:
     //etat du jeu
@@ -58,6 +66,9 @@ private:
     int m_myHp = 2;
     int m_pacmanHp = 3;
     PlayerRole m_myRole;
+
+    bool m_pacmanPowerActive = false;
+    int  m_pacmanPowerTimeLeft = 0;
     
     gf::Font m_font;
     

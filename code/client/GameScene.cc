@@ -79,6 +79,27 @@ void GameScene::doUpdate(gf::Time time) {
                 m_game.goToEndScene(data.reason);
                 break;
             }
+
+            case ServerPacManPowerStart::type: {
+                auto data = packet.as<ServerPacManPowerStart>();
+                m_entity.startPacmanPower();
+                break;
+            }
+
+            case ServerPacManPowerTick::type: {
+                auto data = packet.as<ServerPacManPowerTick>();
+                m_entity.updatePacmanPower(data.timeLeft);
+                break;
+            }
+
+            case ServerPacManPowerEnd::type: {
+                auto data = packet.as<ServerPacManPowerEnd>();
+                m_entity.endPacmanPower();
+                break;
+            }
+
+
+
             
             default:
                 break;

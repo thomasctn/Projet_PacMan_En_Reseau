@@ -149,6 +149,20 @@ void GameEntity::update(gf::Time time)
     m_pacmanSprite.update(time);
 }
 
+void GameEntity::startPacmanPower() {
+    m_pacmanPowerActive = true;
+}
+
+void GameEntity::updatePacmanPower(int timeLeft) {
+    m_pacmanPowerActive = true;
+    m_pacmanPowerTimeLeft = timeLeft;
+}
+
+void GameEntity::endPacmanPower() {
+    m_pacmanPowerActive = false;
+    m_pacmanPowerTimeLeft = 0;
+}
+
 void GameEntity::calculateMovement(gf::RenderTarget &target, const BoardCommon &map, float &tileSize, float &offsetX, float &offsetY)
 {
     gf::View view = target.getView();
@@ -162,6 +176,47 @@ void GameEntity::calculateMovement(gf::RenderTarget &target, const BoardCommon &
     offsetX = (viewSize.x - tileSize * float(map.width)) / 2.f + (view.getCenter().x - viewSize.x * 0.5f);
     offsetY = topMargin + (view.getCenter().y - viewSize.y * 0.5f);
 }
+
+void GameEntity::renderPacManPower(gf::RenderTarget& target,const gf::RenderStates& states, float mapOriginX,float logicalTileSize,float topMargin)
+{
+    if (!m_pacmanPowerActive)
+        return;
+
+    float mapRight = mapOriginX + m_board.width * logicalTileSize;
+
+    float boxPadding = 12.f;
+
+    float startX = mapRight + 20.f;
+    float startY = topMargin - 10.f; 
+
+    unsigned charSize = 12u;
+
+    gf::Text text;
+    text.setFont(m_font);
+    text.setCharacterSize(charSize);
+    text.setColor(gf::Color::Yellow);
+    text.setString("Pacman mode chasseur\nactive : " + std::to_string(m_pacmanPowerTimeLeft) + "s restantes");
+
+    gf::RectF bounds = text.getLocalBounds();
+    float textWidth  = bounds.max.x - bounds.min.x;
+    float textHeight = bounds.max.y - bounds.min.y;
+
+    gf::RoundedRectangleShape box({ textWidth + boxPadding * 2.f,textHeight + boxPadding * 2.f },8.f);
+
+    box.setPosition({ startX, startY });
+    box.setColor(gf::Color::Black);
+    box.setOutlineThickness(2.f);
+    box.setOutlineColor(gf::Color::Yellow);
+
+    target.draw(box, states);
+
+    text.setPosition({ startX + boxPadding,startY + boxPadding +10.f });
+
+    target.draw(text, states);
+}
+
+
+
 
 void GameEntity::renderMap(gf::RenderTarget &target, const gf::RenderStates &states, const BoardCommon &map, float logicalTileSize, float mapOriginX, float mapOriginY)
 {
@@ -576,6 +631,9 @@ void GameEntity::render(gf::RenderTarget &target, const gf::RenderStates &states
     } else {
         renderPacmanLife(target, states, logicalTileSize, mapOriginX, mapOriginY, topMargin);
     }
+
+    //mode chasseur
+    renderPacManPower(target, states, mapOriginX, logicalTileSize, topMargin);
 
 
 }
