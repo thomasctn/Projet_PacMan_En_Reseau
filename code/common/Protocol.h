@@ -184,12 +184,14 @@ Archive &operator|(Archive &ar, ServerListRooms &data)
 struct ServerJoinRoom
 {
   static constexpr gf::Id type = "ServerJoinRoom"_id;
-  gf::Id room;
+  uint32_t roomID;
+  RoomSettings settings;
+  std::vector<PlayerData> players;
 };
 template <typename Archive>
 Archive &operator|(Archive &ar, ServerJoinRoom &data)
 {
-  return ar | data.room;
+  return ar | data.roomID | data.settings | data.players;
 }
 // Réponse au client qui quitte la room
 struct ServerLeaveRoom

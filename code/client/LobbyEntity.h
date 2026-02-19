@@ -41,6 +41,7 @@ public:
 
   void pointTo(gf::Vector2f coords);
   void triggerAction();
+  void setRoomID(uint32_t roomID);
   void setPlayers(const std::vector<PlayerData>& players);
   void setRoomSettings(const RoomSettings& settings);
   void setClientId(uint32_t id);
@@ -89,6 +90,7 @@ private:
   LobbyAction m_lastAction = LobbyAction::None;
 
   //état affiché
+  uint32_t m_roomID;
   std::vector<PlayerData> m_players;
   PlayerData m_client;
   RoomSettings m_roomSettings{};

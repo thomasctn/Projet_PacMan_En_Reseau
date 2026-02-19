@@ -17,15 +17,17 @@ LobbyScene::LobbyScene(ClientGame& game)
 }
 
 void LobbyScene::setInitialState(
+    const uint32_t roomID,
     const std::vector<PlayerData>& players,
     const RoomSettings& settings
 ) {
     m_players = players;
     m_roomSettings = settings;
-
+    m_roomID = roomID;
+    m_entity.setClientId(m_game.getMyId());
     m_entity.setPlayers(m_players);
     m_entity.setRoomSettings(m_roomSettings);
-    m_entity.setClientId(m_game.getMyId());
+    m_entity.setRoomID(roomID);
 }
 
 void LobbyScene::doProcessEvent(gf::Event& event) {

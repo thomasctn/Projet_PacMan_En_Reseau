@@ -39,7 +39,13 @@ void Room::addPlayer(uint32_t playerId) {
     }
 
     gf::Packet joinPacket;
-    joinPacket.is(ServerJoinRoom{});
+    ServerJoinRoom joinData;
+    joinData.roomID = id;
+    joinData.settings = settings;
+    for(auto& d : preGamePlayers) {
+        joinData.players.push_back(d.second);
+    }
+    joinPacket.is(joinData);
     network.send(playerId, joinPacket);
 
     // Mettre à jour tous les clients

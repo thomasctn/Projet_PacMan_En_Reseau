@@ -111,13 +111,6 @@ void Lobby::handleClientJoinRoom(PacketContext& ctx) {
     // Ajouter le joueur à la room
     playerRoom[ctx.senderId] = roomId;
     rooms.at(roomId)->addPlayer(ctx.senderId);
-
-    gf::Packet joinAck;
-    ServerJoinRoom sjr;
-    sjr.room = roomId;
-    joinAck.is(sjr);
-    network.send(ctx.senderId, joinAck);
-
     broadcastRoomsList();
 
     gf::Log::info("[Lobby] Joueur %u ajouté à la room %u\n", ctx.senderId, roomId);
@@ -129,11 +122,7 @@ void Lobby::handleClientCreateRoom(PacketContext &ctx)
     RoomId roomId = createRoom("Player_" + std::to_string(ctx.senderId));
     playerRoom[ctx.senderId] = roomId;
     rooms.at(roomId)->addPlayer(ctx.senderId);
-    gf::Packet joinAck;
-    ServerJoinRoom sjr;
-    sjr.room = roomId;
-    joinAck.is(sjr);
-    network.send(ctx.senderId, joinAck);
+
     broadcastRoomsList();
 
     gf::Log::info("[Lobby] Joueur %u ajouté à la room %u\n", ctx.senderId, roomId);

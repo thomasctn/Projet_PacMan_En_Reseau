@@ -68,8 +68,9 @@ void LobbyListScene::doUpdate(gf::Time time) {
 
             case ServerJoinRoom::type: {
                         gf::Log::info("Serveur: rejoint la room\n"); 
+                        ServerJoinRoom data = packet.as<ServerJoinRoom>();
+                        m_game.lobbyScene.setInitialState(data.roomID,data.players,data.settings);
                         m_game.requestScene(SceneRequest::GoToLobby);
-
                         
                         break;
                     }

@@ -13,6 +13,7 @@ public:
     explicit LobbyScene(ClientGame& game);
 
     void setInitialState(
+        const uint32_t roomID,
         const std::vector<PlayerData>& players,
         const RoomSettings& settings
     );
@@ -28,6 +29,7 @@ private:
     gf::Font m_font;
     LobbyEntity m_entity;
 
+    uint32_t m_roomID;
     std::vector<PlayerData> m_players;
     RoomSettings m_roomSettings{};
     bool m_amReady = false;

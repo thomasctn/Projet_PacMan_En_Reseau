@@ -106,11 +106,17 @@ void LobbyEntity::triggerAction() {
     m_container.triggerAction();
 }
 
+void LobbyEntity::setRoomID(uint32_t roomID)
+{
+    m_roomID = roomID;
+}
+
 void LobbyEntity::setPlayers(const std::vector<PlayerData>& players) {
     m_players = players;
     for(auto& p : players) {
         if(p.id == m_clientId) {
             m_client = p;
+            break;
         }
     }
 }
@@ -149,7 +155,7 @@ void LobbyEntity::render(gf::RenderTarget& target, const gf::RenderStates& state
     roomName.setFont(m_font);
     roomName.setCharacterSize(28U);
     roomName.setColor(gf::Color::White);
-    roomName.setString("Nom de la room ?");
+    roomName.setString("Room n° " + std::to_string(m_roomID));
     roomName.setPosition({textPosX, LOGICAL_W* .04f});
     target.draw(roomName, states);
 
