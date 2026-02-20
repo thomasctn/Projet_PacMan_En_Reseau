@@ -1,0 +1,55 @@
+@startuml
+' --- Orientation verticale ---
+top to bottom direction
+
+
+
+' --- Style ---
+skinparam class {
+  BackgroundColor #F0F8FF
+  BorderColor black
+  ArrowColor black
+}
+
+' --- Classes comme handlers ---
+class Client
+class Server
+class Lobby
+class Room
+class Game
+
+' --- Chaîne de responsabilité ---
+Client --> Server : envoie paquet
+Server --> Lobby : forward si non géré
+Lobby --> Room : forward si non géré
+Room --> Game : forward si non géré
+
+
+note right of Client
+Envoie les intentions de déplacement
+Affiche le jeu
+end note
+
+note right of Server
+Gère les connexions TCP
+Valide les intentions
+Diffuse les infos aux clients
+end note
+
+note right of Lobby
+Gère l’entrée dans les salles
+Crée de nouvelles rooms si besoin
+end note
+
+note right of Room
+Gère les joueurs
+Vérifie si la salle est pleine
+Lance la partie
+end note
+
+note right of Game
+Gère la logique de la partie
+Collision, score, fin de partie
+end note
+
+@enduml
