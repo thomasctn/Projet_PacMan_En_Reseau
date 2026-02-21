@@ -6,165 +6,9 @@
 #include <gf/Array2D.h>
 #include <functional>
 #include "Types.h"
-#include "Constants.h"
+#include "ProtocolData.h"
 
 using namespace gf::literals;
-
-/*
-Liste des échanges client <-> serveur
-
-Client (envoyé)
-- Tentative de connexion au lobby
-- Tentative de modification des paramètres de la partie
-- Tentative de démarrage de la partie
-- Tentative de déplacement
-- Tentative d'activation de pouvoir
-
-
-Serveur (envoyé)
-- Réponse à la tentative de connexion au lobby
-- Nouveau joueur dans le lobby (Tous les client)
-
-- Réponse à la tentative de modification des paramètres
-- Modification des paramètres de la partie (Tous les client)
-
-- Réponse à la tentative de démarrage de la partie
-- Démarrage de la partie (Tous les client)
-
-- Réponde à la tentative de déplacement (Ex : s'il a ramassé un pouvoir / toucher qlq)
-- Déplacement d'un joueur (Tous les client)
--- Joueur x mangé (Tous les client)
--- Pacgomme mangé (Tous les client)
-
-- Réponse à la tentative d'activation d'un pouvoir
-- Activation d'un pouvoir (Tous les client)
-
-- Modification de l'environnement (destruction de mur) (Tous les client) ?
-
-- Fin de partie (Tous les client)
-
-
-*/
-
-// Faudra probablement les déplacer ces structures
-struct Position
-{
-  static constexpr gf::Id type = "Position"_id;
-  unsigned int x;
-  unsigned int y;
-
-  Position() : x(0), y(0) {}
-  Position(unsigned int xp, unsigned int yp) : x(xp), y(yp) {}
-
-  bool operator==(const Position &a) const
-  {
-    return (x == a.x && y == a.y);
-  }
-
-  bool operator<(const Position &a) const
-  {
-    return (x < a.x || (x == a.x && y < a.y));
-  }
-};
-
-namespace std
-{
-  template <>
-  struct hash<Position>
-  {
-    std::size_t operator()(const Position &p) const noexcept
-    {
-      return std::hash<unsigned int>()(p.x) ^ (std::hash<unsigned int>()(p.y) << 1);
-    }
-  };
-}
-
-template <typename Archive>
-Archive &operator|(Archive &ar, Position &data)
-{
-  return ar | data.x | data.y;
-}
-
-struct CaseCommon
-{
-  static constexpr gf::Id type = "CaseCommon"_id;
-  CellType celltype;
-  bool pacGomme = false;
-  CaseCommon() : celltype(CellType::Floor) {}
-  CaseCommon(CellType t)
-  {
-    celltype = t;
-  }
-};
-template <typename Archive>
-Archive &operator|(Archive &ar, CaseCommon &data)
-{
-  return ar | data.celltype;
-}
-
-struct BoardCommon
-{
-  BoardCommon() {};
-  BoardCommon(unsigned int w, unsigned int h) : grid({w, h}), width(w), height(h) {}
-  static constexpr gf::Id type = "BoardCommon"_id;
-  unsigned int width;
-  unsigned int height;
-  gf::Array2D<CaseCommon> grid;
-};
-template <typename Archive>
-Archive &operator|(Archive &ar, BoardCommon &data)
-{
-  return ar | data.width | data.height | data.grid;
-}
-
-struct PlayerData
-{
-  static constexpr gf::Id type = "PlayerData"_id;
-  uint32_t id;
-  float x, y;
-  uint32_t color; // RGBA
-  std::string name;
-  PlayerRole role;
-  int score;
-  bool ready = false;
-  int hp = 0;
-};
-template <typename Archive>
-Archive &operator|(Archive &ar, PlayerData &data)
-{
-  return ar | data.id | data.x | data.y | data.color | data.name | data.role | data.score | data.ready | data.hp;
-}
-
-struct RoomSettings
-{
-  static constexpr gf::Id type = "RoomSettings"_id;
-  unsigned int roomSize;
-  unsigned int nbBot;
-  unsigned int gameDuration;
-  unsigned int nbLifePacman = MIN_HP_PACMAN;
-  unsigned int nbLifeGhost = MIN_HP_GHOST;
-};
-template <typename Archive>
-Archive &operator|(Archive &ar, RoomSettings &data)
-{
-  return ar | data.roomSize | data.nbBot | data.gameDuration | data.nbLifePacman | data.nbLifeGhost;
-}
-
-struct RoomData
-{
-  static constexpr gf::Id type = "RoomData"_id;
-  unsigned int roomID;
-  unsigned int roomSize;
-  std::string hostName;
-  unsigned int nbPlayer;
-};
-template <typename Archive>
-Archive &operator|(Archive &ar, RoomData &data)
-{
-  return ar | data.roomID | data.roomSize | data.hostName | data.nbPlayer;
-}
-
-//------------------------------------------
 
 // Un peu inspiré de https://github.com/Hatunruna/ggj2020/blob/master/code/bits/common/Protocol.h
 
@@ -350,36 +194,41 @@ Archive &operator|(Archive &ar, ServerGamePreStart &data)
 }
 
 // PacMan devient chasseur
-struct ServerPacManPowerStart {
-    static constexpr gf::Id type = "ServerPacManPowerStart"_id;
-    uint32_t playerId;
+struct ServerPacManPowerStart
+{
+  static constexpr gf::Id type = "ServerPacManPowerStart"_id;
+  uint32_t playerId;
 };
 template <typename Archive>
-Archive& operator|(Archive& ar, ServerPacManPowerStart& data) {
-    return ar | data.playerId;
+Archive &operator|(Archive &ar, ServerPacManPowerStart &data)
+{
+  return ar | data.playerId;
 }
 
 // Tick chaque seconde
-struct ServerPacManPowerTick {
-    static constexpr gf::Id type = "ServerPacManPowerTick"_id;
-    uint32_t playerId;
-    int timeLeft; // secondes restantes
+struct ServerPacManPowerTick
+{
+  static constexpr gf::Id type = "ServerPacManPowerTick"_id;
+  uint32_t playerId;
+  int timeLeft; // secondes restantes
 };
 template <typename Archive>
-Archive& operator|(Archive& ar, ServerPacManPowerTick& data) {
-    return ar | data.playerId | data.timeLeft;
+Archive &operator|(Archive &ar, ServerPacManPowerTick &data)
+{
+  return ar | data.playerId | data.timeLeft;
 }
 
 // Fin du mode chasseur
-struct ServerPacManPowerEnd {
-    static constexpr gf::Id type = "ServerPacManPowerEnd"_id;
-    uint32_t playerId;
+struct ServerPacManPowerEnd
+{
+  static constexpr gf::Id type = "ServerPacManPowerEnd"_id;
+  uint32_t playerId;
 };
 template <typename Archive>
-Archive& operator|(Archive& ar, ServerPacManPowerEnd& data) {
-    return ar | data.playerId;
+Archive &operator|(Archive &ar, ServerPacManPowerEnd &data)
+{
+  return ar | data.playerId;
 }
-
 
 inline gf::v1::Serializer &operator|(gf::v1::Serializer &ar, const std::pair<Position, PacGommeType> &pg)
 {
@@ -394,8 +243,6 @@ inline gf::v1::Deserializer &operator|(gf::v1::Deserializer &ar, std::pair<Posit
   pg.second = static_cast<PacGommeType>(typeVal);
   return ar;
 }
-
-
 
 // Client -> serveur
 
@@ -495,8 +342,6 @@ Archive &operator|(Archive &ar, ClientDisconnect &data)
   return ar;
 }
 
-//
-
 struct ClientMove
 {
   static constexpr gf::Id type = "ClientMove"_id;
@@ -507,4 +352,3 @@ Archive &operator|(Archive &ar, ClientMove &data)
 {
   return ar | data.moveDir;
 }
-
