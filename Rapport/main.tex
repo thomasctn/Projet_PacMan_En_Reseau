@@ -155,8 +155,8 @@ Le serveur a été conçu selon un modèle multithreadé ou chaine de responsabi
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.6\textwidth]{UML/PacMan_UML_Server_chaine.png}
-    \caption{Diagramme de Chaine de responsabilité}
+    \includegraphics[width=0.6\textwidth]{images/chaine_responsabilité.png}
+    \caption{Model de Chaine de responsabilité}
 \end{figure}
 
 \section{Répartition des rôles}
@@ -252,6 +252,14 @@ Ce choix architectural permet de garantir la cohérence globale du système, d�
 
 Ce prototype a ainsi servi de socle technique pour la suite du développement, notamment pour la mise en place du routage des paquets, de la gestion multithread et de la boucle de jeu.
 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{images/prototype.png}
+
+    \caption{Premier prototype}
+    \caption*{Vue de l'un des clients, il y a 2 client de connecté au serveur}
+\end{figure}
+
 \section{Conception de l’architecture du serveur}
 
 Après validation du prototype initial, l’architecture du serveur a été repensée afin de supporter une structure plus complexe adaptée à un jeu multijoueur complet.
@@ -262,72 +270,54 @@ L’objectif principal était de passer d’un prototype monolithique à une arc
 
 \subsubsection*{Architecture multithread}
 
-Afin de gérer plusieurs connexions simultanées, le serveur repose sur une architecture multithread.
+Afin de supporter plusieurs connexions simultanées sans dégrader les performances, le serveur repose sur une architecture multithread. 
+La gestion réseau est détachée de la logique de jeu afin d’éviter qu’une opération bloquante (attente de paquet, latence réseau, déconnexion) ne ralentisse l’ensemble du système.
 
-Chaque client connecté dispose :
-\begin{itemize}
-    \item d’un thread dédié à la réception des paquets,
-    \item d’une file d’attente (queue) pour stocker les messages entrants,
-    \item d’un traitement synchronisé côté logique serveur.
-\end{itemize}
+Un thread est dédié à la réception des paquets. 
+Les messages reçus sont placés dans une file d’attente interne, puis traités de manière synchronisée par la logique centrale du serveur. 
+Cette séparation permet de distinguer clairement la couche communication de la couche métier.
 
-Cette organisation permet :
+L’utilisation de files de messages agit comme un tampon entre le réseau et la boucle de jeu. 
+Ainsi, le serveur peut continuer à exécuter ses mises à jour périodiques indépendamment des délais de transmission.
 
-\begin{itemize}
-    \item d’éviter le blocage du serveur lors d’attentes réseau,
-    \item de séparer la communication de la logique métier,
-    \item de garantir une meilleure réactivité globale.
-\end{itemize}
+Cette architecture améliore la robustesse du système, limite les risques de blocage et constitue une base adaptée à l’exécution simultanée de plusieurs parties.
 
-Le serveur conserve toutefois une logique autoritaire : toutes les décisions impactant l’état du jeu sont prises centralement.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{UML/PacMan_UML_Server_chaine.png}
+    \caption{Diagramme de Chaine de responsabilité}
+\end{figure}
 
 \subsubsection*{Transformation du prototype}
 
-Le prototype initial a servi de base structurelle. Cependant, plusieurs adaptations ont été nécessaires :
+Le prototype initial validait la communication réseau et le modèle autoritaire, mais son architecture restait monolithique. 
+L’ensemble des responsabilités, gestion des connexions, organisation des joueurs et logique de jeu, étaient fortement couplées. 
+Cette structure suffisait pour une démonstration technique, mais devenait rapidement limitée dès lors que l’on souhaitait introduire plusieurs parties simultanées.
 
-\begin{itemize}
-    \item Séparation claire entre la gestion réseau et la logique de jeu.
-    \item Introduction d’un système de \textit{Lobby}.
-    \item Ajout d’un système de \textit{Room}.
-    \item Encapsulation de la logique de partie dans une classe dédiée \textit{Game}.
-\end{itemize}
+La transformation du prototype a consisté à structurer le serveur en plusieurs couches distinctes, chacune possédant un rôle clairement défini. 
+La gestion réseau a d’abord été isolée de la logique métier afin de rendre le système plus modulaire. 
+Un système de \textit{Lobby} a ensuite été introduit pour centraliser la création et l’organisation des parties. 
+Chaque partie est encapsulée dans une entité \textit{Room}, responsable de la gestion des joueurs et de leur état avant le démarrage. 
+Enfin, la logique complète du jeu est contenue dans une classe dédiée \textit{Game}, indépendante des mécanismes réseau.
 
-L’architecture finale suit une chaîne de responsabilité :
+L’architecture finale suit ainsi une chaîne de responsabilité structurée :
 
 \begin{center}
-Client $\rightarrow$ Server $\rightarrow$ Lobby $\rightarrow$ Room $\rightarrow$ Game
+    Client $\rightarrow$ Server $\rightarrow$ Lobby $\rightarrow$ Room $\rightarrow$ Game
 \end{center}
 
-Chaque couche possède une responsabilité bien définie :
-
-\begin{itemize}
-    \item \textbf{Server} : gestion des connexions et routage des paquets.
-    \item \textbf{Lobby} : gestion des salons et création des parties.
-    \item \textbf{Room} : gestion des joueurs et préparation de la partie.
-    \item \textbf{Game} : logique complète du jeu.
-\end{itemize}
-
-Cette organisation améliore la lisibilité du code et permet d’isoler les responsabilités.
+Chaque couche agit comme un filtre spécialisé qui délègue la responsabilité au niveau inférieur. 
+Cette hiérarchisation améliore la lisibilité du code, facilite les tests unitaires et permet d’étendre le système (nouvelles règles, nouveaux modes de jeu) sans modifier la couche réseau.
 
 \subsubsection*{Première implémentation du plateau}
 
-La première version du plateau utilisait une grille simple composée de cases murales et traversables.
+La première version du plateau reposait sur une grille bidimensionnelle composée de cases murales et de cases traversables. 
+Cette représentation volontairement simple avait pour objectif de stabiliser le modèle du jeu avant d’introduire des mécanismes plus complexes.
 
-L’objectif initial était de :
+Cette phase intermédiaire a permis de valider plusieurs éléments comme la détection des collisions, la synchronisation des déplacements entre clients et serveur, ainsi que la cohérence entre la représentation logique du plateau côté serveur et son affichage graphique côté client.
 
-\begin{itemize}
-    \item Vérifier les collisions.
-    \item Tester les déplacements synchronisés.
-    \item Préparer l’intégration future d’un générateur de labyrinthe.
-\end{itemize}
-
-Cette étape intermédiaire a permis de valider la cohérence entre :
-\begin{itemize}
-    \item La représentation logique du plateau côté serveur.
-    \item L’affichage côté client.
-\end{itemize}
-
-Le plateau est progressivement devenu une structure centrale du projet, servant de base à la génération procédurale et à l’intelligence artificielle des fantômes.
+Le plateau est ainsi devenu une structure centrale du projet. 
+Il ne constituait plus seulement un support visuel, mais une entité logique partagée servant de référence unique pour les calculs de déplacement, la gestion des interactions et, par la suite, pour la génération procédurale du labyrinthe et l’intelligence artificielle des entités ennemies.
 
 \subsection{Mise en place du jeu}
 
