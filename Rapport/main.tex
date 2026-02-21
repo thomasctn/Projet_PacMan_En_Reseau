@@ -178,21 +178,19 @@ Cette répartition a permis une progression simultanée sur plusieurs fronts du 
 
 \section{Architecture générale}
 
-Après validation du prototype initial, l’architecture du serveur a été repensée afin de supporter une structure plus complexe adaptée à un jeu multijoueur complet.
+L’architecture du serveur est conçue pour supporter un jeu multijoueur complet reposant sur une structure modulaire, évolutive et maintenable.
 
-L’objectif principal était de passer d’un prototype monolithique à une architecture modulaire, évolutive et maintenable.
+Le serveur s’appuie sur une architecture multithread permettant de gérer plusieurs connexions simultanées sans dégradation des performances. 
+La couche réseau est strictement séparée de la logique de jeu afin d’éviter qu’une opération bloquante — telle qu’une attente de paquet, une latence élevée ou une déconnexion — n’impacte l’exécution globale du système.
 
-Afin de supporter plusieurs connexions simultanées sans dégrader les performances, le serveur repose sur une architecture multithread. 
-La gestion réseau est détachée de la logique de jeu afin d’éviter qu’une opération bloquante (attente de paquet, latence réseau, déconnexion) ne ralentisse l’ensemble du système.
+Un thread est dédié à la réception des paquets réseau. 
+Les messages reçus sont insérés dans une file d’attente interne, puis traités de manière synchronisée par la logique centrale du serveur. 
+Cette organisation garantit une séparation claire entre la couche communication et la couche métier.
 
-Un thread est dédié à la réception des paquets. 
-Les messages reçus sont placés dans une file d’attente interne, puis traités de manière synchronisée par la logique centrale du serveur. 
-Cette séparation permet de distinguer clairement la couche communication de la couche métier.
+La file de messages agit comme un mécanisme de tampon entre le système réseau et la boucle de jeu à tick fixe. 
+Ainsi, l’exécution des mises à jour périodiques demeure indépendante des variations de latence ou du débit des clients.
 
-L’utilisation de files de messages agit comme un tampon entre le réseau et la boucle de jeu. 
-Ainsi, le serveur peut continuer à exécuter ses mises à jour périodiques indépendamment des délais de transmission.
-
-Cette architecture améliore la robustesse du système, limite les risques de blocage et constitue une base adaptée à l’exécution simultanée de plusieurs parties.
+Cette architecture renforce la robustesse du système, limite les risques de blocage et permet l’exécution simultanée de plusieurs parties indépendantes au sein du même serveur.
 
 \begin{figure}[H]
     \centering
@@ -208,58 +206,55 @@ Cette architecture améliore la robustesse du système, limite les risques de bl
 
 \subsubsection*{Architecture multithread}
 
-Afin de supporter plusieurs connexions simultanées sans dégrader les performances, le serveur repose sur une architecture multithread. 
-La gestion réseau est détachée de la logique de jeu afin d’éviter qu’une opération bloquante (attente de paquet, latence réseau, déconnexion) ne ralentisse l’ensemble du système.
+Le serveur repose sur une architecture multithread conçue pour supporter plusieurs connexions simultanées sans dégradation des performances. 
+La couche réseau est strictement séparée de la logique de jeu afin d’éviter qu’une opération bloquante — attente de paquet, latence élevée ou déconnexion — n’impacte l’exécution globale du système.
 
-Un thread est dédié à la réception des paquets. 
-Les messages reçus sont placés dans une file d’attente interne, puis traités de manière synchronisée par la logique centrale du serveur. 
-Cette séparation permet de distinguer clairement la couche communication de la couche métier.
+Un thread est dédié à la réception des paquets réseau. 
+Les messages entrants sont insérés dans une file d’attente interne, puis traités de manière synchronisée par la logique centrale du serveur. 
+Cette organisation assure une séparation claire entre la couche communication et la couche métier.
 
-L’utilisation de files de messages agit comme un tampon entre le réseau et la boucle de jeu. 
-Ainsi, le serveur peut continuer à exécuter ses mises à jour périodiques indépendamment des délais de transmission.
+La file de messages agit comme un tampon entre le réseau et la boucle de jeu à tick fixe. 
+Ainsi, les mises à jour périodiques du monde restent indépendantes des variations de latence ou du débit des clients.
 
-Cette architecture améliore la robustesse du système, limite les risques de blocage et constitue une base adaptée à l’exécution simultanée de plusieurs parties.
+Cette architecture renforce la robustesse du système et permet l’exécution simultanée de plusieurs parties indépendantes au sein d’un même serveur.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.6\textwidth]{UML/PacMan_UML_Server_chaine.png}
-    \caption{Diagramme de Chaine de responsabilité}
+    \caption{Chaîne de responsabilité côté serveur}
 \end{figure}
 
-\subsubsection*{Transformation du prototype}
+\subsubsection*{Architecture modulaire}
 
-Le prototype initial validait la communication réseau et le modèle autoritaire, mais son architecture restait monolithique. 
-L’ensemble des responsabilités, gestion des connexions, organisation des joueurs et logique de jeu, étaient fortement couplées. 
-Cette structure suffisait pour une démonstration technique, mais devenait rapidement limitée dès lors que l’on souhaitait introduire plusieurs parties simultanées.
+L’architecture du serveur est organisée en plusieurs couches distinctes possédant chacune une responsabilité clairement définie. 
+Cette structuration modulaire garantit lisibilité, extensibilité et maintenabilité.
 
-La transformation du prototype a consisté à structurer le serveur en plusieurs couches distinctes, chacune possédant un rôle clairement défini. 
-La gestion réseau a d’abord été isolée de la logique métier afin de rendre le système plus modulaire. 
-Un système de \textit{Lobby} a ensuite été introduit pour centraliser la création et l’organisation des parties. 
-Chaque partie est encapsulée dans une entité \textit{Room}, responsable de la gestion des joueurs et de leur état avant le démarrage. 
-Enfin, la logique complète du jeu est contenue dans une classe dédiée \textit{Game}, indépendante des mécanismes réseau.
+La couche \textit{Server} assure la gestion des connexions et le routage des messages. 
+Le \textit{Lobby} centralise l’organisation des joueurs et la création des parties. 
+Chaque partie est encapsulée dans une entité \textit{Room}, responsable de son état propre et de ses joueurs. 
+Enfin, la logique complète du jeu est contenue dans la classe \textit{Game}, indépendante des mécanismes réseau.
 
-L’architecture finale suit ainsi une chaîne de responsabilité structurée :
+L’architecture suit ainsi une chaîne de responsabilité hiérarchique :
 
 \begin{center}
-    Client $\rightarrow$ Server $\rightarrow$ Lobby $\rightarrow$ Room $\rightarrow$ Game
+Client $\rightarrow$ Server $\rightarrow$ Lobby $\rightarrow$ Room $\rightarrow$ Game
 \end{center}
 
-Chaque couche agit comme un filtre spécialisé qui délègue la responsabilité au niveau inférieur. 
-Cette hiérarchisation améliore la lisibilité du code, facilite les tests unitaires et permet d’étendre le système (nouvelles règles, nouveaux modes de jeu) sans modifier la couche réseau.
+Chaque couche délègue les traitements spécialisés au niveau inférieur, ce qui permet d’introduire de nouvelles fonctionnalités sans modifier les composants fondamentaux du système.
 
-\subsubsection*{Première implémentation du plateau}
+\subsubsection*{Structure du plateau}
 
-La première version du plateau reposait sur une grille bidimensionnelle composée de cases murales et de cases traversables. 
-Cette représentation volontairement simple avait pour objectif de stabiliser le modèle du jeu avant d’introduire des mécanismes plus complexes.
+Le plateau est modélisé sous forme d’une grille bidimensionnelle composée de cases murales et de cases traversables. 
+Cette représentation discrète constitue la base logique du système.
 
-Cette phase intermédiaire a permis de valider plusieurs éléments comme la détection des collisions, la synchronisation des déplacements entre clients et serveur, ainsi que la cohérence entre la représentation logique du plateau côté serveur et son affichage graphique côté client.
+Il sert de référence unique pour la détection des collisions, la mise à jour des déplacements, le placement des éléments interactifs ainsi que pour les algorithmes d’intelligence artificielle. 
+La cohérence entre la représentation logique côté serveur et l’affichage côté client garantit une synchronisation fiable du monde de jeu.
 
-Le plateau est ainsi devenu une structure centrale du projet. 
-Il ne constituait plus seulement un support visuel, mais une entité logique partagée servant de référence unique pour les calculs de déplacement, la gestion des interactions et, par la suite, pour la génération procédurale du labyrinthe et l’intelligence artificielle des entités ennemies.
-
+Le plateau constitue ainsi une structure centrale sur laquelle reposent la génération procédurale du labyrinthe et les mécanismes décisionnels des fantômes.
 
 
-\subsection{Mise en place du jeu}
+
+\subsection{Gameplay}
 
 \subsubsection*{Boucle de jeu}
 
@@ -380,113 +375,80 @@ Un bruit aléatoire contrôlé est également introduit afin d’éviter les cyc
 
 Cette approche hybride offre un compromis entre précision stratégique, coût computationnel maîtrisé et richesse comportementale.
 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{images/trace.png}
+    \caption{Vue des traces}
+    \caption*{Rouge pour PacMan et Bleu pour les fantômes}
+\end{figure}
+
 \subsubsection{Rooms : gestion des parties}
 
-Afin de supporter plusieurs parties simultanées, le serveur utilise un système de \textbf{rooms}. 
-Chaque room est un espace indépendant qui gère :
+Afin de supporter plusieurs parties simultanées, le serveur repose sur un système de \textit{rooms}. 
+Une room représente une instance autonome de jeu possédant son propre état, ses propres joueurs et son propre cycle d’exécution. 
+Cette abstraction permet d’isoler complètement les parties les unes des autres tout en conservant une architecture serveur centralisée.
 
-\begin{itemize}
-    \item La liste des joueurs connectés
-    \item Les rôles attribués à chaque joueur (Pac-Man ou fantôme)
-    \item Les paramètres de la partie (durée, nombre de vies, nombre de pac-gommes spéciales)
-    \item L’état de la partie (en attente, en cours, terminée)
-\end{itemize}
+Chaque room maintient la liste des joueurs connectés, l’attribution des rôles (Pac-Man ou fantômes), les paramètres de la partie ainsi que son état courant (en attente, en cours, terminée). 
+Elle encapsule également sa propre boucle de jeu et son plateau, garantissant qu’aucune donnée n’est partagée entre deux parties distinctes.
 
-\paragraph{Création et attribution des rôles}
+\paragraph{Création dynamique et attribution des rôles}
 
-\begin{itemize}
-    \item Lorsqu’un joueur rejoint un lobby, il peut entrer dans une room disponible.
-    \item Si aucune room n’est disponible, une nouvelle room est créée automatiquement.
-    \item Les rôles sont assignés en fonction des règles :
-    \begin{itemize}
-        \item Un joueur est choisi comme Pac-Man
-        \item Les autres sont des fantômes
-    \end{itemize}
-\end{itemize}
+Lorsqu’un joueur rejoint le lobby, il est dirigé vers une room existante disposant de places libres. 
+Si aucune room n’est disponible, une nouvelle instance est créée dynamiquement. 
+Cette création à la demande permet au serveur d’adapter automatiquement sa structure au nombre de joueurs connectés.
 
-\paragraph{Transmission des informations}
+L’attribution des rôles est effectuée au moment du lancement de la partie selon une règle simple : un joueur incarne Pac-Man tandis que les autres deviennent des fantômes. 
+Ce mécanisme est géré exclusivement côté serveur afin d’éviter toute incohérence ou manipulation côté client.
 
-Chaque room maintient un état centralisé, qui est diffusé à tous les joueurs connectés via le serveur :
+\paragraph{Gestion et diffusion de l’état}
 
-\begin{itemize}
-    \item Position des joueurs
-    \item État des pac-gommes
-    \item État des timers (partie et mode chasseur)
-\end{itemize}
+Chaque room possède un état centralisé comprenant les positions des joueurs, l’état des pac-gommes et les différents systèmes temporels. 
+À chaque tick, cet état est mis à jour puis diffusé uniquement aux joueurs appartenant à la room concernée.
 
-Cette approche garantit :
+Ce cloisonnement garantit la cohérence interne de chaque partie et empêche toute interférence entre sessions distinctes. 
+Il constitue un élément clé de la scalabilité du système.
 
-\begin{itemize}
-    \item La cohérence des parties multijoueurs
-    \item L’isolation des parties entre elles
-    \item Une architecture modulaire et scalable
-\end{itemize}
+\paragraph{Paramétrisation des parties}
 
-\paragraph{Paramètres de la partie}
+Les rooms permettent également d’ajuster dynamiquement certains paramètres, tels que la durée maximale d’une partie, le nombre de vies de Pac-Man ou encore la quantité de pac-gommes spéciales. 
+Cette capacité de configuration facilite les phases de test, l’équilibrage du gameplay et l’organisation de parties compétitives aux règles différenciées.
 
-Les rooms permettent de configurer :
+L’introduction du système de rooms marque ainsi une transition vers une architecture modulaire capable de gérer un nombre variable de parties simultanées tout en conservant un modèle serveur autoritaire cohérent.
 
-\begin{itemize}
-    \item La durée de la partie
-    \item Le nombre de vies de Pac-Man
-    \item Le nombre et la disposition des pac-gommes spéciales
-\end{itemize}
-
-Ainsi, chaque partie peut avoir des règles légèrement différentes, offrant plus de rejouabilité et de flexibilité pour les tests et la compétition entre joueurs.
 
 
 \subsubsection{Règles du jeu}
 
-Le jeu respecte des règles spécifiques pour Pac-Man et les fantômes, afin de garantir un gameplay équilibré et stratégique.
+Les règles du jeu ont été définies afin d’instaurer un équilibre entre tension, stratégie et asymétrie des rôles. 
+Chaque camp dispose d’objectifs distincts et de contraintes spécifiques, créant une dynamique d’opposition structurée.
 
 \paragraph{Conditions de victoire}
 
-\begin{itemize}
-    \item \textbf{Pour Pac-Man} : 
-    \begin{itemize}
-        \item Avoir consommé toutes les pac-gommes du plateau
-        \item Ou survivre jusqu’à la fin du timer de la partie
-    \end{itemize}
-    \item \textbf{Pour les fantômes} :
-    \begin{itemize}
-        \item Éliminer Pac-Man en lui faisant perdre toutes ses vies
-    \end{itemize}
-\end{itemize}
+Pac-Man remporte la partie s’il parvient à consommer l’ensemble des pac-gommes présentes sur le plateau ou s’il survit jusqu’à l’expiration du timer global. 
+Les fantômes, quant à eux, gagnent en épuisant toutes les vies de Pac-Man avant la fin du temps imparti.
 
-\paragraph{Pac-gommes spéciales}
+Ce double système de victoire introduit une pression temporelle permanente : Pac-Man doit optimiser ses déplacements, tandis que les fantômes doivent coordonner leurs actions pour limiter ses opportunités.
 
-Certaines pac-gommes permettent à Pac-Man d’entrer temporairement en \textit{mode chasseur} :
+\paragraph{Pac-gommes spéciales et renversement de dynamique}
 
-\begin{itemize}
-    \item Pendant cette période, Pac-Man peut éliminer les fantômes.
-    \item La durée du mode est limitée par un timer spécifique.
-    \item Les fantômes affectés réapparaissent après un certain délai.
-\end{itemize}
+Certaines pac-gommes déclenchent un mode temporaire dit « chasseur ». 
+Durant cette période, Pac-Man devient capable d’éliminer les fantômes au contact. 
+Cet état est strictement limité dans le temps par un compteur décrémenté à chaque tick serveur. 
+Les fantômes éliminés réapparaissent après un délai prédéfini, maintenant ainsi l’équilibre global.
 
-\paragraph{Vision des joueurs}
+Ce mécanisme introduit un renversement ponctuel de dominance, transformant momentanément la proie en prédateur et modifiant profondément les stratégies en cours.
 
-\begin{itemize}
-    \item Les fantômes ne voient qu’autour d’eux (vision locale limitée).
-    \item Pac-Man voit l’ensemble du plateau.
-\end{itemize}
+\paragraph{Asymétrie de vision}
 
-Cette asymétrie introduit une dynamique de jeu intéressante et stratégique :
+Le système repose également sur une asymétrie informationnelle. 
+Pac-Man dispose d’une vision globale du plateau, tandis que les fantômes ne perçoivent qu’un environnement local restreint.
 
-\begin{itemize}
-    \item Les fantômes doivent coopérer pour localiser Pac-Man.
-    \item Pac-Man peut planifier ses déplacements en connaissance de cause.
-\end{itemize}
+Cette différence crée une dynamique stratégique spécifique : Pac-Man peut planifier ses trajectoires de manière optimale, alors que les fantômes doivent s’appuyer sur leur intelligence artificielle distribuée et sur leurs comportements émergents pour localiser efficacement leur cible.
 
-\paragraph{Résumé du système}
+\paragraph{Cohérence du système}
 
-La combinaison de ces règles avec la génération procédurale et l’IA des fantômes permet :
-
-\begin{itemize}
-    \item Un gameplay varié et imprévisible.
-    \item La possibilité pour Pac-Man et les fantômes de développer des stratégies différentes.
-    \item Une forte rejouabilité du jeu.
-\end{itemize}
-
+La combinaison de ces règles avec la génération procédurale du plateau et l’architecture hybride de l’intelligence artificielle produit un gameplay varié et imprévisible. 
+Les interactions entre pression temporelle, asymétrie de vision et renversement temporaire des rôles favorisent l’émergence de stratégies multiples et renforcent la rejouabilité du jeu.
 
 
 \section{Structure du client}
