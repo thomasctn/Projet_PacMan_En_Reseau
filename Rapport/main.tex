@@ -178,7 +178,21 @@ Cette répartition a permis une progression simultanée sur plusieurs fronts du 
 
 \section{Architecture générale}
 
-Description de l’architecture client-serveur, diagrammes éventuels.
+Après validation du prototype initial, l’architecture du serveur a été repensée afin de supporter une structure plus complexe adaptée à un jeu multijoueur complet.
+
+L’objectif principal était de passer d’un prototype monolithique à une architecture modulaire, évolutive et maintenable.
+
+Afin de supporter plusieurs connexions simultanées sans dégrader les performances, le serveur repose sur une architecture multithread. 
+La gestion réseau est détachée de la logique de jeu afin d’éviter qu’une opération bloquante (attente de paquet, latence réseau, déconnexion) ne ralentisse l’ensemble du système.
+
+Un thread est dédié à la réception des paquets. 
+Les messages reçus sont placés dans une file d’attente interne, puis traités de manière synchronisée par la logique centrale du serveur. 
+Cette séparation permet de distinguer clairement la couche communication de la couche métier.
+
+L’utilisation de files de messages agit comme un tampon entre le réseau et la boucle de jeu. 
+Ainsi, le serveur peut continuer à exécuter ses mises à jour périodiques indépendamment des délais de transmission.
+
+Cette architecture améliore la robustesse du système, limite les risques de blocage et constitue une base adaptée à l’exécution simultanée de plusieurs parties.
 
 \begin{figure}[H]
     \centering
@@ -189,82 +203,6 @@ Description de l’architecture client-serveur, diagrammes éventuels.
 \end{figure}
 
 \section{Structure du serveur}
-
-Gestion des joueurs, des parties, des salles (lobby),
-synchronisation de l’état du jeu.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=1\textwidth]{UML/PacMan_UML_Server_Game.png}
-
-    \caption{Diagramme de classes de l'architecture de jeu}
-    \caption*{Vue côté serveur - synchronisation, rooms et logique de jeu (sans geter et seter)}
-\end{figure}
-
-
-\section{Structure du client}
-
-Affichage, gestion des entrées utilisateur,
-réception et traitement des messages réseau.
-
-\section{Protocoles et échanges réseau}
-
-Description des trames, types de messages,
-gestion des événements (connexion, mouvement, fin de partie).
-
-
-Utilisation de gf::TCPSocket, permettant de faire une tramsmission de données fiable
-Socket de connnexion + communication coté serveur, communication uniquement pour le client
-Un thread coté client et serveur pour empiler les packet reçu, puis dépilement dans la boucle de jeu pour être traité
-
-Structures communes utilisé par le client et serveur pour la communication (BoardCommonn, PlayerData, RoomSettings, etc...)
-
-Sérialisation/Désérialisation avec gf::Packet.is() et gf::Packet.as() et la surchage de | avec la classe Archive. Déjà implémenté pour les types de base par gf
-
-Les structures ont des gf::Id, pour pouvoir les identifier lors de la déserialisation;
-Descritpion des strucutres
-Exemple avec board : le serveur convertit le plateau en BoardCommon, puis le sérialise avec gf::Packet.is(), avant de l'envoyer au client. Le client traite le packet en regardant si l'id correspond à la structure BoardCommon, puis déserialise avec gf::Packet.as(), avant de traiter les données
-
-Pour chaque modification on retransmet toutes les données
-
-
-%\section{L'application}
-
-%\section{La gestion des tickets}
-
-\chapter{Réalisation et déroulement du projet}
-
-\section{Mise en place de l’environnement de développement}
-
-\subsection*{Prototype client-serveur initial}
-
-Avant d’implémenter l’ensemble des mécaniques du jeu, une phase de prototypage a été réalisée afin de tester les choix architecturaux initiaux.
-L’objectif n’était pas encore de développer un gameplay complet, mais de sécuriser les bases réseau et la synchronisation entre plusieurs clients.
-
-Le prototype consistait en une application minimaliste dans laquelle un client contrôlait le déplacement d’un cube sur un plan 2D. 
-Chaque action utilisateur était transmise au serveur sous forme d’intention de déplacement. 
-Le serveur recevait cette requête, la validait, mettait à jour l’état interne, puis diffusait la nouvelle position à l’ensemble des clients connectés.
-
-Ce modèle repose sur une architecture dite \textit{serveur autoritaire}. 
-Dans cette approche, le serveur est l’unique source de vérité : les clients ne modifient jamais directement l’état du jeu, mais se contentent d’envoyer leurs intentions et d’afficher l’état validé par le serveur.
-
-Ce choix architectural permet de garantir la cohérence globale du système, d’éviter les désynchronisations et de poser des bases solides pour l’extension future vers un véritable jeu multijoueur structuré en rooms et en parties indépendantes.
-
-Ce prototype a ainsi servi de socle technique pour la suite du développement, notamment pour la mise en place du routage des paquets, de la gestion multithread et de la boucle de jeu.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=1\textwidth]{images/prototype.png}
-
-    \caption{Premier prototype}
-    \caption*{Vue de l'un des clients, il y a 2 client de connecté au serveur}
-\end{figure}
-
-\section{Conception de l’architecture du serveur}
-
-Après validation du prototype initial, l’architecture du serveur a été repensée afin de supporter une structure plus complexe adaptée à un jeu multijoueur complet.
-
-L’objectif principal était de passer d’un prototype monolithique à une architecture modulaire, évolutive et maintenable.
 
 \subsection{Mise en place de la structure}
 
@@ -319,294 +257,128 @@ Cette phase intermédiaire a permis de valider plusieurs éléments comme la dé
 Le plateau est ainsi devenu une structure centrale du projet. 
 Il ne constituait plus seulement un support visuel, mais une entité logique partagée servant de référence unique pour les calculs de déplacement, la gestion des interactions et, par la suite, pour la génération procédurale du labyrinthe et l’intelligence artificielle des entités ennemies.
 
+
+
 \subsection{Mise en place du jeu}
 
 \subsubsection*{Boucle de jeu}
 
-La boucle de jeu constitue le cœur de la logique serveur. 
-Contrairement à une architecture purement événementielle, le jeu repose sur un modèle à mise à jour périodique (tick serveur).
+La boucle de jeu constitue le cœur du serveur et repose sur un modèle à mise à jour périodique, appelé \textit{tick serveur}. 
+Contrairement à une architecture purement événementielle, l’état du monde est recalculé à intervalle régulier selon une fréquence fixe. 
+Ce fonctionnement garantit un comportement déterministe et centralisé.
 
-Le serveur exécute une boucle principale à intervalle régulier permettant :
+À chaque tick, le serveur exécute une séquence ordonnée d’opérations. 
+Les intentions de déplacement reçues des clients sont d’abord traitées, puis les positions des entités sont mises à jour en fonction des règles du jeu. 
+Les collisions sont ensuite évaluées, les états temporaires sont décrémentés, le score est ajusté et les conditions de fin de partie sont vérifiées.
 
-\begin{itemize}
-    \item De traiter les intentions reçues des clients.
-    \item De mettre à jour les positions des entités.
-    \item De vérifier les collisions.
-    \item De gérer les états temporaires (mode chasseur).
-    \item De mettre à jour le score.
-    \item De vérifier les conditions de fin de partie.
-\end{itemize}
+Les rôles sont attribués au début de chaque partie : un joueur incarne Pac-Man tandis que les autres incarnent les fantômes. 
+Chaque rôle possède des contraintes spécifiques influençant les déplacements et les interactions. 
+L’ensemble de ces règles est appliqué exclusivement côté serveur.
 
-Cette approche garantit que toutes les mises à jour du monde de jeu sont centralisées et synchronisées.\\
+Le plateau contient deux types de pac-gommes. 
+Les pac-gommes classiques augmentent le score lors de leur consommation, tandis que les pac-gommes spéciales déclenchent un mode temporaire dit « chasseur ». 
+Ce mode est géré par un système de minuterie interne décrémenté à chaque tick. 
+Lorsque ce compteur atteint zéro, l’état normal est restauré.
 
-\textbf{Rôles des joueurs}\\
+Deux systèmes temporels coexistent : un timer global définissant la durée maximale d’une partie, et un timer local associé aux états temporaires. 
+Cette gestion unifiée du temps garantit une cohérence entre les événements et évite toute dépendance au rythme d’exécution des clients.
 
-Au début de chaque partie, les rôles sont attribués :
+Les collisions sont évaluées de manière systématique à chaque mise à jour. 
+Un déplacement vers une case murale est annulé. 
+Lors d’une collision entre Pac-Man et un fantôme, l’issue dépend de l’état courant : perte d’une vie en mode normal, ou élimination temporaire du fantôme en mode chasseur. 
+L’intégralité de ces calculs étant effectuée côté serveur, toute tentative de triche ou de désynchronisation est neutralisée.
 
-\begin{itemize}
-    \item Un joueur incarne Pac-Man.
-    \item Les autres incarnent des fantômes.
-\end{itemize}
-
-Chaque rôle possède des règles de déplacement et de vision spécifiques.\\
-
-\textbf{Gestion des pac-gommes}\\
-
-Le plateau contient deux types de pac-gommes :
-
-\begin{itemize}
-    \item Pac-gommes classiques.
-    \item Pac-gommes spéciales.
-\end{itemize}
-
-Lorsqu’une pac-gomme classique est consommée :
-\begin{itemize}
-    \item Le score de Pac-Man augmente.
-    \item La case devient vide.
-\end{itemize}
-
-Lorsqu’une pac-gomme spéciale est consommée :
-\begin{itemize}
-    \item Pac-Man entre en mode chasseur.
-    \item Un timer spécifique est activé.\\
-\end{itemize}
-
-
-\textbf{Gestion du timer}\\
-
-Deux systèmes temporels sont utilisés :
-
-\begin{itemize}
-    \item Un timer global de partie.
-    \item Un timer temporaire pour le mode chasseur.
-\end{itemize}
-
-Le timer global définit la durée maximale d’une partie.
-Si celui-ci atteint zéro, la condition de victoire est évaluée.
-
-Le timer du mode chasseur est décrémenté à chaque tick.
-Lorsque celui-ci expire, Pac-Man redevient vulnérable.\\
-
-\textbf{Gestion des collisions}\\
-
-Les collisions sont vérifiées à chaque mise à jour :
-
-\begin{itemize}
-    \item Collision Pac-Man / mur → déplacement annulé.
-    \item Collision Pac-Man / fantôme :
-        \begin{itemize}
-            \item Si mode normal → perte d’une vie.
-            \item Si mode chasseur → fantôme éliminé temporairement.
-        \end{itemize}
-\end{itemize}
-
-Les collisions sont gérées côté serveur afin d’éviter toute triche ou désynchronisation.\\
-
-\textbf{Synchronisation}\\
-
-À la fin de chaque tick, l’état mis à jour est diffusé à tous les clients via un mécanisme de broadcast.
-
-Ainsi :
-\begin{itemize}
-    \item Les clients ne calculent jamais la logique.
-    \item Ils se contentent d’afficher l’état reçu.
-\end{itemize}
+À la fin de chaque tick, l’état global mis à jour est diffusé à l’ensemble des clients. 
+Ces derniers ne réalisent aucun calcul logique : ils se contentent d’afficher l’état reçu. 
+Cette architecture renforce la cohérence du jeu et s’inscrit dans le modèle de serveur autoritaire défini précédemment.
 
 \subsubsection*{Plateau et génération procédurale}
 
-Le plateau du jeu repose sur une génération procédurale de labyrinthe.
-L’algorithme utilisé est une variante de l’algorithme de Prim appliquée à la génération de labyrinthes.
+Le plateau repose sur une génération procédurale de labyrinthe fondée sur une variante de l’algorithme de Prim. 
+Ce choix permet de produire automatiquement des cartes connexes, tout en garantissant une forte variabilité entre les parties.
 
-L’objectif est d’obtenir :
+La génération débute par une initialisation complète du plateau en murs. 
+Une case de départ est ensuite sélectionnée et marquée comme traversable. 
+Ses murs adjacents sont ajoutés à une liste dite \textit{frontier}. 
+À chaque itération, un mur est choisi aléatoirement dans cette liste. 
+S’il sépare une case déjà accessible d’une case encore murale, il est supprimé, la nouvelle case devient traversable, et ses propres murs sont ajoutés à la frontier. 
+Le processus se poursuit jusqu’à épuisement de cette liste.
 
-\begin{itemize}
-    \item Un labyrinthe connexe.
-    \item Une structure cohérente pour le gameplay.
-    \item Une forte rejouabilité grâce à la génération aléatoire.
-\end{itemize}
+Ce mécanisme produit un arbre couvrant garantissant un labyrinthe connexe sans zones isolées.
 
-\paragraph{Algorithme de génération (variante de Prim)}
+Afin d’adapter cette structure aux contraintes du gameplay, plusieurs transformations supplémentaires sont appliquées.
 
-Le principe est le suivant :
+Une zone centrale fixe de taille 3×3, appelée « hut », est réservée avant la génération. 
+Elle est protégée durant l’exécution de l’algorithme afin de préserver sa structure. 
+Une fonction dédiée assure ensuite son raccordement au labyrinthe principal par au moins une ouverture.
 
-\begin{enumerate}
-    \item Initialisation complète du plateau en murs.
-    \item Sélection d’une case initiale (ici $(1,1)$).
-    \item Marquage de cette case comme \textit{Floor}.
-    \item Ajout des murs voisins dans une liste appelée \textit{frontier}.
-\end{enumerate}
+Les coins du plateau, destinés aux positions initiales des joueurs, sont également vérifiés après génération. 
+Si l’un d’eux se retrouve isolé, une ouverture contrôlée est créée pour garantir son accessibilité.
 
-Tant que la liste \textit{frontier} n’est pas vide :
+L’algorithme de Prim produisant un arbre sans cycles, des ouvertures supplémentaires sont ajoutées de manière aléatoire afin d'ajouter des chemins. 
+Cette étape enrichit la dynamique de poursuite et évite des trajectoires trop prévisibles.
 
-\begin{enumerate}
-    \item Sélection aléatoire d’un mur dans la frontier.
-    \item Vérification s’il possède au moins un voisin déjà marqué comme \textit{Floor}.
-    \item Si c’est le cas, suppression du mur entre les deux cases.
-    \item Marquage de cette case comme \textit{Floor}.
-    \item Ajout de ses voisins encore murs à la frontier.
-\end{enumerate}
+Enfin, certains culs-de-sac sont supprimés en identifiant les cases ne possédant qu’un unique voisin accessible. 
+La suppression partielle de ces impasses améliore la fluidité des déplacements et limite les situations excessivement punitives.
 
-Ce procédé garantit la création d’un labyrinthe connexe sans îlots isolés.\\
+Des portails latéraux sont également intégrés sur les bords du plateau, permettant à une entité de réapparaître du côté opposé après sortie. 
+Ce mécanisme introduit une dimension stratégique supplémentaire et complexifie les interactions entre joueurs.
 
-\textbf{Ajout de la cabane centrale}\\
+Le plateau devient ainsi une structure centrale du système : il sert de support aux collisions, au placement des pac-gommes, ainsi qu’aux algorithmes de poursuite des fantômes. 
+La génération procédurale contribue directement à la rejouabilité et à la diversité stratégique des parties.
 
-Une zone centrale 3×3, appelée ``cabane'', est insérée au centre du plateau.
-
-Cette zone est protégée durant la génération grâce à une fonction empêchant l’algorithme de Prim de modifier ses murs.
-
-Une fonction \textit{connectHut()} garantit qu’au moins une ouverture relie la cabane au reste du labyrinthe, assurant ainsi son accessibilité.\\
-
-\textbf{Accessibilité des coins}\\
-
-Les coins du plateau sont destinés aux positions initiales des joueurs.
-Après génération du labyrinthe, une vérification est effectuée afin de s’assurer que ces zones sont accessibles.
-
-Si nécessaire, des murs adjacents sont ouverts pour relier ces zones au reste du plateau.\\
-
-\textbf{Ajout de cycles}\\
-
-L’algorithme de Prim produit un arbre couvrant, donc un labyrinthe sans cycles.
-
-Afin d’améliorer le gameplay et d’éviter des trajectoires trop prévisibles, des ouvertures supplémentaires sont ajoutées aléatoirement après la génération principale.
-
-Cela permet :
-
-\begin{itemize}
-    \item De créer des chemins alternatifs.
-    \item D’éviter un comportement trop déterministe.
-    \item D’enrichir les stratégies de poursuite.\\
-\end{itemize}
-
-\textbf{Suppression des culs-de-sac}\\
-
-Les culs-de-sac sont identifiés en détectant les cases ayant un seul voisin accessible.
-
-Certains sont supprimés en cassant aléatoirement un mur adjacent.
-Cela réduit les pièges trop défavorables pour Pac-Man et améliore la fluidité du jeu.\\
-
-\textbf{Portails}\\
-
-Des ouvertures spécifiques sont placées sur les bords du plateau afin de créer des portails.
-Ces passages permettent à une entité sortant d’un côté du plateau de réapparaître de l’autre côté.
-
-Ce mécanisme introduit :
-
-\begin{itemize}
-    \item Des stratégies d’évasion supplémentaires.
-    \item Une dynamique de poursuite plus complexe.\\
-\end{itemize}
-
-\textbf{Intégration gameplay}\\
-
-Le plateau devient ainsi une structure centrale du système :
-
-\begin{itemize}
-    \item Support de la logique de collision.
-    \item Support du pathfinding des fantômes.
-    \item Support du placement des pac-gommes.
-\end{itemize}
-
-La génération procédurale contribue fortement à la rejouabilité et à la variabilité stratégique des parties.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{images/plateau.png}
+    \caption{Plateau de jeu}
+\end{figure}
 
 \subsubsection{Intelligence artificielle des fantômes}
 
-L’intelligence artificielle des fantômes repose sur une architecture hybride combinant :
-
-\begin{itemize}
-    \item Pathfinding classique
-    \item Système d’influence inspiré des colonies de fourmis
-    \item Prise de décision hiérarchique
-\end{itemize}
-
-L’objectif est d’obtenir un comportement :
-
-\begin{itemize}
-    \item Réactif face aux situations critiques
-    \item Cohérent dans ses déplacements
-    \item Émergent lorsqu’il y a plusieurs fantômes
-\end{itemize}
+L’intelligence artificielle des fantômes repose sur une architecture hybride combinant pathfinding classique, système d’influence local et prise de décision hiérarchique. 
+L’objectif n’est pas uniquement de poursuivre efficacement Pac-Man, mais de produire un comportement crédible, adaptatif et capable de générer des dynamiques collectives.
 
 \paragraph{Architecture décisionnelle hiérarchique}
 
-Le système fonctionne par niveaux de priorité.
-À chaque tick serveur, le fantôme évalue sa situation selon l’ordre suivant :
+À chaque tick serveur, chaque fantôme évalue sa situation selon un ordre de priorité strict.
 
-\subparagraph{Priorité 1 — Fuite stratégique}
+Lorsque Pac-Man est en mode chasseur, la priorité absolue devient la fuite stratégique vers la cabane centrale. 
+Le plus court chemin est alors calculé à l’aide d’un algorithme de Breadth First Search (BFS), garantissant une trajectoire optimale dans un graphe non pondéré. 
+Ce choix assure robustesse et compatibilité avec les labyrinthes générés procéduralement.
 
-Si Pac-Man est en mode chasseur, le fantôme cherche à rejoindre la cabane centrale.
+En situation normale, si Pac-Man est détecté dans un rayon de vision défini, le fantôme active un mode de poursuite ciblée. 
+Un BFS à profondeur limitée est exécuté afin de simuler une perception partielle de l’environnement. 
+Cette limitation réduit le coût computationnel tout en conservant un comportement crédible.
 
-Pour cela, un algorithme de \textbf{Breadth First Search (BFS)} est utilisé afin d’obtenir le plus court chemin non pondéré.
-
-Le BFS garantit :
-\begin{itemize}
-    \item Un chemin optimal
-    \item Une complexité maîtrisée
-    \item Une robustesse face aux labyrinthes générés procéduralement
-\end{itemize}
-
-\subparagraph{Priorité 2 — Poursuite ciblée}
-
-Si Pac-Man est détecté dans un rayon de vision défini :
-
-\begin{itemize}
-    \item Un BFS à profondeur limitée est exécuté.
-    \item Le voisin rapprochant le plus rapidement de la cible est sélectionné.
-\end{itemize}
-
-Cette limitation permet :
-\begin{itemize}
-    \item De simuler une vision partielle.
-    \item De réduire le coût computationnel.
-\end{itemize}
-
-\subparagraph{Priorité 3 — Comportement autonome}
-
-En absence de menace ou de cible visible, le fantôme adopte un comportement autonome basé sur un système d’influence.
+En l’absence de menace ou de cible visible, le fantôme adopte un comportement autonome fondé sur un système d’influence distribué.
 
 \paragraph{Système d’influence}
 
-Chaque case du plateau possède un score calculé dynamiquement :
+Chaque case du plateau possède un score dynamique défini par :
 
 \[
 Score = Attraction - Répulsions
 \]
 
-Les composantes sont les suivantes :
+Les traces laissées par Pac-Man génèrent une force attractive, tandis que la présence d’autres fantômes induit des forces répulsives différenciées. 
+Le fantôme sélectionne localement la case voisine maximisant ce score selon une approche gloutonne.
 
-\begin{itemize}
-    \item Traces de Pac-Man $\rightarrow$ Attraction
-    \item Traces de fantômes alliés $\rightarrow$ Répulsion forte
-    \item Traces de fantômes adverses $\rightarrow$ Répulsion modérée
-\end{itemize}
-
-Le fantôme sélectionne le voisin présentant le score maximal.
-Il s’agit d’une approche locale de type \textit{greedy search}.
+Ce mécanisme s’inspire des modèles de colonies de fourmis, où l’information est distribuée dans l’environnement plutôt que centralisée.
 
 \paragraph{Comportement émergent}
 
-Ce système permet l’émergence de comportements collectifs naturels :
+L’interaction entre attraction vers la cible et répulsion inter-agents produit des comportements collectifs sans coordination explicite. 
+Les fantômes tendent naturellement à se disperser, à éviter les regroupements inutiles et à converger progressivement vers Pac-Man en exploitant différentes trajectoires.
 
-\begin{itemize}
-    \item Dispersion automatique des fantômes
-    \item Réduction des regroupements inutiles
-    \item Convergence progressive vers Pac-Man
-\end{itemize}
+Cette émergence résulte uniquement de règles locales simples, démontrant l’efficacité d’un modèle distribué appliqué à un système multi-agents.
 
-Sans coordination explicite entre les agents, un équilibre dynamique apparaît.
+\paragraph{Choix algorithmiques}
 
-\paragraph{Techniques utilisées}
+L’implémentation combine plusieurs techniques complémentaires : 
+le BFS pour le calcul de chemins optimaux, une version limitée pour la simulation de vision, une recherche gloutonne locale pour l’exploration autonome, ainsi que des heuristiques légères telles que l’utilisation de la distance euclidienne au carré. 
+Un bruit aléatoire contrôlé est également introduit afin d’éviter les cycles déterministes et les oscillations.
 
-L’implémentation repose sur plusieurs techniques algorithmiques :
-
-\begin{itemize}
-    \item \textbf{Breadth First Search (BFS)} — plus court chemin
-    \item \textbf{BFS limité} — simulation de vision
-    \item \textbf{Recherche gloutonne locale} — sélection optimale immédiate
-    \item \textbf{Distance euclidienne au carré} — heuristique rapide
-    \item \textbf{Bruit aléatoire contrôlé} — prévention des cycles et oscillations
-\end{itemize}
-
-L’approche hybride permet d’obtenir un compromis entre précision stratégique et coût computationnel maîtrisé.
+Cette approche hybride offre un compromis entre précision stratégique, coût computationnel maîtrisé et richesse comportementale.
 
 \subsubsection{Rooms : gestion des parties}
 
@@ -662,6 +434,7 @@ Les rooms permettent de configurer :
 
 Ainsi, chaque partie peut avoir des règles légèrement différentes, offrant plus de rejouabilité et de flexibilité pour les tests et la compétition entre joueurs.
 
+
 \subsubsection{Règles du jeu}
 
 Le jeu respecte des règles spécifiques pour Pac-Man et les fantômes, afin de garantir un gameplay équilibré et stratégique.
@@ -713,6 +486,39 @@ La combinaison de ces règles avec la génération procédurale et l’IA des fa
     \item La possibilité pour Pac-Man et les fantômes de développer des stratégies différentes.
     \item Une forte rejouabilité du jeu.
 \end{itemize}
+
+
+
+\section{Structure du client}
+
+Affichage, gestion des entrées utilisateur,
+réception et traitement des messages réseau.
+
+\section{Protocoles et échanges réseau}
+
+Description des trames, types de messages,
+gestion des événements (connexion, mouvement, fin de partie).
+
+
+Utilisation de gf::TCPSocket, permettant de faire une tramsmission de données fiable
+Socket de connnexion + communication coté serveur, communication uniquement pour le client
+Un thread coté client et serveur pour empiler les packet reçu, puis dépilement dans la boucle de jeu pour être traité
+
+Structures communes utilisé par le client et serveur pour la communication (BoardCommonn, PlayerData, RoomSettings, etc...)
+
+Sérialisation/Désérialisation avec gf::Packet.is() et gf::Packet.as() et la surchage de | avec la classe Archive. Déjà implémenté pour les types de base par gf
+
+Les structures ont des gf::Id, pour pouvoir les identifier lors de la déserialisation;
+Descritpion des strucutres
+Exemple avec board : le serveur convertit le plateau en BoardCommon, puis le sérialise avec gf::Packet.is(), avant de l'envoyer au client. Le client traite le packet en regardant si l'id correspond à la structure BoardCommon, puis déserialise avec gf::Packet.as(), avant de traiter les données
+
+Pour chaque modification on retransmet toutes les données
+
+
+%\section{L'application}
+
+%\section{La gestion des tickets}
+
 
 \chapter{Bilan et perspectives}
 
