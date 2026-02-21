@@ -17,13 +17,10 @@ void LobbyScene::setInitialState(
     const std::vector<PlayerData> &players,
     const RoomSettings &settings)
 {
-    m_players = players;
-    m_roomSettings = settings;
-    m_roomID = roomID;
     m_entity.setClientId(m_game.getMyId());
-    m_entity.setPlayers(m_players);
-    m_entity.setRoomSettings(m_roomSettings);
-    m_entity.setRoomID(roomID);
+    setRoomID(roomID);
+    setRoomSettings(settings);
+    setPlayers(players);
 }
 
 void LobbyScene::doProcessEvent(gf::Event &event)
@@ -83,18 +80,15 @@ void LobbyScene::doUpdate(gf::Time)
         case ServerRoomSettings::type:
         {
             auto data = packet.as<ServerRoomSettings>();
-            m_roomSettings = data.settings;
-            m_entity.setRoomSettings(m_roomSettings);
+            setRoomSettings(data.settings);
             break;
         }
 
         case ServerListRoomPlayers::type:
         {
             auto data = packet.as<ServerListRoomPlayers>();
-            m_players = data.players;
-            std::reverse(m_players.begin(), m_players.end());
-            m_entity.setClientId(m_game.getMyId());
-            m_entity.setPlayers(m_players);
+            std::reverse(data.players.begin(), data.players.end());
+            setPlayers(data.players);
             break;
         }
 
@@ -248,20 +242,16 @@ void LobbyScene::doUpdate(gf::Time)
 
     case LobbyAction::ToggleReady:
     {
-        m_amReady = !m_amReady;
         gf::Packet p;
-        p.is(ClientReady{m_amReady});
+        p.is(ClientReady{!m_client.ready});
         m_game.getSocket().sendPacket(p);
         break;
     }
 
     case LobbyAction::ChangeRole:
     {
-        PlayerData d{};
-        d.id = m_game.getMyId();
-        d.ready = m_amReady;
         gf::Packet p;
-        p.is(ClientChangeRoomCharacterData{d});
+        p.is(ClientChangeRoomCharacterData{m_client});
         m_game.getSocket().sendPacket(p);
         break;
     }
@@ -276,4 +266,27 @@ void LobbyScene::resizeYourself()
     auto size = m_game.getWindow().getSize();
     m_game.handleResize(size.x, size.y);
     getWorldView() = m_game.getMainView();
+}
+
+void LobbyScene::setPlayers(const std::vector<PlayerData>& players)
+{
+    m_players = players;
+    m_entity.setPlayers(players);
+    for(auto& d : m_players) {
+        if(d.id == m_game.getMyId()) {
+            m_client = d;
+        }
+    }  
+}
+
+void LobbyScene::setRoomSettings(const RoomSettings &settings)
+{
+    m_roomSettings = settings;
+    m_entity.setRoomSettings(settings);
+}
+
+void LobbyScene::setRoomID(uint32_t id)
+{
+    m_roomID = id;
+    m_entity.setRoomID(id);
 }

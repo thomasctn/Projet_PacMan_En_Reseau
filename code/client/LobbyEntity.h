@@ -73,6 +73,9 @@ public:
   const unsigned int CHANGE_ROLE_CHAR_SIZE = 18u;
   const unsigned int READY_CHAR_SIZE = 18u;
 
+  const gf::Color4f DEFAULT_TEXT_COLOR = gf::Color::White;
+  const gf::Color4f DEFAULT_OUTLINE_COLOR = gf::Color::Blue;
+
 private:
   gf::Font m_font;
   gf::Text m_settingsLabel;

@@ -140,8 +140,9 @@ void Room::startGame() {
 
         return;
     }
-
-
+    //On reset l'état prêt à faux
+    resetPlayersState();
+    broadcastRoomPlayers();
 
 
     constexpr int boardWidth = 27;

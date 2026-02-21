@@ -70,34 +70,34 @@ LobbyEntity::LobbyEntity()
 
     m_settingsLabel.setFont(m_font);
     m_settingsLabel.setCharacterSize(SETTINGS_CHAR_SIZE);
-    m_settingsLabel.setColor(gf::Color::White);
+    m_settingsLabel.setColor(DEFAULT_TEXT_COLOR);
     m_settingsLabel.setString("Paramètre du jeu");
 
     m_roomName.setFont(m_font);
     m_roomName.setCharacterSize(ROOM_NAME_CHAR_SIZE);
-    m_roomName.setColor(gf::Color::White);
+    m_roomName.setColor(DEFAULT_TEXT_COLOR);
 
     m_playerListLabel.setFont(m_font);
     m_playerListLabel.setCharacterSize(PLAYER_LIST_CHAR_SIZE);
-    m_playerListLabel.setColor(gf::Color::White);
+    m_playerListLabel.setColor(DEFAULT_TEXT_COLOR);
 
     m_pseudoLabel.setFont(m_font);
     m_pseudoLabel.setCharacterSize(PSEUDO_CHAR_SIZE);
     m_pseudoLabel.setAnchor(gf::Anchor::TopCenter);
-    m_pseudoLabel.setColor(gf::Color::White);
+    m_pseudoLabel.setColor(DEFAULT_TEXT_COLOR);
     m_pseudoLabel.setAlignment(gf::Alignment::Center);
 
     m_roleLabel.setFont(m_font);
     m_roleLabel.setAnchor(gf::Anchor::TopCenter);
     m_roleLabel.setAlignment(gf::Alignment::Center);
     m_roleLabel.setCharacterSize(ROLE_CHAR_SIZE);
-    m_roleLabel.setColor(gf::Color::White);
+    m_roleLabel.setColor(DEFAULT_TEXT_COLOR);
 
     m_roleDesc.setFont(m_font);
     m_roleDesc.setAnchor(gf::Anchor::TopCenter);
     m_roleDesc.setAlignment(gf::Alignment::Justify);
     m_roleDesc.setCharacterSize(ROLE_DESC_CHAR_SIZE);
-    m_roleDesc.setColor(gf::Color::White);
+    m_roleDesc.setColor(DEFAULT_TEXT_COLOR);
 
     m_changeRolePreBtn.setCharacterSize(CHANGE_ROLE_CHAR_SIZE);
     m_changeRolePreBtn.setAnchor(gf::Anchor::TopCenter);
@@ -114,12 +114,16 @@ LobbyEntity::LobbyEntity()
     m_readyBtn.setCharacterSize(READY_CHAR_SIZE);
     defaultButtonColor(m_readyBtn);
     m_readyBtn.setDefaultBackgroundColor(gf::Color::Green);
+    m_readyBtn.setDefaultBackgroundOutlineColor(gf::Color::Transparent);
+    m_readyBtn.setSelectedBackgroundOutlineColor(gf::Color::Transparent);
     m_readyBtn.setPadding(READY_CHAR_SIZE * .5f);
 
     m_leaveBtn.setCharacterSize(READY_CHAR_SIZE);
     m_leaveBtn.setAnchor(gf::Anchor::TopCenter);
     defaultButtonColor(m_leaveBtn);
     m_leaveBtn.setDefaultBackgroundColor(gf::Color::Red);
+    m_leaveBtn.setDefaultBackgroundOutlineColor(gf::Color::Transparent);
+    m_leaveBtn.setSelectedBackgroundOutlineColor(gf::Color::Transparent);
     m_leaveBtn.setPadding(READY_CHAR_SIZE * .5f);
 }
 
@@ -222,7 +226,7 @@ void LobbyEntity::renderPlayerRow(gf::RenderTarget &target, const gf::RenderStat
     playerText.setFont(m_font);
     playerText.setCharacterSize(PLAYER_ROW_CHAR_SIZE);
     playerText.setAnchor(gf::Anchor::TopLeft);
-    playerText.setColor(gf::Color::White);
+    playerText.setColor(DEFAULT_TEXT_COLOR);
     std::string playerStr = data.name;
     if (data.id == m_clientId)
     {
@@ -242,7 +246,7 @@ void LobbyEntity::renderPlayerList(gf::RenderTarget &target, const gf::RenderSta
     playBox.setPosition(position);
     playBox.setColor(gf::Color::Transparent);
     playBox.setOutlineThickness(2.f);
-    playBox.setOutlineColor(gf::Color::White);
+    playBox.setOutlineColor(DEFAULT_OUTLINE_COLOR);
 
     target.draw(playBox, states);
 
@@ -271,7 +275,7 @@ void LobbyEntity::renderRoleSelectionAndReady(gf::RenderTarget &target, const gf
     playBox.setPosition(position);
     playBox.setColor(gf::Color::Transparent);
     playBox.setOutlineThickness(2.f);
-    playBox.setOutlineColor(gf::Color::White);
+    playBox.setOutlineColor(DEFAULT_OUTLINE_COLOR);
 
     target.draw(playBox, states);
 
@@ -338,7 +342,7 @@ void LobbyEntity::renderSettingsRow(gf::RenderTarget &target, const gf::RenderSt
     gf::Text stgNameLabel;
     stgNameLabel.setFont(m_font);
     stgNameLabel.setCharacterSize(SETTINGS_NAME_CHAR_SIZE);
-    stgNameLabel.setColor(gf::Color::White);
+    stgNameLabel.setColor(DEFAULT_TEXT_COLOR);
     stgNameLabel.setString(stgName);
     stgNameLabel.setPosition(position);
     target.draw(stgNameLabel, states);
@@ -358,7 +362,7 @@ void LobbyEntity::renderSettingsRow(gf::RenderTarget &target, const gf::RenderSt
     gf::Text valueText;
     valueText.setFont(m_font);
     valueText.setCharacterSize(20u);
-    valueText.setColor(gf::Color::White);
+    valueText.setColor(DEFAULT_TEXT_COLOR);
     valueText.setAlignment(gf::Alignment::Center);
     valueText.setString(std::to_string(currentValue));
     valueText.setPosition({position.x + (PLUS_BTN_POS_X + MINUS_BTN_POS_X) / 2, position.y});
@@ -372,7 +376,7 @@ void LobbyEntity::renderSettings(gf::RenderTarget &target, const gf::RenderState
     playBox.setPosition(position);
     playBox.setColor(gf::Color::Transparent);
     playBox.setOutlineThickness(2.f);
-    playBox.setOutlineColor(gf::Color::White);
+    playBox.setOutlineColor(DEFAULT_OUTLINE_COLOR);
 
     target.draw(playBox, states);
 
@@ -404,11 +408,11 @@ void LobbyEntity::renderSettings(gf::RenderTarget &target, const gf::RenderState
 
 void LobbyEntity::defaultButtonColor(gf::TextButtonWidget &w)
 {
-    w.setDefaultTextColor(gf::Color::White);
+    w.setDefaultTextColor(DEFAULT_TEXT_COLOR);
     w.setSelectedTextColor(gf::Color::Black);
     w.setDefaultBackgroundColor(gf::Color::Black);
     w.setSelectedBackgroundColor(gf::Color::White);
     w.setBackgroundOutlineThickness(1.f);
-    w.setDefaultBackgroundOutlineColor(gf::Color::White);
-    w.setSelectedBackgroundOutlineColor(gf::Color::White);
+    w.setDefaultBackgroundOutlineColor(DEFAULT_OUTLINE_COLOR);
+    w.setSelectedBackgroundOutlineColor(DEFAULT_OUTLINE_COLOR);
 }

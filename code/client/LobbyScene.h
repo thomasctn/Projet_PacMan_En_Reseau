@@ -18,6 +18,9 @@ public:
         const RoomSettings& settings
     );
     void resizeYourself() ;
+    void setPlayers(const std::vector<PlayerData>& players);
+    void setRoomSettings(const RoomSettings& settings);
+    void setRoomID(uint32_t id);
 
 private:
     void doProcessEvent(gf::Event& event) override;
@@ -31,6 +34,6 @@ private:
 
     uint32_t m_roomID;
     std::vector<PlayerData> m_players;
+    PlayerData m_client;
     RoomSettings m_roomSettings{};
-    bool m_amReady = false;
 };
