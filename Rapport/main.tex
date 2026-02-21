@@ -238,37 +238,19 @@ Pour chaque modification on retransmet toutes les données
 
 \subsection*{Prototype client-serveur initial}
 
-Avant de développer le jeu complet, un prototype minimal client-serveur a été conçu afin de valider les bases techniques du projet.
+Avant d’implémenter l’ensemble des mécaniques du jeu, une phase de prototypage a été réalisée afin de tester les choix architecturaux initiaux.
+L’objectif n’était pas encore de développer un gameplay complet, mais de sécuriser les bases réseau et la synchronisation entre plusieurs clients.
 
-L’objectif de ce prototype était de :
+Le prototype consistait en une application minimaliste dans laquelle un client contrôlait le déplacement d’un cube sur un plan 2D. 
+Chaque action utilisateur était transmise au serveur sous forme d’intention de déplacement. 
+Le serveur recevait cette requête, la validait, mettait à jour l’état interne, puis diffusait la nouvelle position à l’ensemble des clients connectés.
 
-\begin{itemize}
-    \item Vérifier le bon fonctionnement de la communication réseau.
-    \item Mettre en place une architecture client-serveur autoritaire.
-    \item Tester la gestion des threads côté serveur.
-    \item Établir une base de synchronisation entre plusieurs clients.
-\end{itemize}
+Ce modèle repose sur une architecture dite \textit{serveur autoritaire}. 
+Dans cette approche, le serveur est l’unique source de vérité : les clients ne modifient jamais directement l’état du jeu, mais se contentent d’envoyer leurs intentions et d’afficher l’état validé par le serveur.
 
-Ce prototype consistait en une application simple où un client contrôlait le déplacement d’un cube sur un plan 2D. 
+Ce choix architectural permet de garantir la cohérence globale du système, d’éviter les désynchronisations et de poser des bases solides pour l’extension future vers un véritable jeu multijoueur structuré en rooms et en parties indépendantes.
 
-Le fonctionnement était le suivant :
-
-\begin{enumerate}
-    \item Le client envoie son intention de déplacement au serveur.
-    \item Le serveur reçoit cette intention.
-    \item Le serveur valide la demande.
-    \item Le serveur met à jour la position.
-    \item Le serveur diffuse (broadcast) la nouvelle position à tous les clients.
-\end{enumerate}
-
-Cette approche permet de poser les bases d’un \textbf{serveur autoritaire}, garantissant que :
-\begin{itemize}
-    \item Les clients ne peuvent pas modifier directement l’état du jeu.
-    \item Toutes les décisions critiques sont centralisées.
-    \item La cohérence du jeu est assurée.
-\end{itemize}
-
-Ce prototype a servi de fondation pour la suite du développement, notamment pour la gestion des rooms, la synchronisation des joueurs et l’implémentation de la logique de jeu complète.
+Ce prototype a ainsi servi de socle technique pour la suite du développement, notamment pour la mise en place du routage des paquets, de la gestion multithread et de la boucle de jeu.
 
 \section{Conception de l’architecture du serveur}
 
