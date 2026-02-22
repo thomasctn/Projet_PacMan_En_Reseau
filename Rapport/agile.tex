@@ -1,0 +1,705 @@
+\documentclass[a4paper, 11pt]{report}
+\usepackage[utf8]{inputenc}   % Pour lire les fichiers UTF-8
+\usepackage[T1]{fontenc}      % Pour une meilleure gestion des caractères accentués
+\usepackage{textcomp}         % Pour quelques symboles supplémentaires
+\usepackage{lmodern}          % Police compatible avec T1
+\usepackage[english,french]{babel} 
+\usepackage{graphicx} % Pour les images
+\def\@captype{figure}
+\usepackage{float}
+\usepackage{multicol} % Pour faire des multi colonnes
+\usepackage[export]{adjustbox} % Pour la clé 'valign'  (aligner verticalement)
+\usepackage[colorlinks=true,linkcolor=black]{hyperref} % Pour qu'il y est des liens sur la table des matières
+\usepackage{caption} % Utiliser plus de fonction sur caption (caption* pour ne pas afficher FIGURE-1)
+\usepackage{lipsum} % Pour générer du texte pour voir comment ca rend
+\usepackage{ragged2e} % Pour justifier le texte
+\usepackage{ulem}
+\usepackage[margin=3.2cm]{geometry}
+\usepackage{forest}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage[section]{placeins}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{fancybox}
+\usepackage{fancyhdr}
+\usepackage[none]{hyphenat}
+\emergencystretch=3em
+\usepackage{graphicx}
+\usepackage{adjustbox}
+\usepackage{float}
+
+
+\usepackage{csquotes}
+
+
+% Configuration de fancyhdr
+\pagestyle{fancy}
+\fancyhf{} % Efface tous les en-tètes et pieds de page précédents
+\fancyhead[C]{Rapport Agile} % Texte centré en haut de la page
+\fancyfoot[L]{2025} % Texte en bas à  gauche du pied de page
+\fancyfoot[C]{COUTANT, LITAMPHA, PETER} % Texte au centre du pied de page
+\fancyfoot[R]{\thepage} % Numéro de page en bas à  droite du pied de page
+
+\renewcommand{\headrulewidth}{0.4pt} % à‰paisseur de la ligne de séparation de l'en-tète
+\renewcommand{\footrulewidth}{0.4pt} % à‰paisseur de la ligne de séparation du pied depage
+\setlength{\headheight}{13.59999pt}
+% Appliquer le style d'en-tète fancy aux pages de début de chapitre
+
+\fancypagestyle{plain}{
+  \fancyhf{} % Effacer tous
+  \fancyhead[C]{Rapport Agile} % Texte centré en haut de la page
+  \fancyfoot[L]{L3 Informatique} % Texte en bas à  gauche du pied de page
+  \fancyfoot[C]{COUTANT, LITAMPHA, PETER} % Texte au centre du pied de page
+  \fancyfoot[R]{\thepage} % Numéro de page en bas à  droite du pied de page
+  \renewcommand{\headrulewidth}{0.4pt} % à‰paisseur de la ligne de séparation de l'en-tète
+  \renewcommand{\footrulewidth}{0.4pt} % à‰paisseur de la ligne de séparation du pied de page
+}
+
+
+
+
+\begin{document}
+
+% Page de titre
+
+% Page de titre
+\begin{titlepage}
+    \centering
+    \vspace{3cm}
+    \includegraphics[width=0.4\textwidth]{images/logo_univ.jpg}\hfill
+    \includegraphics[width=0.5\textwidth]{images/logo_ufrst.png}\\
+    \vspace{1.5cm}
+    {\huge \textbf{Université Marie \& Louis Pasteur\\ UFR Sciences et Techniques}\par}
+    \vspace{0.5cm}
+
+
+    \shadowbox{\parbox{0.9\linewidth}{\centering \huge \textbf{Projet L3 : Pacman en réseau}}}\\
+    \vspace{1cm}
+    {\Large \textbf{Rapport Agile} \\ Licence CMI Informatique - 3ème année \\ 2025-2026\par}
+    \vspace{0.5cm}
+
+    \includegraphics[width=0.7\textwidth]{images/entete.png}\\
+    \vspace{0.5cm}
+
+    {\LARGE \textbf{Thomas COUTANT}\\ \textbf{Benoît LITAMPHA}\\ \textbf{Auriane PETER}\par}
+    \vspace{1cm}
+    {\large \textbf{Encadrant : Julien BERNARD} }\\
+
+    
+\end{titlepage}
+
+\tableofcontents
+\newpage
+
+\chapter{Introduction}
+
+Le projet de Licence 3 Informatique avait pour objectif la conception et le développement d’un jeu multijoueur en réseau inspiré du célèbre jeu d’arcade Pac-Man. 
+Au-delà de l’aspect ludique, ce projet constituait un exercice complet d’ingénierie logicielle mobilisant plusieurs compétences techniques majeures : architecture client-serveur, synchronisation réseau, génération procédurale de contenu, intelligence artificielle et conception d’interface graphique.
+
+Le principal défi technique résidait dans la mise en place d’une architecture client-serveur autoritaire capable de gérer plusieurs connexions simultanées tout en garantissant la cohérence du jeu. 
+Contrairement à une architecture pair-à-pair, le modèle retenu centralise la logique côté serveur, ce qui permet d’assurer l’équité du jeu, de limiter les incohérences d’état et de simplifier la validation des actions des joueurs.
+
+En parallèle, le projet intégrait une génération procédurale du plateau de jeu afin de produire dynamiquement des labyrinthes jouables et connexes, garantissant ainsi la rejouabilité. 
+Un système d’intelligence artificielle a également été développé afin de contrôler des entités non-joueurs capables de se déplacer et d’interagir avec les joueurs humains.
+
+Compte tenu de la complexité technique et des forte dépendances entre les composants client et serveur, une organisation inspirée des méthodes Agile a été adoptée. 
+L’objectif n’était pas seulement de répartir les tâches, mais de structurer le développement de manière incrémentale, en validant régulièrement les choix d’architecture et en s’adaptant aux difficultés rencontrées.
+
+Le projet s’est déroulé en deux grandes phases. Une première phase, de mi-octobre à décembre, a permis de concevoir un prototype minimal client-serveur servant de base technique. 
+Une seconde phase intensive, organisée en trois sprints d’une semaine chacun au mois de janvier, a permis de transformer ce prototype en une version fonctionnelle et stable du jeu.
+
+Ce rapport présente l’organisation Agile adoptée, le déroulement des différents sprints, les difficultés rencontrées ainsi que les adaptations mises en place.
+
+\chapter{Organisation du projet et approche Agile}
+
+\section{Choix d’une organisation inspirée des méthodes Agile}
+
+L’objectif principal de l'utilisation des méthodes Agiles était de privilégier une progression incrémentale, permettant de valider régulièrement les choix techniques et d’adapter le développement en fonction des difficultés rencontrées.
+
+Plutôt que de définir un cahier des charges entièrement figé dès le départ, l’équipe a choisi d’avancer par itérations successives. 
+Chaque itération avait un objectif fonctionnel précis et devait aboutir à une version exécutable du projet, même partielle. 
+Cette approche a permis de réduire les risques liés à l’architecture réseau et d’éviter l’accumulation d’erreurs découvertes trop tardivement.
+
+L’organisation mise en place s’inspire du cadre Scrum, tout en restant adaptée au cadre universitaire du projet. 
+Elle reposait sur des cycles courts et une communication continue.
+
+\section{Répartition des rôles}
+
+Le projet a été réalisé par une équipe de trois étudiants. 
+Une répartition claire des responsabilités a été définie afin de garantir une progression efficace et de limiter les conflits d’implémentation.
+
+Les rôles étaient organisés comme suit :
+
+\begin{itemize}
+    \item \textbf{Thomas} : responsable principal du développement du serveur, incluant la gestion des connexions, la logique de jeu centralisée et la synchronisation des états.
+    \item \textbf{Auriane} : responsable du développement du client, incluant l’interface graphique, l’affichage du jeu et la gestion des interactions utilisateur.
+    \item \textbf{Benoît} : intervenant à la fois sur le client et le serveur, avec une responsabilité particulière sur la communication réseau et la cohérence des échanges de données.
+\end{itemize}
+
+Les décisions techniques majeures étaient prises de manière collaborative afin de garantir la cohérence globale du projet.
+
+Cette organisation à la fois structurée et collaborative a permis de combiner spécialisation technique et vision d’ensemble.
+
+\section{Phases du projet}
+
+Le projet s’est déroulé en deux phases distinctes.
+
+\subsection{Phase de prototypage (mi-octobre à décembre)}
+
+La première phase a consisté à développer un prototype client-serveur minimal. 
+L’objectif était de disposer d’une base technique stable avant la phase intensive de développement.
+
+Ce prototype permettait :
+\begin{itemize}
+    \item d’établir une connexion entre un client et un serveur,
+    \item d’échanger des messages simples,
+    \item de tester les premières bases de la synchronisation.
+\end{itemize}
+
+Cette phase a été essentielle pour réduire l’incertitude technique et identifier précocement les contraintes liées à l’architecture réseau.
+
+\subsection{Phase de développement intensif (janvier)}
+
+La seconde phase, prévue sur trois semaines, a été structurée en trois sprints d’une semaine chacun. 
+Chaque sprint avait un objectif clair, avoir une version fonctionnelle en fin de semaine.
+
+Une réunion hebdomadaire avec le tuteur de projet était organisée chaque mercredi. 
+Ces réunions servaient à présenter l’avancement, valider les choix techniques et ajuster les priorités si nécessaire.
+
+\section{Communication et outils}
+
+La communication au sein de l’équipe a été continue tout au long du projet. 
+L’outil principal utilisé pour les échanges quotidiens était Discord, permettant une coordination rapide et la résolution immédiate des problèmes techniques.
+
+La gestion du code source était assurée via GitHub.
+L’utilisation du système de versionnement partagé a permis :
+
+\begin{itemize}
+    \item de travailler en parallèle sur différentes parties du projet,
+    \item de suivre l’évolution du code,
+    \item de conserver un historique clair des modifications.
+\end{itemize}
+
+Cette combinaison d’outils a amélioré l’efficacité du travail collaboratif et facilité l’intégration des différentes composantes du système.
+
+\section{Fonctionnement des sprints}
+
+Chaque sprint suivait une organisation similaire :
+
+\begin{enumerate}
+    \item Définition des objectifs en début de semaine.
+    \item Développement parallèle des différentes composantes.
+    \item Communication régulière pour synchroniser client et serveur.
+    \item Point intermédiaire avec le tuteur.
+    \item Stabilisation et validation en fin de sprint.
+\end{enumerate}
+
+Cette structuration hebdomadaire a permis d’identifier rapidement les blocages techniques, notamment lors de la refonte du prototype serveur pour intégrer un système de lobby ou lors de la mise en place du gestionnaire de scènes côté client.
+
+L’approche Agile adoptée a ainsi favorisé une progression contrôlée et adaptable, particulièrement adaptée à un projet intégrant de nombreuses dépendances techniques.   
+
+\chapter{Sprint 1 : Mise en place de l’architecture complète}
+
+\section{Objectifs du sprint}
+
+Le premier sprint constituait une étape fondamentale du projet. 
+L’objectif principal était de transformer le prototype minimal développé durant la phase préliminaire en une architecture client-serveur complète et structurée.
+
+À l’issue de cette semaine, le système devait permettre :
+\begin{itemize}
+    \item la gestion de connexions multiples,
+    \item la mise en place d’un système de lobby,
+    \item la création et la gestion de rooms (salons de jeu),
+    \item l’instanciation d’une partie,
+    \item l’exécution d’une boucle de jeu serveur,
+    \item la génération procédurale du plateau.
+\end{itemize}
+
+Ce sprint était critique, car il définissait l’ossature technique sur laquelle reposeraient tous les développements ultérieurs.
+
+\section{Refonte du prototype initial}
+
+Le prototype développé entre octobre et décembre permettait uniquement :
+\begin{itemize}
+    \item une connexion client-serveur simple,
+    \item l’échange de messages basiques,
+    \item une logique de traitement basique.
+\end{itemize}
+
+Cependant, cette architecture n’était pas adaptée à une gestion multi-parties ni à un modèle évolutif. 
+La principale difficulté du sprint a donc consisté à refondre cette base sans casser les éléments déjà fonctionnels.
+
+La restructuration du serveur a conduit à une séparation claire des responsabilités internes :
+
+\begin{itemize}
+    \item Gestionnaire de connexions,
+    \item Gestionnaire de lobby,
+    \item Gestionnaire de rooms,
+    \item Instance de jeu,
+    \item Boucle principale.
+\end{itemize}
+
+Cette modularisation a permis de clarifier la logique métier et d’éviter une centralisation excessive du code.
+
+L’introduction d’un système de lobby représentait un changement structurel majeur. 
+Contrairement au prototype initial, il était désormais nécessaire de gérer plusieurs joueurs connectés simultanément, pouvant créer ou rejoindre différentes rooms.
+
+Le lobby devait assurer :
+\begin{itemize}
+    \item la liste des joueurs connectés,
+    \item la création de nouvelles rooms,
+    \item l’affectation des joueurs à une room,
+    \item la transition vers l’état de jeu.
+\end{itemize}
+
+Cette étape a nécessité une réorganisation complète de la gestion des états serveur, en introduisant une machine à états implicite distinguant :
+\begin{itemize}
+    \item l’état connecté,
+    \item l’état lobby,
+    \item l’état en partie.
+\end{itemize}
+
+Chaque room devait encapsuler :
+\begin{itemize}
+    \item la liste des joueurs présents,
+    \item l’état courant de la partie,
+    \item le plateau généré,
+    \item la boucle de jeu associée.
+\end{itemize}
+
+Une décision importante a été prise : rendre chaque instance de partie indépendante. 
+Ainsi, chaque room possédait sa propre boucle de jeu, évitant toute interférence entre parties simultanées.
+
+La boucle de jeu serveur constitue le c\oe ur de l’architecture autoritaire. 
+Elle centralise toutes les décisions logiques : mouvements, collisions, mises à jour d’état et synchronisation.
+
+Le sprint incluait également l’intégration d’un système de génération procédurale du labyrinthe. 
+
+\section{Difficultés rencontrées}
+
+La principale difficulté de ce sprint a été la refonte du prototype pour intégrer le système de lobby sans introduire de régressions.
+
+Plusieurs problèmes sont apparus :
+\begin{itemize}
+    \item gestion incorrecte des états lors des transitions lobby → partie,
+    \item synchronisation imparfaite lors de la création simultanée de rooms,
+    \item restructuration du code nécessitant plusieurs itérations.
+\end{itemize}
+
+L’approche Agile a permis de corriger progressivement ces problèmes au cours de la semaine, avec des validations intermédiaires.
+
+\section{Résultats en fin de sprint}
+
+À l’issue du premier sprint, le système disposait :
+\begin{itemize}
+    \item d’une architecture serveur modulaire,
+    \item d’un système de lobby fonctionnel,
+    \item d’une gestion des rooms,
+    \item d’une boucle de jeu stable,
+    \item d’une génération procédurale intégrée.
+\end{itemize}
+
+Ce sprint a posé les bases structurelles du projet et a sécurisé l’architecture pour les développements suivants.
+
+\chapter{Sprint 2 : Développement du client et intégration des bots}
+
+\section{Objectifs du sprint}
+
+Le second sprint avait pour objectif principal de rendre le système réellement jouable. 
+Alors que le premier sprint avait permis de stabiliser l’architecture serveur, cette seconde phase visait à développer une interface client fonctionnelle et à intégrer les entités contrôlées par intelligence artificielle.
+
+Les objectifs définis en début de semaine étaient les suivants :
+
+\begin{itemize}
+    \item Implémenter une structure client complète et organisée.
+    \item Mettre en place un gestionnaire de scènes permettant la navigation entre menus, lobby et partie.
+    \item Synchroniser correctement l’affichage client avec l’état serveur.
+    \item Développer les bots et intégrer leur logique comportementale.
+\end{itemize}
+
+Ce sprint introduisait une forte dépendance entre les composants client et serveur, rendant la communication réseau particulièrement critique.
+
+\section{Structuration du client}
+
+Le développement du client a nécessité une organisation interne claire afin d’éviter un couplage excessif entre interface graphique et logique réseau.
+
+Une séparation a été mise en place entre :
+\begin{itemize}
+    \item la couche réseau (réception et envoi des messages),
+    \item la couche logique locale (interprétation des données),
+    \item la couche graphique (affichage et interaction utilisateur).
+\end{itemize}
+
+Cette séparation permettait de maintenir une architecture propre et évolutive, tout en facilitant le débogage.
+
+L’un des défis majeurs côté client fut l’implémentation d’un gestionnaire de scènes. 
+Ce composant permettait de structurer le cycle de vie de l’application en différents états distincts :
+
+\begin{itemize}
+    \item Menu principal,
+    \item Lobby,
+    \item Salle d’attente (room),
+    \item Partie en cours.
+\end{itemize}
+
+Sans cette abstraction, la navigation entre les différentes interfaces aurait entraîné une accumulation de conditions et un code difficilement maintenable.
+
+Le gestionnaire de scènes fonctionnait selon un principe simple : une scène active à un instant donné, pouvant être remplacée par une autre selon les événements reçus.
+
+Ce système a permis de découpler la logique d’affichage de la logique réseau, améliorant ainsi la lisibilité et la robustesse du client.
+
+\section{Synchronisation client-serveur}
+
+Une difficulté majeure de ce sprint résidait dans la synchronisation entre l’état autoritaire du serveur et l’affichage côté client.
+
+Le client ne devait jamais être considéré comme source de vérité. 
+Son rôle était uniquement :
+\begin{itemize}
+    \item d’envoyer les intentions du joueur (mouvement, action),
+    \item de recevoir les mises à jour d’état,
+    \item d’afficher fidèlement la version validée par le serveur.
+\end{itemize}
+
+L’échange constant via Discord a permis d’ajuster rapidement les structures de messages afin d’assurer une compatibilité parfaite entre client et serveur.
+
+\section{Implémentation des bots}
+
+En parallèle du développement du client, les bots ont été intégrés afin de dynamiser les parties.
+
+Les bots étaient gérés côté serveur, garantissant une cohérence complète de leur comportement. 
+Leur logique reposait sur :
+
+\begin{itemize}
+    \item un déplacement autonome dans le labyrinthe,
+    \item une logique de poursuite conditionnelle lorsqu’un joueur est détecté,
+    \item un retour à un comportement de patrouille en cas de perte de cible.
+\end{itemize}
+
+La gestion des bots dans la boucle serveur permettait d’unifier la mise à jour des entités :
+
+\begin{lstlisting}[language=C++, caption={Intégration des bots dans la boucle serveur}]
+void updateGameState() {
+    updatePlayers();
+    updateBots();
+}
+\end{lstlisting}
+
+Cette centralisation assurait une cohérence totale entre joueurs humains et entités contrôlées par l’intelligence artificielle.
+
+\section{Difficultés rencontrées}
+
+Les principales difficultés de ce sprint ont été :
+
+\begin{itemize}
+    \item la mise en place du gestionnaire de scènes côté client,
+    \item l’adaptation continue des messages réseau,
+    \item la coordination étroite entre développement client et serveur.
+\end{itemize}
+
+L’interdépendance des composants nécessitait des ajustements permanents. 
+Toute modification dans le format des messages serveur impliquait une adaptation immédiate du client.
+
+L’approche Agile a ici démontré son efficacité : les cycles courts et la communication continue ont permis de résoudre rapidement les incompatibilités.
+
+\section{Résultats en fin de sprint}
+
+À l’issue du second sprint, le projet disposait :
+
+\begin{itemize}
+    \item d’un client structuré et navigable,
+    \item d’une synchronisation stable avec le serveur,
+    \item de bots fonctionnels intégrés à la logique de jeu,
+    \item d’un système jouable de bout en bout.
+\end{itemize}
+
+Ce sprint a marqué le passage d’une architecture technique fonctionnelle à une expérience interactive complète.
+
+\chapter{Sprint 3 : Stabilisation, amélioration visuelle et phase de débogage intensive}
+
+\section{Objectifs du sprint}
+
+Le troisième et dernier sprint avait pour objectif principal la stabilisation complète du système et l'amélioration de l'expérience utilisateur. 
+Contrairement aux deux premiers sprints, orientés vers la construction de l’architecture et l’intégration fonctionnelle, ce sprint était centré sur la qualité, la robustesse et la présentation finale du projet.
+
+Les objectifs définis étaient les suivants :
+
+\begin{itemize}
+    \item Corriger les incohérences restantes entre client et serveur.
+    \item Améliorer la fluidité de l’interface graphique.
+    \item Finaliser l’ergonomie du client.
+    \item Stabiliser la boucle de jeu et les transitions d’états.
+\end{itemize}
+
+Ce sprint s’inscrivait dans une logique d’optimisation et de consolidation plutôt que d’ajout de nouvelles fonctionnalités.
+
+\section{Phase de débogage côté serveur}
+
+Plusieurs anomalies sont apparues lors des tests complets en conditions réelles, notamment lorsque plusieurs joueurs interagissaient simultanément.
+
+Les principaux problèmes rencontrés étaient :
+
+\begin{itemize}
+    \item Des incohérences lors du passage du lobby à l’état de jeu.
+    \item Des erreurs d’état lors de la déconnexion d’un joueur.
+    \item Des désynchronisations ponctuelles dans la gestion des entités.
+\end{itemize}
+
+Une attention particulière a été portée à la gestion des transitions d’états serveur. 
+Certaines variables globales issues du prototype initial ont dû être restructurées afin d’éviter des effets de bord.
+
+Ce travail de refactorisation a permis :
+\begin{itemize}
+    \item d’améliorer la lisibilité du code,
+    \item de réduire le couplage entre modules,
+    \item d’éliminer des comportements indéterminés.
+\end{itemize}
+
+\section{Débogage et amélioration côté client}
+
+Côté client, la priorité était d’assurer une expérience fluide et cohérente.
+
+Les principaux axes d’amélioration ont été :
+
+\begin{itemize}
+    \item Correction des transitions entre scènes.
+    \item Amélioration de la réactivité visuelle.
+    \item Harmonisation des éléments graphiques.
+\end{itemize}
+
+Le gestionnaire de scènes, mis en place lors du sprint précédent, a été optimisé afin d’éviter des rechargements inutiles et de garantir une transition propre entre les états de l’application.
+
+Des tests répétés ont permis d’identifier des cas limites, notamment lors :
+\begin{itemize}
+    \item d’une reconnexion rapide,
+    \item d’un changement de room,
+    \item d’un lancement de partie interrompu.
+\end{itemize}
+
+Ces tests ont conduit à renforcer la robustesse du traitement des messages réseau côté client.
+
+\section{Optimisation de la communication réseau}
+
+La communication réseau a également fait l’objet d’une attention particulière. 
+Certaines structures de messages ont été simplifiées afin de réduire leur taille et d’améliorer leur lisibilité.
+
+L’objectif était double :
+\begin{itemize}
+    \item réduire la complexité du traitement côté client,
+    \item limiter les risques d’erreurs de parsing.
+\end{itemize}
+
+Cette phase a permis d’aboutir à un protocole de communication plus stable et plus cohérent.
+
+\section{Amélioration visuelle et expérience utilisateur}
+
+Une partie importante de ce sprint a été consacrée à la mise en beauté du client.
+
+Cela incluait :
+
+\begin{itemize}
+    \item l’amélioration de l’affichage du plateau,
+    \item l’ajout d’éléments graphiques plus cohérents,
+    \item une meilleure organisation visuelle des menus,
+    \item une interface plus intuitive pour la navigation dans le lobby.
+\end{itemize}
+
+Cette étape, bien que moins technique en apparence, a fortement contribué à la qualité perçue du projet. 
+Un logiciel fonctionnel mais visuellement confus peut nuire à la compréhension globale de l’architecture réalisée.
+
+\section{Apport de l’approche Agile dans ce sprint}
+
+L’organisation en sprints courts a été particulièrement bénéfique durant cette phase finale.
+
+Plutôt que d’accumuler les corrections en fin de projet, les problèmes avaient déjà été identifiés progressivement lors des itérations précédentes. 
+Ce troisième sprint a donc pu être consacré à la consolidation et à la finition.
+
+La réunion hebdomadaire avec le tuteur a permis de valider la stabilité globale du système et d’orienter les derniers ajustements.
+
+\section{Résultats en fin de sprint}
+
+À l’issue du troisième sprint, le projet présentait :
+
+\begin{itemize}
+    \item une architecture client-serveur stable,
+    \item un système de lobby fonctionnel,
+    \item une gestion correcte des rooms,
+    \item une boucle de jeu robuste,
+    \item une interface graphique finalisée,
+    \item une expérience de jeu complète et jouable.
+\end{itemize}
+
+Ce sprint a marqué la transition entre une version techniquement fonctionnelle et une version prête à être présentée et évaluée.
+
+\chapter{Analyse critique de l’approche Agile adoptée}
+
+\section{Pertinence de l’approche itérative}
+
+L’adoption d’une organisation inspirée des méthodes Agile s’est révélée particulièrement adaptée à la nature du projet. 
+Le développement d’un jeu multijoueur en réseau implique de nombreuses interdépendances techniques : client, serveur, protocole de communication, logique de jeu et interface graphique doivent évoluer de manière coordonnée.
+
+Une approche séquentielle classique (type cycle en V) aurait nécessité une spécification exhaustive dès le départ. 
+Or, plusieurs aspects du projet — notamment la gestion des états réseau et l’intégration du lobby — ont nécessité des ajustements imprévus.
+
+Le découpage en sprints courts a permis :
+
+\begin{itemize}
+    \item de valider progressivement les choix d’architecture,
+    \item de détecter rapidement les erreurs structurelles,
+    \item d’éviter l’accumulation de dette technique,
+    \item d’assurer une montée en complexité maîtrisée.
+\end{itemize}
+
+Chaque fin de sprint correspondait à une version fonctionnelle du projet, même partielle, ce qui a permis de maintenir une vision concrète de l’avancement.
+
+\section{Apports concrets de l’Agile dans le projet}
+
+Plusieurs bénéfices directs peuvent être identifiés.
+
+\subsection{Réduction du risque architectural}
+
+Le premier sprint a servi à sécuriser l’architecture serveur avant d’ajouter des couches supplémentaires. 
+Cette stratégie incrémentale a évité de développer un client complexe reposant sur une base instable.
+
+\subsection{Adaptabilité face aux difficultés}
+
+Lors de la refonte du prototype pour intégrer le lobby, plusieurs modifications structurelles ont été nécessaires. 
+Grâce au fonctionnement en itérations courtes, ces ajustements ont pu être réalisés sans compromettre l’ensemble du projet.
+
+De même, les problèmes de synchronisation client-serveur ont été résolus progressivement, en adaptant le format des messages et la gestion des états au fur et à mesure des tests.
+
+\subsection{Communication continue}
+
+L’utilisation permanente de Discord a joué un rôle central dans la réussite du projet. 
+La coordination en temps réel était indispensable compte tenu de la dépendance forte entre client et serveur.
+
+La communication régulière a permis :
+
+\begin{itemize}
+    \item d’éviter les divergences de protocole,
+    \item de synchroniser les évolutions structurelles,
+    \item de résoudre rapidement les erreurs bloquantes.
+\end{itemize}
+
+\section{Limites de l’organisation mise en place}
+
+Malgré ses bénéfices, l’organisation adoptée présentait certaines limites.
+
+\subsection{Absence d’outil formel de gestion de tâches}
+
+Bien que GitHub ait été utilisé pour le versionnement, aucun outil formel de gestion de tickets (type tableau Kanban structuré) n’a été mis en place. 
+Une telle organisation aurait pu améliorer la visualisation de la charge de travail et la priorisation des tâches.
+
+\subsection{Estimation initiale de la complexité}
+
+Certaines tâches, notamment la refonte du serveur pour intégrer le lobby et la mise en place du gestionnaire de scènes côté client, ont été sous-estimées en termes de complexité.
+
+Cette sous-estimation est caractéristique des projets techniques comportant des éléments fortement interdépendants.
+
+\subsection{Rôle du chef de sprint}
+
+Bien qu’un rôle de coordination ait été défini, la gestion des priorités restait en partie informelle. 
+Une formalisation plus rigoureuse des objectifs de sprint aurait pu améliorer encore l’efficacité globale.
+
+\section{Enseignements tirés}
+
+Plusieurs enseignements peuvent être dégagés de cette expérience :
+
+\begin{itemize}
+    \item La mise en place précoce d’un prototype réduit fortement les incertitudes techniques.
+    \item Une architecture serveur modulaire simplifie l’évolution du système.
+    \item La séparation claire entre logique métier et interface graphique est essentielle.
+    \item Les sprints courts favorisent la réactivité face aux problèmes.
+\end{itemize}
+
+De manière générale, cette expérience a confirmé que l’approche Agile est particulièrement adaptée aux projets impliquant de fortes interactions entre plusieurs composants logiciels.
+
+Elle permet de maintenir un équilibre entre structuration et flexibilité, indispensable dans un contexte de développement complexe.
+
+\chapter{Bilan et retour d’expérience}
+
+\section{Bilan technique du projet}
+
+Le projet a permis de mettre en pratique un ensemble de compétences techniques avancées, allant bien au-delà d’un simple développement applicatif.
+
+La mise en place d’une architecture client-serveur autoritaire a constitué une expérience structurante. 
+Elle a permis de comprendre concrètement les enjeux liés à la synchronisation réseau, à la cohérence d’état et à la séparation des responsabilités entre client et serveur.
+
+Le développement du système de lobby et des rooms a également introduit des problématiques d’organisation interne du serveur, notamment en matière de gestion des états et d’isolation des instances de jeu.
+
+Du côté client, l’implémentation d’un gestionnaire de scènes a mis en évidence l’importance d’une architecture logicielle claire afin d’éviter un couplage excessif entre interface graphique et logique applicative.
+
+L’intégration des bots a quant à elle permis d’explorer des mécanismes d’intelligence artificielle simples mais efficaces, intégrés dans une boucle serveur centralisée.
+
+\section{Apports méthodologiques}
+
+Au-delà de l’aspect purement technique, le projet a constitué une mise en situation concrète d’organisation Agile.
+
+La structuration en sprints a permis :
+
+\begin{itemize}
+    \item une montée en complexité progressive,
+    \item une validation régulière des choix techniques,
+    \item une adaptation rapide face aux difficultés rencontrées.
+\end{itemize}
+
+La distinction claire entre phase de prototypage et phase de développement intensif s’est révélée particulièrement pertinente. 
+Le prototype initial a servi de laboratoire expérimental, réduisant considérablement l’incertitude lors des sprints de janvier.
+
+L’expérience a également montré l’importance d’une communication continue dans un projet à forte interdépendance technique. 
+La coordination entre client et serveur nécessitait des ajustements constants, rendus possibles grâce à des échanges fréquents.
+
+\section{Compétences développées}
+
+Ce projet a contribué au développement de plusieurs compétences clés :
+
+\begin{itemize}
+    \item Conception d’architecture logicielle modulaire.
+    \item Gestion de la communication réseau.
+    \item Implémentation d’une boucle de jeu centralisée.
+    \item Structuration d’une interface graphique dynamique.
+    \item Travail collaboratif sur un dépôt partagé.
+\end{itemize}
+
+Il a également permis de renforcer la capacité d’analyse face à des problèmes techniques complexes, notamment lors des phases de débogage intensif.
+
+\section{Axes d’amélioration}
+
+Avec un recul critique, plusieurs améliorations pourraient être envisagées dans un projet similaire :
+
+\begin{itemize}
+    \item Mettre en place un outil formel de gestion de tâches (tableau Kanban).
+    \item Définir plus précisément les critères de validation de chaque sprint.
+    \item Formaliser davantage le protocole réseau dès les premières étapes.
+    \item Intégrer des tests automatisés pour sécuriser les refactorisations.
+\end{itemize}
+
+Ces améliorations permettraient d’augmenter la robustesse organisationnelle et technique du projet.
+
+\section{Perspective globale}
+
+Ce projet représente une synthèse des compétences acquises durant la formation. 
+Il illustre la complexité réelle d’un développement logiciel impliquant architecture distribuée, gestion d’état et interaction utilisateur.
+
+L’approche Agile adoptée a permis de transformer une idée initiale en un système fonctionnel et structuré, malgré les contraintes temporelles et la complexité technique.
+
+Cette expérience constitue une base solide pour aborder des projets logiciels de plus grande envergure, en intégrant à la fois rigueur technique et organisation méthodologique.
+
+\chapter{Conclusion}
+
+Le développement du jeu Pac-Man multijoueur en réseau a constitué une expérience complète d’ingénierie logicielle, mobilisant à la fois des compétences techniques avancées et une organisation méthodologique structurée.
+
+La mise en place d’une architecture client-serveur autoritaire a permis d’aborder concrètement les problématiques de synchronisation, de gestion d’état et de modularité logicielle. 
+L’intégration d’un système de lobby, de rooms indépendantes et d’une boucle de jeu centralisée a structuré le projet autour d’une architecture robuste et évolutive.
+
+L’approche inspirée des méthodes Agile s’est révélée particulièrement adaptée au contexte du projet. 
+Le découpage en sprints courts a permis une progression incrémentale maîtrisée, une validation régulière des choix techniques et une adaptation rapide face aux difficultés rencontrées. 
+La phase de prototypage initiale a réduit les incertitudes, tandis que les itérations intensives de janvier ont permis de transformer cette base en un système stable et jouable.
+
+Au-delà des résultats techniques obtenus, ce projet a permis de développer une compréhension approfondie des enjeux liés au travail collaboratif, à la structuration d’un projet logiciel complexe et à la nécessité d’une communication continue dans un environnement distribué.
+
+L’expérience acquise constitue un socle solide pour aborder des développements futurs, qu’il s’agisse de projets académiques plus avancés ou d’applications professionnelles impliquant des architectures distribuées et des contraintes de robustesse élevées.
+
+En définitive, ce projet illustre l’importance d’une architecture bien pensée, d’une organisation méthodique et d’une capacité d’adaptation constante dans la réussite d’un développement logiciel complexe.
+
+\end{document}
