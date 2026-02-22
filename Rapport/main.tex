@@ -179,9 +179,7 @@ Cette répartition a permis une progression simultanée sur plusieurs fronts du 
 
 \section{Structure du serveur}
 
-\subsection{Mise en place de la structure}
-
-\subsubsection*{Architecture multithread}
+\subsection{Architecture multithread}
 
 Le serveur repose sur une architecture multithread conçue pour supporter plusieurs connexions simultanées sans dégradation des performances. 
 La couche réseau est strictement séparée de la logique de jeu afin d’éviter qu’une opération bloquante, attente de paquet, latence élevée ou déconnexion, n’impacte l’exécution globale du système.
@@ -201,7 +199,7 @@ Cette architecture renforce la robustesse du système et permet l’exécution s
     \caption{Chaîne de responsabilité côté serveur}
 \end{figure}
 
-\subsubsection*{Architecture modulaire}
+\subsection{Architecture modulaire}
 
 L’architecture du serveur est organisée en plusieurs couches distinctes possédant chacune une responsabilité clairement définie. 
 Cette structuration modulaire garantit lisibilité, extensibilité et maintenabilité.
@@ -228,7 +226,7 @@ Chaque couche délègue les traitements spécialisés au niveau inférieur, ce q
 
 \end{figure}
 
-\subsubsection*{Structure du plateau}
+\subsection{Structure du plateau}
 
 Le plateau est modélisé sous forme d’une grille bidimensionnelle composée de cases murales et de cases traversables. 
 Cette représentation discrète constitue la base logique du système.
@@ -238,11 +236,7 @@ La cohérence entre la représentation logique côté serveur et l’affichage c
 
 Le plateau constitue ainsi une structure centrale sur laquelle reposent la génération procédurale du labyrinthe et les mécanismes décisionnels des fantômes.
 
-
-
-\subsection{Gameplay}
-
-\subsubsection*{Boucle de jeu}
+\subsection{Boucle de jeu}
 
 La boucle de jeu constitue le cœur du serveur et repose sur un modèle à mise à jour périodique, appelé \textit{tick serveur}. 
 Contrairement à une architecture purement événementielle, l’état du monde est recalculé à intervalle régulier selon une fréquence fixe. 
@@ -273,7 +267,7 @@ L’intégralité de ces calculs étant effectuée côté serveur, toute tentati
 Ces derniers ne réalisent aucun calcul logique : ils se contentent d’afficher l’état reçu. 
 Cette architecture renforce la cohérence du jeu et s’inscrit dans le modèle de serveur autoritaire défini précédemment.
 
-\subsubsection*{Plateau et génération procédurale}
+\subsection{Plateau et génération procédurale}
 
 Le plateau repose sur une génération procédurale de labyrinthe fondée sur une variante de l’algorithme de Prim. 
 Ce choix permet de produire automatiquement des cartes connexes, tout en garantissant une forte variabilité entre les parties.
@@ -332,7 +326,7 @@ Ce mécanisme introduit une dimension stratégique supplémentaire et complexifi
 Le plateau devient ainsi une structure centrale du système : il sert de support aux collisions, au placement des pac-gommes, ainsi qu’aux algorithmes de poursuite des fantômes. 
 La génération procédurale contribue directement à la rejouabilité et à la diversité stratégique des parties.
 
-\subsubsection{Intelligence artificielle des fantômes}
+\subsection{Intelligence artificielle des fantômes}
 
 L’intelligence artificielle des fantômes repose sur une architecture hybride combinant pathfinding classique, système d’influence local et prise de décision hiérarchique. 
 L’objectif n’est pas uniquement de poursuivre efficacement Pac-Man, mais de produire un comportement crédible, adaptatif et capable de générer des dynamiques collectives.
@@ -388,7 +382,7 @@ Un bruit aléatoire contrôlé est également introduit afin d’éviter les cyc
     \caption*{Rouge pour PacMan et Bleu pour les fantômes}
 \end{figure}
 
-\subsubsection{Rooms : gestion des parties}
+\subsection{Rooms : gestion des parties}
 
 Afin de supporter plusieurs parties simultanées, le serveur repose sur un système de \textit{rooms}. 
 Une room représente une instance autonome de jeu possédant son propre état, ses propres joueurs et son propre cycle d’exécution. 
@@ -424,7 +418,7 @@ Cette capacité de configuration facilite les phases de test, l’équilibrage d
     \caption{Vue de la Room}
 \end{figure}
 
-\subsubsection{Règles du jeu}
+\subsection{Règles du jeu}
 
 Les règles du jeu ont été définies afin d’instaurer un équilibre entre tension, stratégie et asymétrie des rôles. 
 Chaque camp dispose d’objectifs distincts et de contraintes spécifiques, créant une dynamique d’opposition structurée.
