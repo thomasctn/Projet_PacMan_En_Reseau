@@ -339,19 +339,25 @@ L’objectif n’est pas uniquement de poursuivre efficacement Pac-Man, mais de 
 
 \paragraph{Architecture décisionnelle hiérarchique}
 
-À chaque tick serveur, chaque fantôme évalue sa situation selon un ordre de priorité strict.
+À chaque tick serveur, chaque fantôme évalue sa situation selon un ordre de priorité.
 
-Lorsque Pac-Man est en mode chasseur, la priorité absolue devient la fuite stratégique vers la cabane centrale. 
+Lorsque Pac-Man est en mode chasseur, la priorité absolue devient la fuite stratégique vers la hut. 
 Le plus court chemin est alors calculé à l’aide d’un algorithme de Breadth First Search (BFS), garantissant une trajectoire optimale dans un graphe non pondéré. 
 Ce choix assure robustesse et compatibilité avec les labyrinthes générés procéduralement.
 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{images/code_bfs.png}
+    \caption{fonction implémentant BFS}
+\end{figure}
+
 En situation normale, si Pac-Man est détecté dans un rayon de vision défini, le fantôme active un mode de poursuite ciblée. 
-Un BFS à profondeur limitée est exécuté afin de simuler une perception partielle de l’environnement. 
-Cette limitation réduit le coût computationnel tout en conservant un comportement crédible.
+Un BFS à profondeur limitée est exécuté afin de simuler une perception réduite de l’environnement. 
+Cette limitation réduit le coût tout en conservant un comportement crédible.
 
-En l’absence de menace ou de cible visible, le fantôme adopte un comportement autonome fondé sur un système d’influence distribué.
+En l’absence de menace ou de cible visible, le fantôme adopte un comportement autonome fondé sur un système de trace.
 
-\paragraph{Système d’influence}
+\paragraph{Système de trace}
 
 Chaque case du plateau possède un score dynamique défini par :
 
@@ -359,25 +365,21 @@ Chaque case du plateau possède un score dynamique défini par :
 Score = Attraction - Répulsions
 \]
 
-Les traces laissées par Pac-Man génèrent une force attractive, tandis que la présence d’autres fantômes induit des forces répulsives différenciées. 
+Les traces laissées par Pac-Man génèrent une force attractive, tandis que la présence d’autres fantômes induit des forces répulsives. 
 Le fantôme sélectionne localement la case voisine maximisant ce score selon une approche gloutonne.
 
-Ce mécanisme s’inspire des modèles de colonies de fourmis, où l’information est distribuée dans l’environnement plutôt que centralisée.
+Ce mécanisme s’inspire des modèles de colonies de fourmis, où l’information est distribuée dans l’environnement plutôt que centralisée. Cela permet de faire une forme d'intelligence collectives peu couteuse.
 
 \paragraph{Comportement émergent}
 
 L’interaction entre attraction vers la cible et répulsion inter-agents produit des comportements collectifs sans coordination explicite. 
 Les fantômes tendent naturellement à se disperser, à éviter les regroupements inutiles et à converger progressivement vers Pac-Man en exploitant différentes trajectoires.
 
-Cette émergence résulte uniquement de règles locales simples, démontrant l’efficacité d’un modèle distribué appliqué à un système multi-agents.
-
 \paragraph{Choix algorithmiques}
 
 L’implémentation combine plusieurs techniques complémentaires : 
-le BFS pour le calcul de chemins optimaux, une version limitée pour la simulation de vision, une recherche gloutonne locale pour l’exploration autonome, ainsi que des heuristiques légères telles que l’utilisation de la distance euclidienne au carré. 
+le BFS pour le calcul de chemins optimaux, une version limitée pour la simulation de vision, une recherche gloutonne locale pour l’exploration autonome.
 Un bruit aléatoire contrôlé est également introduit afin d’éviter les cycles déterministes et les oscillations.
-
-Cette approche hybride offre un compromis entre précision stratégique, coût computationnel maîtrisé et richesse comportementale.
 
 \begin{figure}[H]
     \centering
@@ -398,7 +400,7 @@ Elle encapsule également sa propre boucle de jeu et son plateau, garantissant q
 \paragraph{Création dynamique et attribution des rôles}
 
 Lorsqu’un joueur rejoint le lobby, il est dirigé vers une room existante disposant de places libres. 
-Si aucune room n’est disponible, une nouvelle instance est créée dynamiquement. 
+Si aucune room n’est disponible, une nouvelle room est créée dynamiquement.
 Cette création à la demande permet au serveur d’adapter automatiquement sa structure au nombre de joueurs connectés.
 
 L’attribution des rôles est effectuée au moment du lancement de la partie selon une règle simple : un joueur incarne Pac-Man tandis que les autres deviennent des fantômes. 
@@ -409,17 +411,18 @@ Ce mécanisme est géré exclusivement côté serveur afin d’éviter toute inc
 Chaque room possède un état centralisé comprenant les positions des joueurs, l’état des pac-gommes et les différents systèmes temporels. 
 À chaque tick, cet état est mis à jour puis diffusé uniquement aux joueurs appartenant à la room concernée.
 
-Ce cloisonnement garantit la cohérence interne de chaque partie et empêche toute interférence entre sessions distinctes. 
-Il constitue un élément clé de la scalabilité du système.
+Ce cloisonnement garantit la cohérence interne de chaque partie et empêche toute interférence. 
 
 \paragraph{Paramétrisation des parties}
 
 Les rooms permettent également d’ajuster dynamiquement certains paramètres, tels que la durée maximale d’une partie, le nombre de vies de Pac-Man ou encore la quantité de pac-gommes spéciales. 
 Cette capacité de configuration facilite les phases de test, l’équilibrage du gameplay et l’organisation de parties compétitives aux règles différenciées.
 
-L’introduction du système de rooms marque ainsi une transition vers une architecture modulaire capable de gérer un nombre variable de parties simultanées tout en conservant un modèle serveur autoritaire cohérent.
-
-
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{images/room.png}
+    \caption{Vue de la Room}
+\end{figure}
 
 \subsubsection{Règles du jeu}
 
@@ -428,31 +431,29 @@ Chaque camp dispose d’objectifs distincts et de contraintes spécifiques, cré
 
 \paragraph{Conditions de victoire}
 
-Pac-Man remporte la partie s’il parvient à consommer l’ensemble des pac-gommes présentes sur le plateau ou s’il survit jusqu’à l’expiration du timer global. 
+Pac-Man gange la partie s’il parvient à manger tout les pac-gommes du plateau ou s’il survit jusqu’à la fin du timer. 
 Les fantômes, quant à eux, gagnent en épuisant toutes les vies de Pac-Man avant la fin du temps imparti.
 
 Ce double système de victoire introduit une pression temporelle permanente : Pac-Man doit optimiser ses déplacements, tandis que les fantômes doivent coordonner leurs actions pour limiter ses opportunités.
 
-\paragraph{Pac-gommes spéciales et renversement de dynamique}
+\paragraph{Pac-gommes spéciales}
 
 Certaines pac-gommes déclenchent un mode temporaire dit « chasseur ». 
-Durant cette période, Pac-Man devient capable d’éliminer les fantômes au contact. 
-Cet état est strictement limité dans le temps par un compteur décrémenté à chaque tick serveur. 
-Les fantômes éliminés réapparaissent après un délai prédéfini, maintenant ainsi l’équilibre global.
+Durant cette période, Pac-Man devient capable de manger les fantômes au contact. 
+Cet état est limité dans le temps par un compteur décrémenté à chaque tick serveur. 
+Les fantômes éliminés réapparaissent mais ont aussi des vies, maintenant ainsi l’équilibre de jeu.
 
 Ce mécanisme introduit un renversement ponctuel de dominance, transformant momentanément la proie en prédateur et modifiant profondément les stratégies en cours.
 
 \paragraph{Asymétrie de vision}
 
-Le système repose également sur une asymétrie informationnelle. 
-Pac-Man dispose d’une vision globale du plateau, tandis que les fantômes ne perçoivent qu’un environnement local restreint.
-
-Cette différence crée une dynamique stratégique spécifique : Pac-Man peut planifier ses trajectoires de manière optimale, alors que les fantômes doivent s’appuyer sur leur intelligence artificielle distribuée et sur leurs comportements émergents pour localiser efficacement leur cible.
+Le système repose également sur une différence de vision. 
+Pac-Man dispose d’une vision globale du plateau, tandis que les fantômes ne perçoivent qu’un environnement restreint, ils ne peuvent voir qu'a une certaines distance d'eux même, la vison des fantomes n'est pas partagée entre eux.
 
 \paragraph{Cohérence du système}
 
-La combinaison de ces règles avec la génération procédurale du plateau et l’architecture hybride de l’intelligence artificielle produit un gameplay varié et imprévisible. 
-Les interactions entre pression temporelle, asymétrie de vision et renversement temporaire des rôles favorisent l’émergence de stratégies multiples et renforcent la rejouabilité du jeu.
+La combinaison de ces règles avec la génération procédurale du plateau et l’architecture hybride de l’intelligence artificielle et des joueurs, produit un gameplay varié et imprévisible. 
+Les interactions entre le timer qui décroit, le manque de vision et inversement temporaire des rôles permettent de nombreuse stratégies et augmentent la rejouabilité du jeu.
 
 
 \section{Structure du client}
