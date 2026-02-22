@@ -176,29 +176,6 @@ Cette répartition a permis une progression simultanée sur plusieurs fronts du 
 
 \chapter{Architecture et conception}
 
-\section{Architecture générale}
-
-L’architecture du serveur est conçue pour supporter un jeu multijoueur complet reposant sur une structure modulaire, évolutive et maintenable.
-
-Le serveur s’appuie sur une architecture multithread permettant de gérer plusieurs connexions simultanées sans dégradation des performances. 
-La couche réseau est strictement séparée de la logique de jeu afin d’éviter qu’une opération bloquante — telle qu’une attente de paquet, une latence élevée ou une déconnexion — n’impacte l’exécution globale du système.
-
-Un thread est dédié à la réception des paquets réseau. 
-Les messages reçus sont insérés dans une file d’attente interne, puis traités de manière synchronisée par la logique centrale du serveur. 
-Cette organisation garantit une séparation claire entre la couche communication et la couche métier.
-
-La file de messages agit comme un mécanisme de tampon entre le système réseau et la boucle de jeu à tick fixe. 
-Ainsi, l’exécution des mises à jour périodiques demeure indépendante des variations de latence ou du débit des clients.
-
-Cette architecture renforce la robustesse du système, limite les risques de blocage et permet l’exécution simultanée de plusieurs parties indépendantes au sein du même serveur.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=1\textwidth]{UML/PacMan_UML_Server_Reseau.png}
-    \caption{Diagrammes de classe de l'architecture réseau}
-    \caption*{Vue côté serveur - Gestion des packets, des parties, des salles (sans geter et seter)}
-
-\end{figure}
 
 \section{Structure du serveur}
 
@@ -207,7 +184,7 @@ Cette architecture renforce la robustesse du système, limite les risques de blo
 \subsubsection*{Architecture multithread}
 
 Le serveur repose sur une architecture multithread conçue pour supporter plusieurs connexions simultanées sans dégradation des performances. 
-La couche réseau est strictement séparée de la logique de jeu afin d’éviter qu’une opération bloquante — attente de paquet, latence élevée ou déconnexion — n’impacte l’exécution globale du système.
+La couche réseau est strictement séparée de la logique de jeu afin d’éviter qu’une opération bloquante, attente de paquet, latence élevée ou déconnexion, n’impacte l’exécution globale du système.
 
 Un thread est dédié à la réception des paquets réseau. 
 Les messages entrants sont insérés dans une file d’attente interne, puis traités de manière synchronisée par la logique centrale du serveur. 
@@ -241,6 +218,15 @@ Client $\rightarrow$ Server $\rightarrow$ Lobby $\rightarrow$ Room $\rightarrow$
 \end{center}
 
 Chaque couche délègue les traitements spécialisés au niveau inférieur, ce qui permet d’introduire de nouvelles fonctionnalités sans modifier les composants fondamentaux du système.
+
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{UML/PacMan_UML_Server_Reseau.png}
+    \caption{Diagrammes de classe de l'architecture réseau}
+    \caption*{Vue côté serveur - Gestion des packets, des parties, des salles (sans geter et seter)}
+
+\end{figure}
 
 \subsubsection*{Structure du plateau}
 
@@ -276,7 +262,7 @@ Ce mode est géré par un système de minuterie interne décrémenté à chaque 
 Lorsque ce compteur atteint zéro, l’état normal est restauré.
 
 Deux systèmes temporels coexistent : un timer global définissant la durée maximale d’une partie, et un timer local associé aux états temporaires. 
-Cette gestion unifiée du temps garantit une cohérence entre les événements et évite toute dépendance au rythme d’exécution des clients.
+Cette gestion unifiée du temps garantit une certaine cohérence entre les événements et évite toute dépendance au rythme d’exécution des clients.
 
 Les collisions sont évaluées de manière systématique à chaque mise à jour. 
 Un déplacement vers une case murale est annulé. 
@@ -301,6 +287,12 @@ Le processus se poursuit jusqu’à épuisement de cette liste.
 
 Ce mécanisme produit un arbre couvrant garantissant un labyrinthe connexe sans zones isolées.
 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{images/plateau_42_1.png}
+    \caption{Plateau apès l'algorithme de Prim}
+\end{figure}
+
 Afin d’adapter cette structure aux contraintes du gameplay, plusieurs transformations supplémentaires sont appliquées.
 
 Une zone centrale fixe de taille 3×3, appelée « hut », est réservée avant la génération. 
@@ -310,8 +302,20 @@ Une fonction dédiée assure ensuite son raccordement au labyrinthe principal pa
 Les coins du plateau, destinés aux positions initiales des joueurs, sont également vérifiés après génération. 
 Si l’un d’eux se retrouve isolé, une ouverture contrôlée est créée pour garantir son accessibilité.
 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{images/plateau_42_2.png}
+    \caption{Plateau apès génération de la hut}
+\end{figure}
+
 L’algorithme de Prim produisant un arbre sans cycles, des ouvertures supplémentaires sont ajoutées de manière aléatoire afin d'ajouter des chemins. 
 Cette étape enrichit la dynamique de poursuite et évite des trajectoires trop prévisibles.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{images/plateau_42_3.png}
+    \caption{Plateau apès ajout de cycles}
+\end{figure}
 
 Enfin, certains culs-de-sac sont supprimés en identifiant les cases ne possédant qu’un unique voisin accessible. 
 La suppression partielle de ces impasses améliore la fluidité des déplacements et limite les situations excessivement punitives.
@@ -319,14 +323,14 @@ La suppression partielle de ces impasses améliore la fluidité des déplacement
 Des portails latéraux sont également intégrés sur les bords du plateau, permettant à une entité de réapparaître du côté opposé après sortie. 
 Ce mécanisme introduit une dimension stratégique supplémentaire et complexifie les interactions entre joueurs.
 
-Le plateau devient ainsi une structure centrale du système : il sert de support aux collisions, au placement des pac-gommes, ainsi qu’aux algorithmes de poursuite des fantômes. 
-La génération procédurale contribue directement à la rejouabilité et à la diversité stratégique des parties.
-
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.8\textwidth]{images/plateau.png}
-    \caption{Plateau de jeu}
+    \includegraphics[width=1\textwidth]{images/plateau_42_4.png}
+    \caption{Plateau apès suppression des culs-de-sac et ajout des portails}
 \end{figure}
+
+Le plateau devient ainsi une structure centrale du système : il sert de support aux collisions, au placement des pac-gommes, ainsi qu’aux algorithmes de poursuite des fantômes. 
+La génération procédurale contribue directement à la rejouabilité et à la diversité stratégique des parties.
 
 \subsubsection{Intelligence artificielle des fantômes}
 
