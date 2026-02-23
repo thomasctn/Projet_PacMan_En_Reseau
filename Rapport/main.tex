@@ -465,20 +465,17 @@ Utilisation de \href{https://gamedevframework.github.io/v1.2.0/classgf_1_1_tcp_s
 Socket de connnexion + communication coté serveur, communication uniquement pour le client
 Un thread coté client et serveur pour empiler les packet reçu, puis dépilement dans la boucle de jeu pour être traité
 
+Structures de données à la fois utilisé par le serveur et le client (BoardCommonn, PlayerData, RoomSettings, etc...), pas transmit tel quel mais utilisé par les strucutes de com
+Exemple illustré avec PlayerData
 
-Structures communes utilisé par le client et serveur pour la communication (BoardCommonn, PlayerData, RoomSettings, etc...)
-Exemple illustré avec PlayerData ou BoardData
+Structures de communication, contenant parfois ces strucutes communes. gf::Id, pour pouvoir les identifier lors de la déserialisation.
+Exemple avec ServerListRoomPlayers
 
-Les structures ont des gf::Id, pour pouvoir les identifier lors de la déserialisation;
-
-Surchage de l'opétaeur | avec la classe Archive, nécessaire pour la sérialisation/déserialisation
-Exemple illustré avec PlayerData ou BoardData
+Surchage de l'opétaeur | avec la classe Archive pour les 2 types de structures, nécessaire pour la sérialisation/déserialisation
+Exemple illustré avec PlayerData et ServerListRoomPlayers
 
 Sérialisation/Désérialisation avec gf::Packet.is() et gf::Packet.as().
-Exemple illustré avec PlayerData ou BoardData
-
-Descritpion des strucutres
-Exemple avec board : le serveur convertit le plateau en BoardCommon, puis le sérialise avec gf::Packet.is(), avant de l'envoyer au client. Le client traite le packet en regardant si l'id correspond à la structure BoardCommon, puis déserialise avec gf::Packet.as(), avant de traiter les données
+Exemple illustré avec ServerListRoomPlayers
 
 Pour chaque modification on retransmet toutes les données
 
