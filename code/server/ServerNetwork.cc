@@ -4,8 +4,8 @@
 // - nextId correspond a l'id qui sera assigner au prochain client
 // - running pour couper la boucle de server
 // - lobby -> appartient a ServerNetwork
-ServerNetwork::ServerNetwork()
-: listener("5000")
+ServerNetwork::ServerNetwork(std::string port)
+: listener(port)
 , nextId(1)
 , running(true)
 , lobby(std::make_unique<Lobby>(*this))
