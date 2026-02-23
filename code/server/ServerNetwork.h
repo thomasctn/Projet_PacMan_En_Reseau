@@ -22,7 +22,7 @@ class Lobby;
 
 class ServerNetwork {
 public:
-    ServerNetwork();
+    ServerNetwork(std::string port);
     int run();
     void send(uint32_t playerId, gf::Packet& packet);
     Lobby& getLobby() { return *lobby; }

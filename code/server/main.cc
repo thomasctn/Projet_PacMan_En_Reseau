@@ -29,10 +29,19 @@ void sigintHandler(int) {
     if (gServer) gServer->stop();
 }
 
-int main() {
+int main(int argc, const char * argv[]) {
+    if(argc > 2) {
+        fprintf(stderr,"Invalid number of argument\n");
+        printf("Usage : %s port\n",argv[0]);
+        return -1;
+    }
+    std::string port = "5000";
+    if(argc == 2) {
+        port = argv[1];
+    }
     gf::Log::info("Démarrage du serveur...\n");
 
-    ServerNetwork server;
+    ServerNetwork server(port);
     gServer = &server;
     std::signal(SIGINT, sigintHandler);  // ctrl+c stoppe le serveur
 

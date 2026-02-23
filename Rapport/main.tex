@@ -461,15 +461,22 @@ Description des trames, types de messages,
 gestion des événements (connexion, mouvement, fin de partie).
 
 
-Utilisation de gf::TCPSocket, permettant de faire une tramsmission de données fiable
+Utilisation de \href{https://gamedevframework.github.io/v1.2.0/classgf_1_1_tcp_socket.html}{gf::TCPSocket} et \href{https://gamedevframework.github.io/v1.2.0/classgf_1_1_tcp_listener.html}{gf::TcpListener}, permettant de faire une tramsmission de données fiable avec le protocol TCP
 Socket de connnexion + communication coté serveur, communication uniquement pour le client
 Un thread coté client et serveur pour empiler les packet reçu, puis dépilement dans la boucle de jeu pour être traité
 
-Structures communes utilisé par le client et serveur pour la communication (BoardCommonn, PlayerData, RoomSettings, etc...)
 
-Sérialisation/Désérialisation avec gf::Packet.is() et gf::Packet.as() et la surchage de | avec la classe Archive. Déjà implémenté pour les types de base par gf
+Structures communes utilisé par le client et serveur pour la communication (BoardCommonn, PlayerData, RoomSettings, etc...)
+Exemple illustré avec PlayerData ou BoardData
 
 Les structures ont des gf::Id, pour pouvoir les identifier lors de la déserialisation;
+
+Surchage de l'opétaeur | avec la classe Archive, nécessaire pour la sérialisation/déserialisation
+Exemple illustré avec PlayerData ou BoardData
+
+Sérialisation/Désérialisation avec gf::Packet.is() et gf::Packet.as().
+Exemple illustré avec PlayerData ou BoardData
+
 Descritpion des strucutres
 Exemple avec board : le serveur convertit le plateau en BoardCommon, puis le sérialise avec gf::Packet.is(), avant de l'envoyer au client. Le client traite le packet en regardant si l'id correspond à la structure BoardCommon, puis déserialise avec gf::Packet.as(), avant de traiter les données
 
