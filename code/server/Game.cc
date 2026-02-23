@@ -178,6 +178,7 @@ bool Game::requestMove(uint32_t playerId, Direction dir)
             }
         }
     }
+    
 
     // =====================================================
     // Traces bots
@@ -314,6 +315,18 @@ void Game::startGameLoop(int tickMs_, InputQueue& inputQueue, ServerNetwork& ser
                     room->endGame(reason);
                     break;
                 }
+                bool allGhostDead = isAllGhostDead();
+                bool allPacmanDead = isAllPacmanDead();
+                if(allGhostDead || allPacmanDead) {
+                    gf::Log::info("Partie terminée !\n");
+                    running.store(false);
+                    gameStarted.store(false);
+                    GameEndReason reason = allGhostDead
+                                              ? GameEndReason::ALL_GHOST_DEATH
+                                              : GameEndReason::PACMAN_DEATH;
+                    room->endGame(reason);
+                    break;
+                }
             }
 
             // --- update des mouvements des joueurs humains ---
@@ -369,8 +382,28 @@ void Game::spawnPlayer(Player& p) {
     }
 }
 
+bool Game::isAllPacmanDead()
+{
+    for(auto& p : players) {
+        if(p.second->getRole() == PlayerRole::PacMan && p.second->isAlive()) {
+            return false;
+        }
+    }
+    return true;
+}
 
-void Game::processInputs(InputQueue& queue) {
+bool Game::isAllGhostDead()
+{
+    for(auto& p : players) {
+        if(p.second->getRole() == PlayerRole::Ghost && p.second->isAlive()) {
+            return false;
+        }
+    }
+    return true;
+}
+
+void Game::processInputs(InputQueue &queue)
+{
     while (auto inputOpt = queue.pop()) {
         auto& input = *inputOpt;
 
@@ -382,7 +415,6 @@ void Game::processInputs(InputQueue& queue) {
         p.setMoveRequest(true);
     }
 }
-
 
 double Game::getPreGameElapsed() const {
     std::lock_guard<std::mutex> lock(chronoMutex);

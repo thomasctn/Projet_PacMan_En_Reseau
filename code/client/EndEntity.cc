@@ -64,9 +64,11 @@ void EndEntity::render(gf::RenderTarget& target, const gf::RenderStates& states)
         case GameEndReason::ALL_DOT_EATEN: 
             reasonStr = "Pacman a mangé toutes les pacgommes.\nPacman gagne !"; break;
         case GameEndReason::TIME_OUT:       
-            reasonStr = "Le temps est écoulé.\nLes fantômes gagnent."; break;
+            reasonStr = "Le temps est écoulé.\nLes fantômes gagnent !"; break;
         case GameEndReason::PACMAN_DEATH:   
-            reasonStr = "Pacman est mort trop de fois.\nLes fantômes gagnent."; break;
+            reasonStr = "Pacman est mort trop de fois.\nLes fantômes gagnent!"; break;
+        case GameEndReason::ALL_GHOST_DEATH:
+            reasonStr = "Les fantômes sont tous mort\nPacman gagne !"; break;
         default:                            
             reasonStr = "Fin de la partie."; break;
     }
