@@ -34,7 +34,7 @@ bool Board::isWalkable(unsigned int x, unsigned int y) const {
 bool Board::isOccupied(unsigned int x, unsigned int y, uint32_t excludeId, const std::vector<Player> &players) const {
     for (auto &p : players)
     {
-        if (p.id != excludeId && p.x == x && p.y == y)
+        if (p.getId() != excludeId && p.getPos().x == x && p.getPos().y == y)
             return true;
     }
     return false;
@@ -523,9 +523,9 @@ void Board::printWithPlayers(const std::vector<Player> &players) const {
 
             for (const auto &p : players)
             {
-                if (p.x == x && p.y == y)
+                if (p.getPos().x == x && p.getPos().y == y)
                 {
-                    std::cout << p.id;
+                    std::cout << p.getId();
                     playerHere = true;
                     break;
                 }

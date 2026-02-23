@@ -8,8 +8,7 @@
 Player::Player(uint32_t id_, PlayerRole role_, const std::string& name_)
 : id(id_)
 , role(role_)
-, x(0.0f)
-, y(0.0f)
+, pos(0.f)
 , color(0xFFFFFFFF)
 , score(0)
 , ready(false)
@@ -21,17 +20,17 @@ Player::Player(uint32_t id_, PlayerRole role_, const std::string& name_)
     switch (role) {
         case PlayerRole::PacMan:
             moveRate = PACMAN_SPEED_MOVERATE;
-            isVunerable = true;
+            vulnerable = true;
             hp = 3;
             break;
         case PlayerRole::Ghost:
             moveRate = GHOST_SPEED_MOVERATE;
-            isVunerable = false;
+            vulnerable = false;
             hp = 2;
             break;
         default:
             moveRate = DEFAULT_SPEED_MOVERATE;
-            isVunerable = false;
+            vulnerable = false;
             hp = 0;
             break;
     }
@@ -54,17 +53,16 @@ void Player::setRole(PlayerRole r) {
 // ------------------
 PlayerData Player::getState() const {
 
-    if (!alive) {
-        return { id, 0.0f, 0.0f, color, "moi", role, score, true, 0 };
+    if (!isAlive()) {
+        return { id, 0.0f, 0.0f, color, name, role, score, true, 0 };
     }
 
-    return { id, x, y, color, "moi", role, score, true, hp };
+    return { id, pos.x,pos.y, color, name, role, score, true, hp };
 }
 
 
 void Player::setState(const PlayerData& state) {
-    x = state.x;
-    y = state.y;
+    pos = {state.x,state.y};
     color = state.color;
 }
 
@@ -88,7 +86,7 @@ bool Player::eat(std::optional<PacGommeType> pacGommeType, Player* otherPlayer)
                 else if (pacGommeType.value() == PacGommeType::Power)
                     {
                         score += 50;
-                        isVunerable = false; // devient chasseur
+                        vulnerable = false; // devient chasseur
                         powerTimeRemaining = CHASSEUR_MODE_TIME;
 
                         gf::Log::info("PacMan %d a mangé une PAC-GOMME POWER !\n", id);
@@ -105,20 +103,13 @@ bool Player::eat(std::optional<PacGommeType> pacGommeType, Player* otherPlayer)
             // --- Mange un fantôme ---
             if (otherPlayer && otherPlayer->getRole() == PlayerRole::Ghost)
             {
-                if (!isVunerable) // mode POWER
+                if (!vulnerable) // mode POWER
                 {
                     score += 100;
 
-                    otherPlayer->hp -= 1;
-                    if (otherPlayer->hp <= 0)
-                    {
-                        otherPlayer->hp = 0;
-                        otherPlayer->alive = false;
-                    }
-
+                    otherPlayer->setHP(otherPlayer->getHP()-1);
                     // Respawn fantôme
-                    otherPlayer->x = 50.f;
-                    otherPlayer->y = 50.f;
+                    otherPlayer->setPos({50.f,50.f});
 
                     gf::Log::info("PacMan %d a mangé Fantôme %d !\n", id, otherPlayer->id);
                     return true;
@@ -132,17 +123,10 @@ bool Player::eat(std::optional<PacGommeType> pacGommeType, Player* otherPlayer)
         {
             if (otherPlayer && otherPlayer->getRole() == PlayerRole::PacMan)
             {
-                if (otherPlayer->isVunerable) // PacMan normal
+                if (otherPlayer->isVulnerable()) // PacMan normal
                 {
-                    otherPlayer->hp -= 1;
-
-                    if (otherPlayer->hp <= 0)
-                    {
-                        otherPlayer->hp = 0;
-                        otherPlayer->alive = false;
-                    }
-
-                    otherPlayer->justDied = true;
+                    otherPlayer->setHP(otherPlayer->getHP()-1);
+                    otherPlayer->setJustDied(true);
                     return true;
                 }
             }
@@ -159,7 +143,7 @@ bool Player::eat(std::optional<PacGommeType> pacGommeType, Player* otherPlayer)
 
 
 void Player::update(double dt) {
-    if (!isVunerable) {
+    if (!isVulnerable()) {
         double oldTime = powerTimeRemaining;
         powerTimeRemaining -= dt;
 
@@ -172,7 +156,7 @@ void Player::update(double dt) {
 
         // --- Fin du mode chasseur ---
         if (powerTimeRemaining <= 0.0) {
-            isVunerable = true;
+            vulnerable = true;
             powerTimeRemaining = 0.0;
             gf::Log::info("PacMan %d n'est plus en mode chasseur !\n", id);
 

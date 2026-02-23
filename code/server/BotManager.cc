@@ -65,8 +65,8 @@ void BotManager::unregisterBot(uint32_t id) {
 // ---------------- Traces ----------------
 void BotManager::updateTraces() {
     for (auto& [id, p] : game.getPlayers()) {
-        int gx = (int)(p->x / CASE_SIZE);
-        int gy = (int)(p->y / CASE_SIZE);
+        int gx = (int)(p->getPos().x / CASE_SIZE);
+        int gy = (int)(p->getPos().y / CASE_SIZE);
 
         Node* node = getNode(gx, gy);
         if (!node) continue;
@@ -74,7 +74,7 @@ void BotManager::updateTraces() {
         Trace t;
         t.ownerId = id;
         t.intensity = 1.0f;
-        t.type = (p->role == PlayerRole::PacMan)
+        t.type = (p->getRole() == PlayerRole::PacMan)
                    ? TraceType::PacMan
                    : TraceType::Ghost;
 
@@ -93,13 +93,13 @@ void BotManager::update(double dt) {
     for (auto& [botId, bot] : bots) {
         Player& p = game.getPlayerInfo(botId);
 
-        p.moveAccumulator += dt;
+        p.setMoveAccumulator(p.getMoveAccumulator()+dt);
 
-        double interval = 1.0 / p.moveRate;
-        if (p.moveAccumulator < interval)
+        double interval = 1.0 / p.getMoveRate();
+        if (p.getMoveAccumulator() < interval)
             continue;
 
-        p.moveAccumulator -= interval;
+        p.setMoveAccumulator(p.getMoveAccumulator()-interval);
 
         auto dirOpt = bot->update(game, *this);
         if (!dirOpt) continue;

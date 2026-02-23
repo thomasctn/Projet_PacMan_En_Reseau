@@ -176,7 +176,7 @@ int main(int argc, const char * argv[]) {
                 std::vector<PlayerSnapshot> players;
                 for (auto& [id, pPtr] : game->getPlayers()) {
                     if (!pPtr) continue;
-                    players.push_back({pPtr->x, pPtr->y, pPtr->getRole(), pPtr->score});
+                    players.push_back({pPtr->getPos().x, pPtr->getPos().y, pPtr->getRole(), pPtr->getScore()});
                 }
 
                 // Dessin joueurs
