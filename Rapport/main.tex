@@ -496,28 +496,43 @@ Pour chaque modification on retransmet toutes les données
 
 \section{Compétences acquises}
 
-Programmation réseau, architecture logicielle,
-travail de conception.
+La réalisation de ce projet nous a permis de mobiliser et d’approfondir plusieurs compétences acquises au cours de notre formation.
+
+Sur le plan technique, nous avons développé des compétences en programmation réseau, notamment dans la conception d’une architecture client-serveur autoritaire, la gestion des communications et la synchronisation d’un système en temps réel.
+
+Le projet a également renforcé nos compétences en architecture logicielle. La transformation d’un prototype vers une structure plus complexes (Server, Lobby, Room, Game) nous a confrontés à des enjeux de séparation des responsabilités, de maintenabilité et d’évolutivité du code. Cette phase de conception a nécessité une réflexion approfondie sur l’organisation des composants et leurs interactions.
+
+Enfin, le travail de conception globale du système, la génération procédurale du plateau, l'implémentation d’une intelligence artificielle, la définition des règles de synchronisation, nous a permis de développer une approche méthodique dans l’analyse des besoins, la modélisation et la résolution de problèmes complexes.
 
 \section{Résultat final}
 
-Fonctionnalités implémentées,
-objectifs atteints ou partiellement atteints.
+Le projet aboutit à un jeu multijoueur fonctionnel capable de gérer plusieurs connexions simultanées. Les principales fonctionnalités prévues ont été implémentées : gestion des lobbies et des parties, synchronisation en temps réel des joueurs, génération procédurale du labyrinthe, ainsi qu’un système d’intelligence artificielle pour les entités ennemies.
+
+La cohérence du jeu est assurée par les mise à jour périodique côté serveur, ce qui garantit que les états partagés aux clients sont bien valide. Les collision, le déplacement et
+les interactions ont été validés et intégrés de manière stable.
 
 \section{Améliorations possibles}
 
-idee.txt
+Plusieurs axes d’évolution peuvent être envisagés pour enrichir le gameplay et la rejouabilité.
 
+Tous d'abord, introduire des capacités spécifiques aux rôles, telles que : vitesse, invisibilité, téléportation, traversée de murs, invulnérabilité, ou effets sur les ennemis (paralysie, aveuglement, localisation). Ces pouvoirs permettraient des stratégies variées et des interactions plus riches entre joueurs.
+
+Le labyrinthe pourrait inclure plusieurs étages, des salles secrètes, des passages modifiables en cours de partie ou des portails supplémentaires. Ces évolutions augmenteraient la complexité et la diversité des parties.
+
+De plus, Pac-Man pourrait accomplir des missions ou tâches déclenchant des alertes pour les fantômes. Des rôles secrets (traître parmi les fantômes, classe spéciale) pourraient introduire des mécanismes de coopération ou de compétition inattendus.
 
 
 % Page de conclusion 
 \chapter*{Conclusion}
 \addcontentsline{toc}{chapter}{Conclusion}
 
-Ce projet a permis de mettre en pratique les connaissances acquises
-durant la formation en informatique, en particulier dans le domaine
-du développement réseau et de la conception logicielle.
+Ce projet a permis de mettre en pratique les connaissances acquises durant notre formation, notamment en développement réseau, de la programmation multithread et de la conception logicielle et objet.
 
+La création d’un jeu multijoueur inspiré de Pac-Man a nous a permis d’explorer des problématiques telles que la synchronisation des clients, la gestion de plusieurs parties simultanées et la programmation d’une intelligence artificielle pour des entités ennemies.
+
+L’architecture choisi a posé une base solide pour d’éventuelles extensions, comme l’introduction de pouvoirs spéciaux, de rôles secrets ou de labyrinthes multi-étages.
+
+Ainsi, ce projet constitue à la fois un aboutissement des compétences acquises et un terrain d’expérimentation pour de futures évolutions, offrant de nombreuses perspectives d’amélioration et d’enrichissement du gameplay.
 
 
 
