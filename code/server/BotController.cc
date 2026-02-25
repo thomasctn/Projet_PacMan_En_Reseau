@@ -56,8 +56,8 @@ std::optional<Direction> BotController::update(Game& game, BotManager& manager) 
 
     Player& me = *(it->second);
 
-    int gx = static_cast<int>(me.x / CASE_SIZE);
-    int gy = static_cast<int>(me.y / CASE_SIZE);
+    int gx = static_cast<int>(me.getPos().x / CASE_SIZE);
+    int gy = static_cast<int>(me.getPos().y / CASE_SIZE);
 
     Node* current = manager.getNode(gx, gy);
     if (!current || current->neighbors.empty())
@@ -73,7 +73,7 @@ std::optional<Direction> BotController::update(Game& game, BotManager& manager) 
     }
 
     // --- PRIORITÉ 1 : Fuite vers la cabane si Pac-Man chasseur ---
-    if (pacMan && !pacMan->isVunerable && me.getRole() == PlayerRole::Ghost) {
+    if (pacMan && !pacMan->isVulnerable() && me.getRole() == PlayerRole::Ghost) {
         // Calcul du centre de la map (cabane 3x3)
         int centerX = game.getBoard().getWidth() / 2;
         int centerY = game.getBoard().getHeight() / 2;
@@ -83,7 +83,7 @@ std::optional<Direction> BotController::update(Game& game, BotManager& manager) 
             // Utilisation de BFS pour trouver le prochain noeud vers la cabane
             Node* nextStep = getNextNodeTowards(current, centerNode);
             if (nextStep) {
-                return getDirectionTowards(me.x, me.y,
+                return getDirectionTowards(me.getPos().x, me.getPos().y,
                                         nextStep->x * CASE_SIZE,
                                         nextStep->y * CASE_SIZE);
             }
@@ -121,7 +121,7 @@ std::optional<Direction> BotController::update(Game& game, BotManager& manager) 
                 }
 
                 if (nextStep)
-                    return getDirectionTowards(me.x, me.y,
+                    return getDirectionTowards(me.getPos().x, me.getPos().y,
                                                nextStep->x * CASE_SIZE,
                                                nextStep->y * CASE_SIZE);
             }
@@ -148,7 +148,7 @@ std::optional<Direction> BotController::update(Game& game, BotManager& manager) 
     if (!bestNode)
         return std::nullopt;
 
-    return getDirectionTowards(me.x, me.y,
+    return getDirectionTowards(me.getPos().x, me.getPos().y,
                                bestNode->x * CASE_SIZE,
                                bestNode->y * CASE_SIZE);
 }
@@ -180,8 +180,8 @@ BotController::getDirectionTowards(
 Node* BotController::getPacmanNode(Game& game, BotManager& manager) {
     for (auto& [id, p] : game.getPlayers()) {
     if (p->getRole() == PlayerRole::PacMan) {
-            int px = static_cast<int>(p->x / CASE_SIZE);
-            int py = static_cast<int>(p->y / CASE_SIZE);
+            int px = static_cast<int>(p->getPos().x / CASE_SIZE);
+            int py = static_cast<int>(p->getPos().y / CASE_SIZE);
             return manager.getNode(px, py);
         }
     }

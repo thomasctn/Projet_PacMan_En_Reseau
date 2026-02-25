@@ -168,7 +168,7 @@ void Room::startGame() {
 
             // --- Attacher le callback pour le mode chasseur ---
             if (p.getRole() == PlayerRole::PacMan) {
-                p.onPowerModeEvent = [this](Player& player, const std::string& event, int secondsLeft) {
+                p.setOnPowerModeEvent([this](Player& player, const std::string& event, int secondsLeft) {
                     
                     gf::Packet packet;
 
@@ -189,7 +189,7 @@ void Room::startGame() {
                     for (uint32_t pid : players) {
                         network.send(pid, packet);
                     }
-                };
+                });
 
             }
 
@@ -213,7 +213,7 @@ void Room::startGame() {
         game->addPlayer(botId, 0.f, 0.f, PlayerRole::Ghost);
         Player& bot = game->getPlayerInfo(botId);
 
-        bot.isBot = true; // important
+        bot.setBot(true); // important
 
         // Créer le BotController et l'enregistrer dans BotManager
         auto botCtrl = std::make_unique<BotController>(botId);

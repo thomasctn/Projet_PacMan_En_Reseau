@@ -78,6 +78,9 @@ public:
     bool isPacManChaser() const { return pacManChaser; }
     void setPacManChaser(bool value) { pacManChaser = value; }
 
+    bool isAllPacmanDead();
+    bool isAllGhostDead();
+
 
 private:
     Board board;

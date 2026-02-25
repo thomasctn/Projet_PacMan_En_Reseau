@@ -40,8 +40,8 @@ bool Game::canMove(uint32_t playerId, float newX, float newY) const {
 
         const Player& other = *playerPtr;
 
-        int px = static_cast<int>(other.x) / 50;
-        int py = static_cast<int>(other.y) / 50;
+        int px = static_cast<int>(other.getPos().x) / 50;
+        int py = static_cast<int>(other.getPos().y) / 50;
 
         if (px == gridX && py == gridY) {
             // PacMan et Ghost peuvent marcher l'un sur l'autre
@@ -79,41 +79,38 @@ bool Game::requestMove(uint32_t playerId, Direction dir)
 
     Player& p = *it->second;
 
-    if (!p.alive)
+    if (!p.isAlive())
         return false;
 
-    float newX = p.x;
-    float newY = p.y;
+    gf::Vector2f newPos = p.getPos();
 
     // --- Gestion des trous (téléportation) ---
-    int curGridX = static_cast<int>(p.x) / 50;
-    int curGridY = static_cast<int>(p.y) / 50;
+    int curGridX = static_cast<int>(p.getPos().x) / 50;
+    int curGridY = static_cast<int>(p.getPos().y) / 50;
 
     if (board.isHole(curGridX, curGridY))
     {
         Position target = board.getLinkedHole(curGridX, curGridY);
-        p.x = target.x * step;
-        p.y = target.y * step;
+        p.setPos({target.x * step,target.y * step});
     }
 
     // --- Calcul nouvelle position ---
     switch (dir)
     {
-        case Direction::Up:    newY -= step; break;
-        case Direction::Down:  newY += step; break;
-        case Direction::Left:  newX -= step; break;
-        case Direction::Right: newX += step; break;
+        case Direction::Up:    newPos.y -= step; break;
+        case Direction::Down:  newPos.y += step; break;
+        case Direction::Left:  newPos.x -= step; break;
+        case Direction::Right: newPos.x += step; break;
     }
 
-    if (!canMove(playerId, newX, newY))
+    if (!canMove(playerId, newPos.x, newPos.y))
         return false;
 
     // --- Applique le mouvement ---
-    p.x = newX;
-    p.y = newY;
+    p.setPos(newPos);
 
-    int gridX = static_cast<int>(p.x) / 50;
-    int gridY = static_cast<int>(p.y) / 50;
+    int gridX = static_cast<int>(p.getPos().x) / 50;
+    int gridY = static_cast<int>(p.getPos().y) / 50;
 
     // =====================================================
     // Pac-gommes
@@ -136,11 +133,11 @@ bool Game::requestMove(uint32_t playerId, Direction dir)
 
         Player& other = *otherPtr;
 
-        if (!other.alive)
+        if (!other.isAlive())
             continue;
 
-        int otherX = static_cast<int>(other.x) / 50;
-        int otherY = static_cast<int>(other.y) / 50;
+        int otherX = static_cast<int>(other.getPos().x) / 50;
+        int otherY = static_cast<int>(other.getPos().y) / 50;
 
         if (otherX == gridX && otherY == gridY)
         {
@@ -157,8 +154,7 @@ bool Game::requestMove(uint32_t playerId, Direction dir)
                 }
                 else
                 {
-                    other.x = 0.f;
-                    other.y = 0.f;
+                    other.setPos({0.f,0.f});
                     gf::Log::info("Player %d est définitivement mort\n", other.getId());
                 }
 
@@ -174,8 +170,7 @@ bool Game::requestMove(uint32_t playerId, Direction dir)
                 }
                 else
                 {
-                    p.x = 0.f;
-                    p.y = 0.f;
+                    p.setPos({0.f,0.f});
                     gf::Log::info("Player %d est définitivement mort\n", p.getId());
                 }
 
@@ -183,14 +178,15 @@ bool Game::requestMove(uint32_t playerId, Direction dir)
             }
         }
     }
+    
 
     // =====================================================
     // Traces bots
     // =====================================================
     if (botManager)
     {
-        int nodeX = static_cast<int>(p.x / 50);
-        int nodeY = static_cast<int>(p.y / 50);
+        int nodeX = static_cast<int>(p.getPos().x / 50);
+        int nodeY = static_cast<int>(p.getPos().y / 50);
 
         Node* node = botManager->getNode(nodeX, nodeY);
         if (node)
@@ -225,8 +221,7 @@ Player& Game::getPlayerInfo(uint32_t playerId) {
 
 void Game::addPlayer(uint32_t id, float x, float y, PlayerRole role = PlayerRole::Spectator) {
     auto player = std::make_unique<Player>(id, role);
-    player->x = x;
-    player->y = y;
+    player->setPos({x,y});
 
     players.emplace(id, std::move(player));
 }
@@ -320,6 +315,18 @@ void Game::startGameLoop(int tickMs_, InputQueue& inputQueue, ServerNetwork& ser
                     room->endGame(reason);
                     break;
                 }
+                bool allGhostDead = isAllGhostDead();
+                bool allPacmanDead = isAllPacmanDead();
+                if(allGhostDead || allPacmanDead) {
+                    gf::Log::info("Partie terminée !\n");
+                    running.store(false);
+                    gameStarted.store(false);
+                    GameEndReason reason = allGhostDead
+                                              ? GameEndReason::ALL_GHOST_DEATH
+                                              : GameEndReason::PACMAN_DEATH;
+                    room->endGame(reason);
+                    break;
+                }
             }
 
             // --- update des mouvements des joueurs humains ---
@@ -350,9 +357,7 @@ void Game::spawnPlayer(Player& p) {
 
         int offsetX = rand() % 3 - 1;
         int offsetY = rand() % 3 - 1;
-
-        p.x = (centerX + offsetX) * 50.0f;
-        p.y = (centerY + offsetY) * 50.0f;
+        p.setPos({(centerX + offsetX) * 50.0f, (centerY + offsetY) * 50.0f});
     } else if (p.getRole() == PlayerRole::PacMan) {
         int w = board.getWidth();
         int h = board.getHeight();
@@ -360,30 +365,45 @@ void Game::spawnPlayer(Player& p) {
         int corner = rand() % 4;
         switch(corner) {
             case 0:
-                p.x = 1*50.0f;
-                p.y = 1*50.0f;
+                p.setPos({1*50.0f, 1*50.0f});
                 break;
             case 1:
-                p.x = 1*50.0f;
-                p.y = (h-2)*50.0f;
+                p.setPos({1*50.0f, (h-2)*50.0f});
                 break;
             case 2:
-                p.x = (w-2)*50.0f;
-                p.y = 1*50.0f;
+                p.setPos({(w-2)*50.0f, 1*50.0f});
                 break;
             case 3:
-                p.x = (w-2)*50.0f;
-                p.y = (h-2)*50.0f;
+                p.setPos({(w-2)*50.0f, (h-2)*50.0f});
                 break;
         }
     } else {
-        p.x = 2*50.0f;
-        p.y = 2*50.0f;
+        p.setPos({2*50.0f, 2*50.0f});
     }
 }
 
+bool Game::isAllPacmanDead()
+{
+    for(auto& p : players) {
+        if(p.second->getRole() == PlayerRole::PacMan && p.second->isAlive()) {
+            return false;
+        }
+    }
+    return true;
+}
 
-void Game::processInputs(InputQueue& queue) {
+bool Game::isAllGhostDead()
+{
+    for(auto& p : players) {
+        if(p.second->getRole() == PlayerRole::Ghost && p.second->isAlive()) {
+            return false;
+        }
+    }
+    return true;
+}
+
+void Game::processInputs(InputQueue &queue)
+{
     while (auto inputOpt = queue.pop()) {
         auto& input = *inputOpt;
 
@@ -391,11 +411,10 @@ void Game::processInputs(InputQueue& queue) {
         if (it == players.end()) continue;
 
         Player& p = *it->second;
-        p.bufferedDir = input.dir;
-        p.hasMoveRequest = true;
+        p.setBufferedDir(input.dir);
+        p.setMoveRequest(true);
     }
 }
-
 
 double Game::getPreGameElapsed() const {
     std::lock_guard<std::mutex> lock(chronoMutex);
@@ -423,24 +442,23 @@ void Game::updateMovement(double dt) {
     for (auto& [id, playerPtr] : players) {
         Player& p = *playerPtr;
 
-        if (!p.alive)
+        if (!p.isAlive())
             continue;
 
         p.update(dt);
 
-        if (!p.hasMoveRequest)
+        if (!p.hasMoveRequest())
+            continue;
+        p.setMoveAccumulator(p.getMoveAccumulator()+dt);
+
+        double interval = 1.0 / p.getMoveRate();
+        if (p.getMoveAccumulator() < interval)
             continue;
 
-        p.moveAccumulator += dt;
+        p.setMoveAccumulator(p.getMoveAccumulator() - interval);
 
-        double interval = 1.0 / p.moveRate;
-        if (p.moveAccumulator < interval)
-            continue;
+        requestMove(id, p.getBufferedDir());
 
-        p.moveAccumulator -= interval;
-
-        requestMove(id, p.bufferedDir);
-
-        p.hasMoveRequest = false;
+        p.setMoveRequest(false);
     }
 }

@@ -25,6 +25,7 @@ enum class GameEndReason {
     ALL_DOT_EATEN,
     TIME_OUT,
     PACMAN_DEATH,
+    ALL_GHOST_DEATH
 };
 
 enum class PacGommeType {
