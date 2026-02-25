@@ -112,11 +112,11 @@
 
 \section{Contexte académique}
 
-Ce projet a été réalisé dans le cadre du semestre six de la licence informatique de l’Université Marie \& Louis Pasteur. Il s’inscrit dans un enseignement visant à mettre en pratique les connaissances acquises au cours de la formation, notamment à travers la réalisation d’un projet informatique de taille conséquente à plusieurs.
+Ce projet a été réalisé dans le cadre du semestre six de la licence informatique de l’Université Marie \& Louis Pasteur. Il s’inscrit dans un enseignement visant à mettre en pratique nos connaissances à travers la réalisation d’un gros projet à plusieurs.
 
-Le travail a été mené en groupe de trois étudiants sur une période s’étendant de la mi-octobre à la fin du mois de mars, sous l’encadrement de Julien Bernard, maître de conférences à l’Université Marie \& Louis Pasteur. Le projet porte sur le développement d’un jeu vidéo en réseau, de sa conception jusqu’à son implémentation.
+Le travail a été mené en groupe de trois étudiants de mi-octobre à la fin du mois de mars, sous l’encadrement de Julien Bernard, maître de conférences à l’Université Marie \& Louis Pasteur. Le projet porte sur le développement d’un jeu vidéo en réseau.
 
-Les objectifs pédagogiques de ce projet sont multiples. Il vise en particulier à consolider les compétences en programmation C++, à approfondir la découverte du développement de jeux vidéo, ainsi qu’à mettre en \oe uvre une architecture réseau de type client–serveur. Le projet permet également de développer des compétences transversales telles que le travail en équipe et la gestion d’un projet informatique sur une durée prolongée.
+Les objectifs de ce projet sont de consolider nos compétences en programmation C++, approfondir la découverte du développement de jeux vidéo, ainsi qu’à mettre en place une architecture réseau client–serveur. Le projet permet également de développer des compétences telles que le travail en équipe et la gestion d’un projet informatique sur une longue période.
 
 \section{Présentation générale du jeu \texttt{Pac-Man}}
 
@@ -129,34 +129,39 @@ Le jeu \texttt{Pac-Man}, apparu au début des années 1980, est un jeu d’arcad
 \end{figure}
 
 
-Dans le cadre de ce projet, le jeu a été adapté afin d’introduire une dimension multijoueur. Une partie oppose un joueur incarnant \texttt{Pac-Man} à plusieurs joueurs incarnant des fantômes. Lorsque le nombre de joueurs humains est insuffisant, certains fantômes peuvent être contrôlés par des intelligences artificielles afin de garantir un déroulement cohérent de la partie. Cette approche permet de conserver un équilbre de gameplay, tout en mettant en avant des interactions entre les joueurs.
+Dans le cadre de ce projet, le jeu a été adapté pour le multijoueur. Une partie oppose un joueur \texttt{Pac-Man} à plusieurs joueurs fantômes. Lorsque le nombre de joueurs est insuffisant, certains fantômes sont controlés par des intelligences artificielles afin de ne pas déséquilibrer la partie.
 
-Le choix de \texttt{Pac-Man} comme base pour une adaptation en réseau s’explique par plusieurs raisons. Tout d’abord, ses règles simples et très connues, ce qui permet une prise en main rapide par les joueurs, cela facilite les phases de test et de démonstration. De plus, le gameplay se prête naturellement à une séparation des rôles entre plusieurs joueurs connectés.
+Le choix de \texttt{Pac-Man} comme sujet pour une version en réseau est stratégique car ses règles simples et très connues, ce qui permet une facilité d'implémentation par rapport a d'autre jeux. De plus, le gameplay se prête à une séparation des rôles entre plusieurs joueurs.
 
 \section{Objectifs généraux du projet}
 
-Les objectifs du projet peuvent être divisés en deux catégories principales : les objectifs fonctionnels, liés à l’expérience de jeu, et les objectifs techniques, liés à la conception et à l’implémentation du système.
+Les objectifs du projet peuvent être divisés en deux catégories : 
+\begin{itemize}
+    \item les objectifs fonctionnels, liés à l’expérience de jeu
+    \item les objectifs techniques, liés à la conception et à l’implémentation du système\\
+\end{itemize}
 
-Du point de vue fonctionnel, l’objectif principal était de concevoir un jeu Pac-Man jouable en réseau, permettant à plusieurs joueurs de participer simultanément à une même partie.
 
-Sur le plan technique, le projet visait à mettre en \oe uvre une architecture réseau reposant sur un modèle client–serveur. Le serveur devait être capable de gérer les connexions simultanées des joueurs, la création et la gestion des parties, ainsi que l’échange des données nécessaires au bon déroulement du jeu.
+Du point de vue fonctionnel, l’objectif était de concevoir un jeu Pac-Man jouable en réseau qui permet à plusieurs joueurs de participer à une même partie.
+
+Sur le plan technique, le projet visait à mettre en place une architecture réseau client–serveur. Le serveur devait être capable de gérer les connexions des joueurs, la création et la gestion des parties, ainsi que l’échange des données nécessaires au jeu.
 
 \chapter{Définition du sujet et problématique}
 
 \section{Problématique du jeu en réseau}
 
-La conception d’un jeu multijoueur en temps réel implique plusieurs contraintes techniques et architecturales. La contrainte majeure concerne la synchronisation des états du jeu entre les différents clients. Chaque joueur doit avoir une vision cohérente de l’ensemble de la partie, incluant les positions de Pac-Man, des fantômes et l’état des pac-gommes. Pour garantir cette cohérence, le projet a opté pour un modèle de serveur autoritaire : toutes les décisions critiques sont validées côté serveur, qui diffuse ensuite les informations mises à jour à tous les clients. Les clients, de leur côté, envoient uniquement leurs intentions de déplacement, qui sont ensuite traitées et synchronisées par le serveur. Les données transitent via des buffers et des queues avant d’être appliquées, assurant un traitement ordonné et fiable des événements du jeu.
+La conception d’un jeu multijoueur en temps réel implique plusieurs contraintes. La difficultée majeur concerne la synchronisation des états du jeu entre les clients. Chaque joueur doit avoir une vision cohérente de l’ensemble de la partie (les positions de Pac-Man, des fantômes et l’état des pac-gommes, ect). Pour garantir cette cohérence, nous avons opté pour un serveur autoritaire : toutes les décisions sont validées côté serveur, qui diffuse ensuite les informations à tous les clients. Qui, de leur côté, envoient uniquement leurs intentions de déplacement, qui sont ensuite traitées et synchronisées par le serveur. Les données transitent via des buffers et des queues avant d’être appliquées. Cela permet un traitement ordonné des événements du jeu.
 
 \section{Choix techniques}
 
-Le projet a été développé en C++ en utilisant la bibliothèque \textit{Gamedev Framework} (gf), adaptée au développement de jeux vidéo et compatible avec la gestion de l’architecture réseau. La communication réseau repose exclusivement sur le protocole TCP, assurant la fiabilité des échanges entre le serveur et les clients. Les messages échangés sont sérialisés afin de structurer et standardiser les informations transmises.
+Le projet a été développé en C++ en utilisant la bibliothèque \textit{Gamedev Framework} (gf), qui est adaptée au développement de jeux vidéo et est compatible avec l’architecture réseau. La communication réseau repose sur le protocole TCP, assurant la sûreté des échanges entre le serveur et les clients. Les messages sont sérialisés afin de structurer les informations transmises.
 
-Le serveur a été conçu selon un modèle multithreadé ou chaine de responsabilitée, reflétant la logique de fonctionnement du jeu : un thread principal gère le serveur et le lobby, tandis que d’autres threads s’occupent des rooms, de la boucle de jeu, des fantômes contrôlés par l’IA et de la communication avec les clients. Cette architecture permet de traiter simultanément les interactions multiples des joueurs et d’assurer une exécution fluide et cohérente des parties.
+Le serveur a été conçu selon un modèle multithread ou chaine de responsabilitée, reflétant la logique de fonctionnement du jeu : un thread\footnote{Un thread (fil d’exécution) est une unité d’exécution légère au sein d’un processus. Dans une architecture client-serveur, il permet par exemple de gérer plusieurs connexions ou tâches simultanément (réception réseau, logique de jeu, envoi des mises à jour) tout en partageant la même mémoire.} principal gère le serveur et le lobby, tandis que d’autres threads s’occupent des rooms, de la boucle de jeu, des fantômes contrôlés par l’IA et de la communication avec les clients. Cette architecture permet de traiter simultanément plusieurs interactions des joueurs et d’assurer une exécution fluide et cohérente des parties.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.6\textwidth]{images/chaine_responsabilité.png}
-    \caption{Model de Chaine de responsabilité}
+    \includegraphics[width=1\textwidth]{images/chaine_responsabilité.png}
+    \caption{Exemple de Chaine de responsabilité}
 \end{figure}
 
 \section{Répartition des rôles}
@@ -169,29 +174,61 @@ Auriane Peter s’est concentrée sur le développement du client, en implément
 
 Benoît Litampha a assuré la communication entre le serveur et le client, participant également à certaines tâches sur le serveur et le client lorsque nécessaire. 
 
-Cette répartition a permis une progression simultanée sur plusieurs fronts du projet, tout en garantissant une cohérence globale de l’application.
+Cette répartition a permis une progression simultanée sur plusieurs fronts du projet, tout en gardant une cohérence globale de l’application.
 
 %\chapter{L'Organisation du stage}
 
 
 \chapter{Architecture et conception}
 
+\section{conception du jeu}
+
+Les règles du jeu ont été définies afin de mettre en place un équilibre entre tension et stratégie.
+Chaque camp dispose d’objectifs et contraintes différents, créant une structure de compétition.
+
+\subsection{Conditions de victoire}
+
+Pac-Man gagne la partie s’il parvient à manger tout les pac-gommes du plateau ou s’il survit jusqu’à la fin du timer. 
+Les fantômes, eux, gagnent en épuisant toutes les vies de Pac-Man avant la fin du temps imparti.
+
+Ce double système de victoire met une pression permanente : Pac-Man doit optimiser ses déplacements, tandis que les fantômes doivent coordonner leurs actions pour limiter ses déplacements.
+
+\subsection{Pac-gommes spéciales}
+
+Certaines pac-gommes déclenchent un mode temporaire appelé « chasseur ».
+Durant cette période, Pac-Man devient capable de manger les fantômes.
+Cet état est limité dans le temps par un timer.
+Les fantômes éliminés réapparaissent mais ont aussi des vies, maintenant ainsi l’équilibre de jeu car les pac-gommes spéciales sont peu nombreuse.
+
+Ce mécanisme introduit un changement brutale du gameplay, les chasseurs deviennent les chassés et inversement.
+
+\subsection{Asymétrie de vision}
+
+Le système repose également sur une différence de vision.
+Pac-Man a une vue globale du plateau, tandis que les fantômes ne voient uniquement environnement limités, ils ne peuvent voir qu'a une certaines distance d'eux même, la vison des fantomes n'est pas partagée entre eux.
+
+\subsection{Cohérence du système}
+
+La combinaison de ces règles avec la génération procédurale du plateau et l’architecture hybride de l’intelligence artificielle et des joueurs, produit un gameplay varié et imprévisible.
+Les interactions entre le timer, le manque de vision et inversement temporaire des rôles permettent de nombreuse stratégies et augmentent la rejouabilité du jeu.
+
+
 
 \section{Structure du serveur}
 
 \subsection{Architecture multithread}
 
-Le serveur repose sur une architecture multithread conçue pour supporter plusieurs connexions simultanées sans dégradation des performances. 
-La couche réseau est strictement séparée de la logique de jeu afin d’éviter qu’une opération bloquante, attente de paquet, latence élevée ou déconnexion, n’impacte l’exécution globale du système.
+Le serveur repose sur une architecture multithread\footnote{Un programme multithread exécute plusieurs fils d'exécution (threads) en parallèle au sein d’un même processus.} conçue pour supporter plusieurs connexions simultanées sans dégradation des performances. 
+La couche réseau est strictement séparée de la logique de jeu afin d’éviter qu’une opération bloquante, attente de paquet\footnote{Un paquet réseau est une unité de données formatée et structurée, transmise à travers un réseau. Il contient généralement une en-tête (header) avec des informations de routage et de contrôle, ainsi qu’une charge utile (payload) correspondant aux données transportées.}, latence élevée ou déconnexion, n’impacte l’exécution globale du système.
 
 Un thread est dédié à la réception des paquets réseau. 
 Les messages entrants sont insérés dans une file d’attente interne, puis traités de manière synchronisée par la logique centrale du serveur. 
-Cette organisation assure une séparation claire entre la couche communication et la couche métier.
+Cette organisation assure une séparation claire entre la  communication et la logique.
 
-La file de messages agit comme un tampon entre le réseau et la boucle de jeu à tick fixe. 
+La file de messages agit comme un tampon entre le réseau et la boucle de jeu à tick\footnote{Un tick désigne une unité de temps discrète utilisée par le moteur du jeu pour mettre à jour l’état du monde. À chaque tick, le serveur traite les entrées des joueurs, met à jour la logique de jeu (physique, collisions, scores, etc.) puis envoie les nouvelles informations aux clients.} fixe. 
 Ainsi, les mises à jour périodiques du monde restent indépendantes des variations de latence ou du débit des clients.
 
-Cette architecture renforce la robustesse du système et permet l’exécution simultanée de plusieurs parties indépendantes au sein d’un même serveur.
+Cette architecture permet l’exécution simultanée de plusieurs parties indépendantes au sein d’un même serveur.
 
 \begin{figure}[H]
     \centering
@@ -201,12 +238,12 @@ Cette architecture renforce la robustesse du système et permet l’exécution s
 
 \subsection{Architecture modulaire}
 
-L’architecture du serveur est organisée en plusieurs couches distinctes possédant chacune une responsabilité clairement définie. 
+L’architecture du serveur est organisée en plusieurs couches distinctes possédant chacune une responsabilité. 
 Cette structuration modulaire garantit lisibilité, extensibilité et maintenabilité.
 
 La couche \textit{Server} assure la gestion des connexions et le routage des messages. 
 Le \textit{Lobby} centralise l’organisation des joueurs et la création des parties. 
-Chaque partie est encapsulée dans une entité \textit{Room}, responsable de son état propre et de ses joueurs. 
+Chaque partie est enfermé dans une entité \textit{Room}, responsable de son état propre et de ses joueurs. 
 Enfin, la logique complète du jeu est contenue dans la classe \textit{Game}, indépendante des mécanismes réseau.
 
 L’architecture suit ainsi une chaîne de responsabilité hiérarchique :
@@ -228,13 +265,13 @@ Chaque couche délègue les traitements spécialisés au niveau inférieur, ce q
 
 \subsection{Structure du plateau}
 
-Le plateau est modélisé sous forme d’une grille bidimensionnelle composée de cases murales et de cases traversables. 
-Cette représentation discrète constitue la base logique du système.
+Le plateau est modélisé sous forme d’une grille en deux dimensions, composée de cases murales et de cases traversables. 
+Cette représentation constitue la base logique du système.
 
 Il sert de référence unique pour la détection des collisions, la mise à jour des déplacements, le placement des éléments interactifs ainsi que pour les algorithmes d’intelligence artificielle. 
-La cohérence entre la représentation logique côté serveur et l’affichage côté client garantit une synchronisation fiable du monde de jeu.
+La cohérence entre la logique côté serveur et l’affichage côté client offre une synchronisation fiable du jeu.
 
-Le plateau constitue ainsi une structure centrale sur laquelle reposent la génération procédurale du labyrinthe et les mécanismes décisionnels des fantômes.
+Le plateau constitue une structure centrale sur laquelle reposent la génération procédurale du labyrinthe et les mécanismes décisionnels des fantômes.
 
 \subsection{Boucle de jeu}
 
@@ -242,44 +279,44 @@ La boucle de jeu constitue le cœur du serveur et repose sur un modèle à mise 
 Contrairement à une architecture purement événementielle, l’état du monde est recalculé à intervalle régulier selon une fréquence fixe. 
 Ce fonctionnement garantit un comportement déterministe et centralisé.
 
-À chaque tick, le serveur exécute une séquence ordonnée d’opérations. 
-Les intentions de déplacement reçues des clients sont d’abord traitées, puis les positions des entités sont mises à jour en fonction des règles du jeu. 
-Les collisions sont ensuite évaluées, les états temporaires sont décrémentés, le score est ajusté et les conditions de fin de partie sont vérifiées.
+À chaque tick, le serveur exécute une séquence d’opérations. 
+Les intentions de déplacement reçues des clients sont d’abord traitées, puis les positions des entités sont mises à jour en fonction des règles. 
+Les états temporaires sont ensuite décrémentés, le score est ajusté et les conditions de fin de partie sont vérifiées.
 
 Les rôles sont attribués au début de chaque partie : un joueur incarne Pac-Man tandis que les autres incarnent les fantômes. 
-Chaque rôle possède des contraintes spécifiques influençant les déplacements et les interactions. 
-L’ensemble de ces règles est appliqué exclusivement côté serveur.
+Chaque rôle possède des contraintes qui influence les déplacements et les interactions. 
+L’ensemble de ces règles est appliqué exclusivement côté serveur, il est le seul qui décide.
 
 Le plateau contient deux types de pac-gommes. 
 Les pac-gommes classiques augmentent le score lors de leur consommation, tandis que les pac-gommes spéciales déclenchent un mode temporaire dit « chasseur ». 
-Ce mode est géré par un système de minuterie interne décrémenté à chaque tick. 
+Ce mode est géré par un système de minuterie interne décrémenté. 
 Lorsque ce compteur atteint zéro, l’état normal est restauré.
 
-Deux systèmes temporels coexistent : un timer global définissant la durée maximale d’une partie, et un timer local associé aux états temporaires. 
-Cette gestion unifiée du temps garantit une certaine cohérence entre les événements et évite toute dépendance au rythme d’exécution des clients.
+Il y a 2 timers, un timer global définissant la durée maximale d’une partie, et un timer local associé aux états temporaires. 
+Cette gestion du temps garantit une certaine cohérence entre les événements et permet l'indépendance des événements du jeu.
 
-Les collisions sont évaluées de manière systématique à chaque mise à jour. 
-Un déplacement vers une case murale est annulé. 
-Lors d’une collision entre Pac-Man et un fantôme, l’issue dépend de l’état courant : perte d’une vie en mode normal, ou élimination temporaire du fantôme en mode chasseur. 
+Les collisions sont évaluées avant chaque chaque mise à jour de position. 
+Un déplacement vers une case murale est annulé ou sur une case hut pour \texttt{PacMan}. 
+Lors d’une collision entre Pac-Man et un fantôme, l’issue dépend de l’état courant : perte d’une vie en mode normal, perte d’une vie du fantôme en mode chasseur. 
 L’intégralité de ces calculs étant effectuée côté serveur, toute tentative de triche ou de désynchronisation est neutralisée.
 
 À la fin de chaque tick, l’état global mis à jour est diffusé à l’ensemble des clients. 
 Ces derniers ne réalisent aucun calcul logique : ils se contentent d’afficher l’état reçu. 
-Cette architecture renforce la cohérence du jeu et s’inscrit dans le modèle de serveur autoritaire défini précédemment.
+Cette architecture s’inscrit dans le modèle de serveur autoritaire défini précédemment.
 
 \subsection{Plateau et génération procédurale}
 
 Le plateau repose sur une génération procédurale de labyrinthe fondée sur une variante de l’algorithme de Prim. 
-Ce choix permet de produire automatiquement des cartes connexes, tout en garantissant une forte variabilité entre les parties.
+Ce choix permet de produire automatiquement des cartes connexes avec une forte variabilité entre les parties.
 
-La génération débute par une initialisation complète du plateau en murs. 
+La génération débute par un remplissage complet du plateau avec des murs. 
 Une case de départ est ensuite sélectionnée et marquée comme traversable. 
 Ses murs adjacents sont ajoutés à une liste dite \textit{frontier}. 
 À chaque itération, un mur est choisi aléatoirement dans cette liste. 
 S’il sépare une case déjà accessible d’une case encore murale, il est supprimé, la nouvelle case devient traversable, et ses propres murs sont ajoutés à la frontier. 
 Le processus se poursuit jusqu’à épuisement de cette liste.
 
-Ce mécanisme produit un arbre couvrant garantissant un labyrinthe connexe sans zones isolées.
+Ce mécanisme produit un arbre couvrant avec un labyrinthe connexe sans zones isolées.
 
 \begin{figure}[H]
     \centering
@@ -289,11 +326,11 @@ Ce mécanisme produit un arbre couvrant garantissant un labyrinthe connexe sans 
 
 Afin d’adapter cette structure aux contraintes du gameplay, plusieurs transformations supplémentaires sont appliquées.
 
-Une zone centrale fixe de taille 3×3, appelée « hut », est réservée avant la génération. 
+Une zone centrale fixe de taille $3 \times 3$, appelée « hut », est réservée avant la génération. 
 Elle est protégée durant l’exécution de l’algorithme afin de préserver sa structure. 
-Une fonction dédiée assure ensuite son raccordement au labyrinthe principal par au moins une ouverture.
+Une fonction dédiée vérifie ensuite son raccordement au labyrinthe principal par au moins une ouverture.
 
-Les coins du plateau, destinés aux positions initiales des joueurs, sont également vérifiés après génération. 
+Les coins du plateau, destinés aux positions initiales des joueurs, sont également vérifiés après la génération. 
 Si l’un d’eux se retrouve isolé, une ouverture contrôlée est créée pour garantir son accessibilité.
 
 \begin{figure}[H]
@@ -302,8 +339,8 @@ Si l’un d’eux se retrouve isolé, une ouverture contrôlée est créée pour
     \caption{Plateau apès génération de la hut}
 \end{figure}
 
-L’algorithme de Prim produisant un arbre sans cycles, des ouvertures supplémentaires sont ajoutées de manière aléatoire afin d'ajouter des chemins. 
-Cette étape enrichit la dynamique de poursuite et évite des trajectoires trop prévisibles.
+L’algorithme de Prim produisant un arbre sans cycles, des ouvertures supplémentaires sont ajoutées de manière aléatoire afin d'ajouter des chemins.
+Cette étape améliore la poursuite par les fantômes et évite des trajectoires trop prévisibles.
 
 \begin{figure}[H]
     \centering
@@ -312,10 +349,9 @@ Cette étape enrichit la dynamique de poursuite et évite des trajectoires trop 
 \end{figure}
 
 Enfin, certains culs-de-sac sont supprimés en identifiant les cases ne possédant qu’un unique voisin accessible. 
-La suppression partielle de ces impasses améliore la fluidité des déplacements et limite les situations excessivement punitives.
+La suppression partielle de ces impasses améliore la fluidité des déplacements et limite les situations punitives.
 
-Des portails latéraux sont également intégrés sur les bords du plateau, permettant à une entité de réapparaître du côté opposé après sortie. 
-Ce mécanisme introduit une dimension stratégique supplémentaire et complexifie les interactions entre joueurs.
+Des portails latéraux sont également intégrés sur les bords du plateau, ce qui permet à une entité de réapparaître du côté opposé. 
 
 \begin{figure}[H]
     \centering
@@ -323,21 +359,21 @@ Ce mécanisme introduit une dimension stratégique supplémentaire et complexifi
     \caption{Plateau apès suppression des culs-de-sac et ajout des portails}
 \end{figure}
 
-Le plateau devient ainsi une structure centrale du système : il sert de support aux collisions, au placement des pac-gommes, ainsi qu’aux algorithmes de poursuite des fantômes. 
-La génération procédurale contribue directement à la rejouabilité et à la diversité stratégique des parties.
+Le plateau est une structure centrale du système : il sert de support aux collisions, au placement des pac-gommes, ainsi qu’aux algorithmes de poursuite des fantômes. 
+La génération procédurale contribue à la rejouabilité et à la diversité stratégique des parties.
 
 \subsection{Intelligence artificielle des fantômes}
 
-L’intelligence artificielle des fantômes repose sur une architecture hybride combinant pathfinding classique, système d’influence local et prise de décision hiérarchique. 
-L’objectif n’est pas uniquement de poursuivre efficacement Pac-Man, mais de produire un comportement crédible, adaptatif et capable de générer des dynamiques collectives.
+L’intelligence artificielle des fantômes repose sur une architecture hybride qui mélange pathfinding classique, système d’influence local et prise de décision hiérarchique. 
+L’objectif n’est pas uniquement de poursuivre efficacement Pac-Man, mais de produire une intelligences artificielle adaptable et collective.
 
 \paragraph{Architecture décisionnelle hiérarchique}
 
-À chaque tick serveur, chaque fantôme évalue sa situation selon un ordre de priorité.
+À chaque tick serveur, chaque  non joueur évalue sa situation selon un ordre de priorité.
 
 Lorsque Pac-Man est en mode chasseur, la priorité absolue devient la fuite stratégique vers la hut. 
-Le plus court chemin est alors calculé à l’aide d’un algorithme de Breadth First Search (BFS), garantissant une trajectoire optimale dans un graphe non pondéré. 
-Ce choix assure robustesse et compatibilité avec les labyrinthes générés procéduralement.
+Le plus court chemin est alors calculé à l’aide d’un algorithme de Breadth First Search (BFS), garantissant une trajectoire optimale dans un graphe non pondéré.
+Ce choix permet la compatibilité avec les labyrinthes générés procéduralement.
 
 \begin{figure}[H]
     \centering
@@ -345,9 +381,9 @@ Ce choix assure robustesse et compatibilité avec les labyrinthes générés pro
     \caption{fonction implémentant BFS}
 \end{figure}
 
-En situation normale, si Pac-Man est détecté dans un rayon de vision défini, le fantôme active un mode de poursuite ciblée. 
+En situation normale, si Pac-Man est détecté dans un rayon de vision défini, le fantôme active un mode de poursuite. 
 Un BFS à profondeur limitée est exécuté afin de simuler une perception réduite de l’environnement. 
-Cette limitation réduit le coût tout en conservant un comportement crédible.
+Cette limitation réduit le coût tout en conservant un comportement crédible et conforme aux regles du jeu.
 
 En l’absence de menace ou de cible visible, le fantôme adopte un comportement autonome fondé sur un système de trace.
 
@@ -362,18 +398,18 @@ Score = Attraction - Répulsions
 Les traces laissées par Pac-Man génèrent une force attractive, tandis que la présence d’autres fantômes induit des forces répulsives. 
 Le fantôme sélectionne localement la case voisine maximisant ce score selon une approche gloutonne.
 
-Ce mécanisme s’inspire des modèles de colonies de fourmis, où l’information est distribuée dans l’environnement plutôt que centralisée. Cela permet de faire une forme d'intelligence collectives peu couteuse.
+Ce mécanisme s’inspire des modèles de colonies de fourmis, où l’information est distribuée dans l’environnement. Cela permet de faire une forme d'intelligence collectives peu couteuse.
 
 \paragraph{Comportement émergent}
 
-L’interaction entre attraction vers la cible et répulsion inter-agents produit des comportements collectifs sans coordination explicite. 
+L’interaction entre attraction vers la cible et répulsion inter-bots produit des comportements collectifs sans coordination explicite. 
 Les fantômes tendent naturellement à se disperser, à éviter les regroupements inutiles et à converger progressivement vers Pac-Man en exploitant différentes trajectoires.
 
 \paragraph{Choix algorithmiques}
 
 L’implémentation combine plusieurs techniques complémentaires : 
 le BFS pour le calcul de chemins optimaux, une version limitée pour la simulation de vision, une recherche gloutonne locale pour l’exploration autonome.
-Un bruit aléatoire contrôlé est également introduit afin d’éviter les cycles déterministes et les oscillations.
+Un bruit aléatoire est également introduit afin d’éviter les cycles déterministes et les oscillations.
 
 \begin{figure}[H]
     \centering
@@ -386,7 +422,7 @@ Un bruit aléatoire contrôlé est également introduit afin d’éviter les cyc
 
 Afin de supporter plusieurs parties simultanées, le serveur repose sur un système de \textit{rooms}. 
 Une room représente une instance autonome de jeu possédant son propre état, ses propres joueurs et son propre cycle d’exécution. 
-Cette abstraction permet d’isoler complètement les parties les unes des autres tout en conservant une architecture serveur centralisée.
+Cette abstraction permet d’isoler complètement les parties les unes des autres tout en gardant une architecture serveur centralisée.
 
 Chaque room maintient la liste des joueurs connectés, l’attribution des rôles (Pac-Man ou fantômes), les paramètres de la partie ainsi que son état courant (en attente, en cours, terminée). 
 Elle encapsule également sa propre boucle de jeu et son plateau, garantissant qu’aucune donnée n’est partagée entre deux parties distinctes.
@@ -399,6 +435,7 @@ Cette création à la demande permet au serveur d’adapter automatiquement sa s
 
 L’attribution des rôles est effectuée au moment du lancement de la partie selon une règle simple : un joueur incarne Pac-Man tandis que les autres deviennent des fantômes. 
 Ce mécanisme est géré exclusivement côté serveur afin d’éviter toute incohérence ou manipulation côté client.
+En cas de conflit le server informe les clients de la règle non respectée.
 
 \paragraph{Gestion et diffusion de l’état}
 
@@ -409,8 +446,8 @@ Ce cloisonnement garantit la cohérence interne de chaque partie et empêche tou
 
 \paragraph{Paramétrisation des parties}
 
-Les rooms permettent également d’ajuster dynamiquement certains paramètres, tels que la durée maximale d’une partie, le nombre de vies de Pac-Man ou encore la quantité de pac-gommes spéciales. 
-Cette capacité de configuration facilite les phases de test, l’équilibrage du gameplay et l’organisation de parties compétitives aux règles différenciées.
+Les rooms permettent d’ajuster dynamiquement certains paramètres, tels que la durée maximale d’une partie, le nombre de vies de Pac-Man, ect. 
+Cette capacité de configuration facilite les phases de test, l’équilibrage du gameplay et l’organisation de parties avec des règles customisées.
 
 \begin{figure}[H]
     \centering
@@ -418,36 +455,6 @@ Cette capacité de configuration facilite les phases de test, l’équilibrage d
     \caption{Vue de la Room}
 \end{figure}
 
-\subsection{Règles du jeu}
-
-Les règles du jeu ont été définies afin d’instaurer un équilibre entre tension, stratégie et asymétrie des rôles. 
-Chaque camp dispose d’objectifs distincts et de contraintes spécifiques, créant une dynamique d’opposition structurée.
-
-\paragraph{Conditions de victoire}
-
-Pac-Man gange la partie s’il parvient à manger tout les pac-gommes du plateau ou s’il survit jusqu’à la fin du timer. 
-Les fantômes, quant à eux, gagnent en épuisant toutes les vies de Pac-Man avant la fin du temps imparti.
-
-Ce double système de victoire introduit une pression temporelle permanente : Pac-Man doit optimiser ses déplacements, tandis que les fantômes doivent coordonner leurs actions pour limiter ses opportunités.
-
-\paragraph{Pac-gommes spéciales}
-
-Certaines pac-gommes déclenchent un mode temporaire dit « chasseur ». 
-Durant cette période, Pac-Man devient capable de manger les fantômes au contact. 
-Cet état est limité dans le temps par un compteur décrémenté à chaque tick serveur. 
-Les fantômes éliminés réapparaissent mais ont aussi des vies, maintenant ainsi l’équilibre de jeu.
-
-Ce mécanisme introduit un renversement ponctuel de dominance, transformant momentanément la proie en prédateur et modifiant profondément les stratégies en cours.
-
-\paragraph{Asymétrie de vision}
-
-Le système repose également sur une différence de vision. 
-Pac-Man dispose d’une vision globale du plateau, tandis que les fantômes ne perçoivent qu’un environnement restreint, ils ne peuvent voir qu'a une certaines distance d'eux même, la vison des fantomes n'est pas partagée entre eux.
-
-\paragraph{Cohérence du système}
-
-La combinaison de ces règles avec la génération procédurale du plateau et l’architecture hybride de l’intelligence artificielle et des joueurs, produit un gameplay varié et imprévisible. 
-Les interactions entre le timer qui décroit, le manque de vision et inversement temporaire des rôles permettent de nombreuse stratégies et augmentent la rejouabilité du jeu.
 
 
 \section{Structure du client}

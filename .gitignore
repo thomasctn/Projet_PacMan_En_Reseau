@@ -27,4 +27,4 @@ Rapport/.bin/*
 Rapport/.bin
 !Rapport/.bin/main.pdf
 !Rapport/.bin/agile.pdf
-
+Rapport/%*
