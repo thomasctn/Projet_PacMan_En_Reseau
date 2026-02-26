@@ -38,7 +38,7 @@ public:
     unsigned int getWidth() const { return width; }
     unsigned int getHeight() const { return height; }
 
-    std::unordered_map<Position, PacGommeType> getPacgommes() const {return pacgommes;}
+    std::unordered_map<gf::Vector2i, PacGommeType> getPacgommes() const {return pacgommes;}
     bool hasPacgomme(unsigned int x, unsigned int y) const;
     bool removePacgomme(unsigned int x, unsigned int y);
     PacGommeType takePacGomme(unsigned int x, unsigned int y);
@@ -48,18 +48,18 @@ public:
     unsigned int getPacgommeCount() const {return pacgommes.size();}
     void openBorderExits(unsigned int count);
     bool isHole(unsigned int x, unsigned int y) const;
-    std::vector<Position> getHoles() const;
+    std::vector<gf::Vector2i> getHoles() const;
 
-    std::map<Position, Position> holeLinks;
+    std::unordered_map<gf::Vector2i, gf::Vector2i> holeLinks;
         void linkHoles();
-    Position getLinkedHole(unsigned int x, unsigned int y) const;
+    gf::Vector2i getLinkedHole(unsigned int x, unsigned int y) const;
     PacGommeType getPacGommeType(int x, int y) const;
 
 private:
     unsigned int width;
     unsigned int height;
     gf::Array2D<Case> grid;
-    std::unordered_map<Position, PacGommeType> pacgommes;
+    std::unordered_map<gf::Vector2i, PacGommeType> pacgommes;
 
     void generateTestMaze();
     void generateMaze();

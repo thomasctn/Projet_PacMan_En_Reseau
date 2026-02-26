@@ -1,42 +1,34 @@
 #pragma once
 #include "Types.h"
 #include "Constants.h"
-
-struct Position
-{
-    unsigned int x;
-    unsigned int y;
-
-    Position() : x(0), y(0) {}
-    Position(unsigned int xp, unsigned int yp) : x(xp), y(yp) {}
-
-    bool operator==(const Position &a) const
-    {
-        return (x == a.x && y == a.y);
-    }
-
-    bool operator<(const Position &a) const
-    {
-        return (x < a.x || (x == a.x && y < a.y));
-    }
-};
-
 namespace std
 {
     template <>
-    struct hash<Position>
+    struct hash<gf::Vector2i>
     {
-        std::size_t operator()(const Position &p) const noexcept
+        std::size_t operator()(const gf::Vector2i &p) const noexcept
         {
-            return std::hash<unsigned int>()(p.x) ^ (std::hash<unsigned int>()(p.y) << 1);
+            return std::hash<int>()(p.x) ^ (std::hash<int>()(p.y) << 1);
+        }
+    };
+
+    template <>
+    struct equal_to<gf::Vector2i>
+    {
+        constexpr bool operator()(const gf::Vector2i &lhs, const gf::Vector2i &rhs) const
+        {
+            return lhs.x == rhs.x && lhs.y == rhs.y;
         }
     };
 }
-
-template <typename Archive>
-Archive &operator|(Archive &ar, Position &data)
+//Incroyable !
+namespace gf
 {
-    return ar | data.x | data.y;
+    template <typename Archive, typename T>
+    Archive &operator|(Archive &ar, gf::v1::Vector<T, 2> &data)
+    {
+        return ar | data.x | data.y;
+    }
 }
 
 struct CaseCommon

@@ -47,7 +47,7 @@ public:
     gf::ActionContainer& getActions(){ 
         return actions; 
     }
-    void goToGameScene(const std::vector<PlayerData>& players, const BoardCommon& board,const std::map<Position, Position>& holeLinks);
+    void goToGameScene(const std::vector<PlayerData>& players, const BoardCommon& board,const std::unordered_map<gf::Vector2i, gf::Vector2i>& holeLinks);
     void goToEndScene(GameEndReason& endReason);
     bool tryPopPacket(gf::Packet& out);
     void startNetwork(const std::string& host, const std::string& port);

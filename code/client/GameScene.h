@@ -10,7 +10,7 @@ class GameScene : public gf::Scene {
 public:
     explicit GameScene(ClientGame& game);
 
-  void setInitialState(const std::vector<PlayerData>& players,const BoardCommon& board,const std::map<Position, Position>& holeLinks);
+  void setInitialState(const std::vector<PlayerData>& players,const BoardCommon& board,const std::unordered_map<gf::Vector2i, gf::Vector2i>& holeLinks);
 
     void resizeYourself() ;
 

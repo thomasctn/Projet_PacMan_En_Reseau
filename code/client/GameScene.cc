@@ -17,7 +17,7 @@ GameScene::GameScene(ClientGame& game)
 void GameScene::setInitialState(
     const std::vector<PlayerData>& players,
     const BoardCommon& board,
-    const std::map<Position, Position>& holeLinks
+    const std::unordered_map<gf::Vector2i, gf::Vector2i>& holeLinks
 ) {
     m_entity.setGameState(players);
     m_entity.setBoard(board);
@@ -62,7 +62,7 @@ void GameScene::doUpdate(gf::Time time) {
                 auto data = packet.as<ServerGameState>();
                 m_entity.setGameState(data.clientStates);
                 
-                std::vector<std::pair<Position, PacGommeType>> pacgommes;
+                std::vector<std::pair<gf::Vector2i, PacGommeType>> pacgommes;
                 for (auto& [pos, type] : data.pacgommes) {
                     pacgommes.push_back({pos, type});
                 }

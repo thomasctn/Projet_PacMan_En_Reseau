@@ -121,7 +121,7 @@ int main(int argc, const char * argv[]) {
                         window.draw(tile);
 
                         // --- Pacgommes ---
-                        Position pos(x,y);
+                        gf::Vector2i pos(x,y);
                         auto it = board.getPacgommes().find(pos); // map<Position, PacGommeType>
                         if (it != board.getPacgommes().end()) {
                             PacGommeType type = it->second;

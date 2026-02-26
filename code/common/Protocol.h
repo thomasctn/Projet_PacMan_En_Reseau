@@ -123,9 +123,9 @@ struct ServerGameStart
   static constexpr gf::Id type = "ServerGameStart"_id;
   BoardCommon board;
   std::vector<PlayerData> players;
-  std::vector<std::pair<Position, PacGommeType>> pacgommes;
+  std::vector<std::pair<gf::Vector2i, PacGommeType>> pacgommes;
   RoomSettings settings;
-  std::map<Position, Position> holeLinks;
+  std::unordered_map<gf::Vector2i, gf::Vector2i> holeLinks;
 };
 template <typename Archive>
 Archive &operator|(Archive &ar, ServerGameStart &data)
@@ -138,7 +138,7 @@ struct ServerGameState
   static constexpr gf::Id type = "ServerGameState"_id;
   std::vector<PlayerData> clientStates;
   BoardCommon board;
-  std::vector<std::pair<Position, PacGommeType>> pacgommes;
+  std::vector<std::pair<gf::Vector2i, PacGommeType>> pacgommes;
   unsigned int timeLeft;
 };
 template <typename Archive>
@@ -230,13 +230,13 @@ Archive &operator|(Archive &ar, ServerPacManPowerEnd &data)
   return ar | data.playerId;
 }
 
-inline gf::v1::Serializer &operator|(gf::v1::Serializer &ar, const std::pair<Position, PacGommeType> &pg)
+inline gf::v1::Serializer &operator|(gf::v1::Serializer &ar, const std::pair<gf::Vector2i, PacGommeType> &pg)
 {
   ar | pg.first.x | pg.first.y | (uint8_t &)pg.second;
   return ar;
 }
 
-inline gf::v1::Deserializer &operator|(gf::v1::Deserializer &ar, std::pair<Position, PacGommeType> &pg)
+inline gf::v1::Deserializer &operator|(gf::v1::Deserializer &ar, std::pair<gf::Vector2i, PacGommeType> &pg)
 {
   uint8_t typeVal;
   ar | pg.first.x | pg.first.y | typeVal;
