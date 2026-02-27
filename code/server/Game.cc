@@ -90,7 +90,7 @@ bool Game::requestMove(uint32_t playerId, Direction dir)
 
     if (board.isHole(curGridX, curGridY))
     {
-        Position target = board.getLinkedHole(curGridX, curGridY);
+        gf::Vector2i target = board.getLinkedHole(curGridX, curGridY);
         p.setPos({target.x * step,target.y * step});
     }
 

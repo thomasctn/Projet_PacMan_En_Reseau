@@ -98,7 +98,7 @@ void ClientGame::requestScene(SceneRequest req) {
     }
 }
 
-void ClientGame::goToGameScene(const std::vector<PlayerData>& players,const BoardCommon& board,const std::map<Position, Position>& holeLinks){
+void ClientGame::goToGameScene(const std::vector<PlayerData>& players,const BoardCommon& board,const std::unordered_map<gf::Vector2i, gf::Vector2i>& holeLinks){
     gameScene.setInitialState(players, board, holeLinks);
     replaceAllScenes(gameScene);
     gameScene.resizeYourself();

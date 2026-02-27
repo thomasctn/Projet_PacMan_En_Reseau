@@ -26,10 +26,10 @@ public:
     
     void setGameState(const std::vector<PlayerData>& states);
     void setBoard(const BoardCommon& board);
-    void setPacGommes(const std::vector<std::pair<Position, PacGommeType>>& pacgommes);
+    void setPacGommes(const std::vector<std::pair<gf::Vector2i, PacGommeType>>& pacgommes);
     void setTimeLeft(int timeLeftPre, unsigned int timeLeft);
     void setGameTimeLeft(unsigned int timeLeft); //ne touche que timeLeft, pas timeLeftPre
-    void setHoleLinks(const std::map<Position, Position>& holeLinks);
+    void setHoleLinks(const std::unordered_map<gf::Vector2i, gf::Vector2i>& holeLinks);
     void setClientId(uint32_t id);
     bool posIsInRange(int oX,int oY,int dX,int dY,double range) {
         return sqrt(pow(abs(oX-dX),2) + pow(abs(oY-dY),2)) <= range;
@@ -39,14 +39,14 @@ public:
     void startPacmanPower();
     void updatePacmanPower(int timeLeft);
     void endPacmanPower();
-
     
 void render(gf::RenderTarget& target, const gf::RenderStates& states) override;
 
 private:
     void calculateMovement(gf::RenderTarget& target, const BoardCommon &map, float &tileSize, float &offsetX, float &offsetY);
     void renderMap(gf::RenderTarget& target, const gf::RenderStates& states, const BoardCommon& map, float logicalTileSize, float mapOriginX, float mapOriginY);
-    void renderPacGommes(gf::RenderTarget& target, const gf::RenderStates& states, const std::vector<std::pair<Position, PacGommeType>>& pacgommes, float logicalTileSize, float mapOriginX, float mapOriginY);
+    void renderPacGommes(gf::RenderTarget& target, const gf::RenderStates& states, const std::vector<std::pair<gf::Vector2i, PacGommeType>>& pacgommes, float logicalTileSize, float mapOriginX, float mapOriginY);
+    void renderSprites(gf::RenderTarget& target, const gf::RenderStates& states,float logicalTileSize, float mapOriginX, float mapOriginY);
     void renderMyLife(gf::RenderTarget& target, const gf::RenderStates& states,float logicalTileSize, float mapOriginX, float mapOriginY, float topMargin);
     void renderPacmanLife(gf::RenderTarget& target, const gf::RenderStates& states,float logicalTileSize, float mapOriginX, float mapOriginY, float topMargin);
     void renderPacManPower(gf::RenderTarget& target, const gf::RenderStates& states,float mapOriginX, float logicalTileSize, float topMargin);
@@ -57,13 +57,14 @@ private:
     //etat du jeu
     std::vector<PlayerData> m_states;
     BoardCommon m_board;
-    std::vector<std::pair<Position, PacGommeType>> m_pacgommes;
+    std::vector<std::pair<gf::Vector2i, PacGommeType>> m_pacgommes;
     int m_timeLeftPre = 0;
     unsigned int m_timeLeft = 0;
-    std::map<Position, Position> m_holeLinks;
+    std::unordered_map<gf::Vector2i, gf::Vector2i> m_holeLinks;
     uint32_t m_clientId = 0;
 
     int m_myHp = 2;
+    PlayerData m_clientData;
     int m_pacmanHp = 3;
     PlayerRole m_myRole;
 
@@ -73,14 +74,7 @@ private:
     gf::Font m_font;
     
     //txtures et sprites
-    gf::Texture m_inkyTexture;
-    gf::Sprite  m_inkySprite;
-    gf::Texture m_clydeTexture;
-    gf::Sprite  m_clydeSprite;
-    gf::Texture m_pinkyTexture;
-    gf::Sprite  m_pinkySprite;
-    gf::Texture m_blinkyTexture;
-    gf::Sprite  m_blinkySprite;
+    gf::Texture m_ghostVulnerableTexture;
     
     gf::AnimatedSprite m_pacmanSprite;
     gf::Texture m_pacmanRightTexture;
@@ -100,4 +94,7 @@ private:
 
     std::map<int,const gf::RectF> wall_texture_rectF;
     std::map<uint32_t, MovementState> pos;
+
+    gf::Sprite ghostSprite;
+    std::vector<gf::Texture> ghostTextures;
 };

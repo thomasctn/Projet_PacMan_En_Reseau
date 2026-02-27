@@ -9,27 +9,18 @@
 #include <algorithm>
 #include <cmath>
 
-
-
-
 GameEntity::GameEntity()
     : m_font("../common/fonts/Emulogic-zrEw.ttf")
 {
-    m_inkyTexture = gf::Texture("../client/assets/ghosts/inky.png");
-    m_inkySprite.setTexture(m_inkyTexture);
-    m_inkySprite.setOrigin({0.f, 0.f});
+    ghostTextures.push_back(gf::Texture("../client/assets/ghosts/inky.png"));
+    ghostTextures.push_back(gf::Texture("../client/assets/ghosts/clyde.png"));
+    ghostTextures.push_back(gf::Texture("../client/assets/ghosts/pinky.png"));
+    ghostTextures.push_back(gf::Texture("../client/assets/ghosts/blinky.png"));
 
-    m_clydeTexture = gf::Texture("../client/assets/ghosts/clyde.png");
-    m_clydeSprite.setTexture(m_clydeTexture);
-    m_clydeSprite.setOrigin({0.f, 0.f});
+    ghostSprite.setTexture(ghostTextures[0]);
+    ghostSprite.setOrigin({0.f, 0.f});
 
-    m_pinkyTexture = gf::Texture("../client/assets/ghosts/pinky.png");
-    m_pinkySprite.setTexture(m_pinkyTexture);
-    m_pinkySprite.setOrigin({0.f, 0.f});
-
-    m_blinkyTexture = gf::Texture("../client/assets/ghosts/blinky.png");
-    m_blinkySprite.setTexture(m_blinkyTexture);
-    m_blinkySprite.setOrigin({0.f, 0.f});
+    m_ghostVulnerableTexture = gf::Texture("../client/assets/ghosts/blue_ghost.png");
 
     m_pacmanRightTexture = gf::Texture("../client/assets/pacman/right_pacman_sheet.png");
     m_pacmanLeftTexture = gf::Texture("../client/assets/pacman/left_pacman_sheet.png");
@@ -67,12 +58,12 @@ GameEntity::GameEntity()
     wall_texture_rectF.insert({14, gf::RectF::fromPositionSize({0.6f, 0.50f}, {0.2f, 0.25f})});
 }
 
-void GameEntity::setGameState(const std::vector<PlayerData>& states)
+void GameEntity::setGameState(const std::vector<PlayerData> &states)
 {
-    m_myRole = PlayerRole::Spectator; //par defaut
+    m_myRole = PlayerRole::Spectator; // par defaut
     auto now = std::chrono::steady_clock::now();
 
-    for (auto& s : states)
+    for (auto &s : states)
     {
         auto it = pos.find(s.id);
 
@@ -88,7 +79,7 @@ void GameEntity::setGameState(const std::vector<PlayerData>& states)
             continue;
         }
 
-        MovementState& m = it->second;
+        MovementState &m = it->second;
 
         m.destPos = {s.x, s.y};
 
@@ -97,28 +88,27 @@ void GameEntity::setGameState(const std::vector<PlayerData>& states)
 
         m.lastServerUpdate = now;
 
-        if (s.role == PlayerRole::PacMan) {
+        if (s.role == PlayerRole::PacMan)
+        {
             m_pacmanHp = s.hp;
         }
-        if (s.id == m_clientId) {
+        if (s.id == m_clientId)
+        {
+            m_clientData = s;
             m_myHp = s.hp;
             m_myRole = s.role;
         }
     }
 
     m_states = states;
-
 }
-
-
-
 
 void GameEntity::setBoard(const BoardCommon &board)
 {
     m_board = board;
 }
 
-void GameEntity::setPacGommes(const std::vector<std::pair<Position, PacGommeType>> &pacgommes)
+void GameEntity::setPacGommes(const std::vector<std::pair<gf::Vector2i, PacGommeType>> &pacgommes)
 {
     m_pacgommes = pacgommes;
 }
@@ -134,7 +124,7 @@ void GameEntity::setGameTimeLeft(unsigned int timeLeft)
     m_timeLeft = timeLeft;
 }
 
-void GameEntity::setHoleLinks(const std::map<Position, Position> &holeLinks)
+void GameEntity::setHoleLinks(const std::unordered_map<gf::Vector2i, gf::Vector2i> &holeLinks)
 {
     m_holeLinks = holeLinks;
 }
@@ -149,16 +139,19 @@ void GameEntity::update(gf::Time time)
     m_pacmanSprite.update(time);
 }
 
-void GameEntity::startPacmanPower() {
+void GameEntity::startPacmanPower()
+{
     m_pacmanPowerActive = true;
 }
 
-void GameEntity::updatePacmanPower(int timeLeft) {
+void GameEntity::updatePacmanPower(int timeLeft)
+{
     m_pacmanPowerActive = true;
     m_pacmanPowerTimeLeft = timeLeft;
 }
 
-void GameEntity::endPacmanPower() {
+void GameEntity::endPacmanPower()
+{
     m_pacmanPowerActive = false;
     m_pacmanPowerTimeLeft = 0;
 }
@@ -177,7 +170,7 @@ void GameEntity::calculateMovement(gf::RenderTarget &target, const BoardCommon &
     offsetY = topMargin + (view.getCenter().y - viewSize.y * 0.5f);
 }
 
-void GameEntity::renderPacManPower(gf::RenderTarget& target,const gf::RenderStates& states, float mapOriginX,float logicalTileSize,float topMargin)
+void GameEntity::renderPacManPower(gf::RenderTarget &target, const gf::RenderStates &states, float mapOriginX, float logicalTileSize, float topMargin)
 {
     if (!m_pacmanPowerActive)
         return;
@@ -187,7 +180,7 @@ void GameEntity::renderPacManPower(gf::RenderTarget& target,const gf::RenderStat
     float boxPadding = 12.f;
 
     float startX = mapRight + 20.f;
-    float startY = topMargin - 10.f; 
+    float startY = topMargin - 10.f;
 
     unsigned charSize = 12u;
 
@@ -198,39 +191,27 @@ void GameEntity::renderPacManPower(gf::RenderTarget& target,const gf::RenderStat
     text.setString("Pacman mode chasseur\nactive : " + std::to_string(m_pacmanPowerTimeLeft) + "s restantes");
 
     gf::RectF bounds = text.getLocalBounds();
-    float textWidth  = bounds.max.x - bounds.min.x;
+    float textWidth = bounds.max.x - bounds.min.x;
     float textHeight = bounds.max.y - bounds.min.y;
 
-    gf::RoundedRectangleShape box({ textWidth + boxPadding * 2.f,textHeight + boxPadding * 2.f },8.f);
+    gf::RoundedRectangleShape box({textWidth + boxPadding * 2.f, textHeight + boxPadding * 2.f}, 8.f);
 
-    box.setPosition({ startX, startY });
+    box.setPosition({startX, startY});
     box.setColor(gf::Color::Black);
     box.setOutlineThickness(2.f);
     box.setOutlineColor(gf::Color::Yellow);
 
     target.draw(box, states);
 
-    text.setPosition({ startX + boxPadding,startY + boxPadding +10.f });
+    text.setPosition({startX + boxPadding, startY + boxPadding + 10.f});
 
     target.draw(text, states);
 }
 
-
-
-
 void GameEntity::renderMap(gf::RenderTarget &target, const gf::RenderStates &states, const BoardCommon &map, float logicalTileSize, float mapOriginX, float mapOriginY)
 {
-    PlayerData client;
-    for (auto &s : m_states)
-    {
-        if (s.id == m_clientId)
-        {
-            client = s;
-            break;
-        }
-    }
-    int posX = abs(floor(client.x)) / 50;
-    int posY = abs(floor(client.y)) / 50;
+    int posX = abs(floor(m_clientData.x)) / 50;
+    int posY = abs(floor(m_clientData.y)) / 50;
     for (unsigned int y = 0; y < map.height; ++y)
     {
         for (unsigned int x = 0; x < map.width; ++x)
@@ -238,7 +219,7 @@ void GameEntity::renderMap(gf::RenderTarget &target, const gf::RenderStates &sta
             const CaseCommon &cell = map.grid({x, y});
             gf::RectangleShape tile({logicalTileSize, logicalTileSize});
             tile.setPosition({mapOriginX + x * logicalTileSize, mapOriginY + y * logicalTileSize});
-            if (!posIsInRange(posX, posY, x, y, VISION_RANGE_PLAYER) && client.role == PlayerRole::Ghost)
+            if (!posIsInRange(posX, posY, x, y, VISION_RANGE_PLAYER) && m_clientData.role == PlayerRole::Ghost)
             {
                 tile.setColor(gf::Color::Black);
             }
@@ -277,36 +258,39 @@ void GameEntity::renderMap(gf::RenderTarget &target, const gf::RenderStates &sta
             }
         }
     }
-
-    if (m_holeLinks.size() >= 2)
+    const std::vector<gf::Color4f> portalColors = {gf::Color::Magenta, gf::Color::Blue, gf::Color::Red, gf::Color::Yellow};
+    unsigned int colorID = 0;
+    for (auto &p : m_holeLinks)
     {
-        auto it = m_holeLinks.begin();
         gf::RectangleShape portalTile({logicalTileSize, logicalTileSize});
+        portalTile.setColor(portalColors[colorID]);
+        if (posIsInRange(posX, posY, p.first.x, p.first.y, VISION_RANGE_PLAYER) || m_clientData.role != PlayerRole::Ghost)
+        {
+            portalTile.setPosition({mapOriginX + p.first.x * logicalTileSize, mapOriginY + p.first.y * logicalTileSize});
+            target.draw(portalTile, states);
+        }
+        if (posIsInRange(posX, posY, p.second.x, p.second.y, VISION_RANGE_PLAYER) || m_clientData.role != PlayerRole::Ghost)
+        {
+            portalTile.setPosition({mapOriginX + p.second.x * logicalTileSize, mapOriginY + p.second.y * logicalTileSize});
+            target.draw(portalTile, states);
+        }
 
-        portalTile.setPosition({mapOriginX + it->first.x * logicalTileSize, mapOriginY + it->first.y * logicalTileSize});
-        portalTile.setColor(gf::Color::Magenta);
-        target.draw(portalTile, states);
-
-        portalTile.setPosition({mapOriginX + it->second.x * logicalTileSize, mapOriginY + it->second.y * logicalTileSize});
-        target.draw(portalTile, states);
-
-        ++it;
-
-        portalTile.setPosition({mapOriginX + it->first.x * logicalTileSize, mapOriginY + it->first.y * logicalTileSize});
-        portalTile.setColor(gf::Color::Blue);
-        target.draw(portalTile, states);
-
-        portalTile.setPosition({mapOriginX + it->second.x * logicalTileSize, mapOriginY + it->second.y * logicalTileSize});
-        target.draw(portalTile, states);
+        colorID = (colorID + 1) % portalColors.size();
     }
 }
 
-void GameEntity::renderPacGommes(gf::RenderTarget &target, const gf::RenderStates &states, const std::vector<std::pair<Position, PacGommeType>> &pacgommes, float logicalTileSize, float mapOriginX, float mapOriginY)
+void GameEntity::renderPacGommes(gf::RenderTarget &target, const gf::RenderStates &states, const std::vector<std::pair<gf::Vector2i, PacGommeType>> &pacgommes, float logicalTileSize, float mapOriginX, float mapOriginY)
 {
     float radius = logicalTileSize / 6.0f;
 
-    for (const auto &[pos, type] : pacgommes)
+    int posX = abs(floor(m_clientData.x)) / 50;
+    int posY = abs(floor(m_clientData.y)) / 50;
+    for (auto &[pos, type] : pacgommes)
     {
+        if (!posIsInRange(posX, posY, pos.x, pos.y, VISION_RANGE_PLAYER) && m_clientData.role == PlayerRole::Ghost)
+        {
+            continue;
+        }
         gf::CircleShape pacGomme(radius);
         pacGomme.setOrigin({radius, radius});
         pacGomme.setPosition({mapOriginX + pos.x * logicalTileSize + logicalTileSize / 2.f,
@@ -324,31 +308,128 @@ void GameEntity::renderPacGommes(gf::RenderTarget &target, const gf::RenderState
             pacGomme.setColor(gf::Color::White);
             break;
         }
-
         target.draw(pacGomme, states);
     }
 }
 
-void GameEntity::renderMyLife(gf::RenderTarget& target, const gf::RenderStates& states,float logicalTileSize, float mapOriginX, float mapOriginY, float topMargin)
+void GameEntity::renderSprites(gf::RenderTarget &target, const gf::RenderStates &states,float logicalTileSize, float mapOriginX, float mapOriginY)
 {
-    /*float x_logical = mapOriginX + m_board.width * logicalTileSize + 8.f; 
-    float y_logical = mapOriginY + 8.f; 
+    float tilePx = logicalTileSize; // logique == pixels fixes
+    auto pacTexSize = m_pacmanRightTexture.getSize();
+    if (pacTexSize.x > 0)
+    {
+        float fw = float(pacTexSize.x) / 4.f;
+        float fh = float(pacTexSize.y);
+        m_pacmanSprite.setScale({tilePx / fw, tilePx / fh});
+    }
 
-    gf::Text t;
-    t.setFont(m_font);
-    t.setCharacterSize(18u);
-    t.setColor(gf::Color::White);
-    t.setString("Vie perso restantes : " + std::to_string(m_myHp));
-    t.setPosition({ x_logical, y_logical });
-    target.draw(t, states);*/
+    int ghostIndex = 0;
+    int posX = abs(floor(m_clientData.x)) / 50;
+    int posY = abs(floor(m_clientData.y)) / 50;
+
+    for (const auto &s : m_states)
+    {
+        if (s.x == 0.f && s.y == 0.f)
+            continue;
+
+        auto &m = pos.at(s.id);
+
+        auto now = std::chrono::steady_clock::now();
+        float elapsed = std::chrono::duration<float>(now - m.startTime).count();
+
+        float speedFactor = SPEEDFACTOR; // 0.5 = moitié de vitesse
+        float t = std::clamp(elapsed / m.expectedDuration * speedFactor, 0.f, 1.f);
+        gf::Vector2f currentPos = m.startPos + (m.destPos - m.startPos) * t;
+
+        float px = mapOriginX + (currentPos.x / 50.f) * logicalTileSize;
+        float py = mapOriginY + (currentPos.y / 50.f) * logicalTileSize;
+
+        int s_posX = static_cast<int>(currentPos.x / 50.f);
+        int s_posY = static_cast<int>(currentPos.y / 50.f);
+        if (!posIsInRange(posX, posY, s_posX, s_posY, VISION_RANGE_PLAYER) && m_clientData.role == PlayerRole::Ghost)
+        {
+            if (s.role == PlayerRole::Ghost)
+            {
+                ghostIndex = (ghostIndex + 1) % ghostTextures.size();
+            }
+            continue;
+        }
+
+        // --- rendu Pac-Man / fantômes ---
+        if (s.role == PlayerRole::PacMan)
+        {
+            gf::Vector2f moveVec = m.destPos - m.startPos;
+
+            if (std::abs(moveVec.x) > std::abs(moveVec.y))
+            {
+                if (moveVec.x > 0 && m_pacmanDir != 'R')
+                {
+                    m_pacmanDir = 'R';
+                    m_pacmanSprite.setAnimation(m_pacmanRightAnim);
+                }
+                else if (moveVec.x < 0 && m_pacmanDir != 'L')
+                {
+                    m_pacmanDir = 'L';
+                    m_pacmanSprite.setAnimation(m_pacmanLeftAnim);
+                }
+            }
+            else if (std::abs(moveVec.y) > 0.001f)
+            {
+                if (moveVec.y > 0 && m_pacmanDir != 'D')
+                {
+                    m_pacmanDir = 'D';
+                    m_pacmanSprite.setAnimation(m_pacmanDownAnim);
+                }
+                else if (moveVec.y < 0 && m_pacmanDir != 'U')
+                {
+                    m_pacmanDir = 'U';
+                    m_pacmanSprite.setAnimation(m_pacmanUpAnim);
+                }
+            }
+
+            m_pacmanSprite.setPosition({px, py});
+            target.draw(m_pacmanSprite, states);
+
+            gf::Text scoreText;
+            scoreText.setFont(m_font);
+            scoreText.setCharacterSize(16u);
+            scoreText.setColor(gf::Color::White);
+            scoreText.setString(std::to_string(s.score));
+            scoreText.setPosition({px + 5.f, py - 18.f});
+            target.draw(scoreText, states);
+
+            m_lastPacmanX = px;
+            m_lastPacmanY = py;
+            m_hasLastPacmanPos = true;
+        }
+        else
+        {
+            if (ghostTextures[ghostIndex].getSize().x > 0)
+            {
+                float s = tilePx / float(ghostTextures[ghostIndex].getSize().x);
+                ghostSprite.setScale({s, s});
+            }
+            ghostSprite.setTexture(m_pacmanPowerActive ? m_ghostVulnerableTexture : ghostTextures[ghostIndex]);
+            ghostSprite.setPosition({px, py});
+            target.draw(ghostSprite, states);
+            ghostIndex = (ghostIndex + 1) % ghostTextures.size();
+        }
+
+        m.startPos = currentPos;
+        m.startTime = now;
+    }
+}
+
+void GameEntity::renderMyLife(gf::RenderTarget &target, const gf::RenderStates &states, float logicalTileSize, float mapOriginX, float mapOriginY, float topMargin)
+{
     unsigned labelSize = 14u;
     unsigned numberSize = 18u;
 
-    float mapLeft   = mapOriginX;
-    float mapRight  = mapOriginX + m_board.width * logicalTileSize;
+    float mapLeft = mapOriginX;
+    float mapRight = mapOriginX + m_board.width * logicalTileSize;
     float mapCenter = (mapLeft + mapRight) * 0.5f;
 
-    float labelY  = topMargin * 0.35f;
+    float labelY = topMargin * 0.35f;
     float numberY = labelY + 20.f;
 
     gf::Text label;
@@ -358,7 +439,7 @@ void GameEntity::renderMyLife(gf::RenderTarget& target, const gf::RenderStates& 
     label.setString("PV PERSO");
 
     gf::RectF bounds = label.getLocalBounds();
-    label.setPosition({ mapCenter - (bounds.max.x - bounds.min.x) * 0.5f, labelY });
+    label.setPosition({mapCenter - (bounds.max.x - bounds.min.x) * 0.5f, labelY});
     target.draw(label, states);
 
     gf::Text value;
@@ -368,28 +449,19 @@ void GameEntity::renderMyLife(gf::RenderTarget& target, const gf::RenderStates& 
     value.setString(std::to_string(m_myHp));
 
     gf::RectF valBounds = value.getLocalBounds();
-    value.setPosition({ mapCenter - (valBounds.max.x - valBounds.min.x) * 0.5f, numberY });
+    value.setPosition({mapCenter - (valBounds.max.x - valBounds.min.x) * 0.5f, numberY});
     target.draw(value, states);
 }
 
-void GameEntity::renderPacmanLife(gf::RenderTarget& target, const gf::RenderStates& states,float logicalTileSize, float mapOriginX, float mapOriginY, float topMargin)
+void GameEntity::renderPacmanLife(gf::RenderTarget &target, const gf::RenderStates &states, float logicalTileSize, float mapOriginX, float mapOriginY, float topMargin)
 {
-    /*float x_logical = mapOriginX + m_board.width * logicalTileSize + 8.f;
-    float y_logical = mapOriginY + 8.f + 26.f; 
-    gf::Text t;
-    t.setFont(m_font);
-    t.setCharacterSize(18u);
-    t.setColor(gf::Color::White);
-    t.setString("Vie Pacman restantes : " + std::to_string(m_pacmanHp));
-    t.setPosition({ x_logical, y_logical });
-    target.draw(t, states);*/
 
     unsigned labelSize = 14u;
     unsigned numberSize = 18u;
 
     float mapRight = mapOriginX + m_board.width * logicalTileSize;
 
-    float labelY  = topMargin * 0.35f;
+    float labelY = topMargin * 0.35f;
     float numberY = labelY + 20.f;
 
     gf::Text label;
@@ -399,7 +471,7 @@ void GameEntity::renderPacmanLife(gf::RenderTarget& target, const gf::RenderStat
     label.setString("PV PACMAN");
 
     gf::RectF bounds = label.getLocalBounds();
-    label.setPosition({ mapRight - (bounds.max.x - bounds.min.x), labelY });
+    label.setPosition({mapRight - (bounds.max.x - bounds.min.x), labelY});
     target.draw(label, states);
 
     gf::Text value;
@@ -409,10 +481,9 @@ void GameEntity::renderPacmanLife(gf::RenderTarget& target, const gf::RenderStat
     value.setString(std::to_string(m_pacmanHp));
 
     gf::RectF valBounds = value.getLocalBounds();
-    value.setPosition({ mapRight - (valBounds.max.x - valBounds.min.x), numberY });
+    value.setPosition({mapRight - (valBounds.max.x - valBounds.min.x), numberY});
     target.draw(value, states);
 }
-
 
 void GameEntity::render(gf::RenderTarget &target, const gf::RenderStates &states)
 {
@@ -441,24 +512,14 @@ void GameEntity::render(gf::RenderTarget &target, const gf::RenderStates &states
 
     renderMap(target, states, m_board, logicalTileSize, mapOriginX, mapOriginY);
     renderPacGommes(target, states, m_pacgommes, logicalTileSize, mapOriginX, mapOriginY);
-/*
-    gf::Text timer;
-    timer.setFont(m_font);
-    timer.setCharacterSize(24u);
-    timer.setColor(gf::Color::White);
-    if (m_timeLeftPre != 0)
-        timer.setString("Temps avant le début de la partie : " + std::to_string(m_timeLeftPre));
-    else
-        timer.setString("Temps avant la fin de la partie : " + std::to_string(m_timeLeft));
+    renderSprites(target, states, logicalTileSize, mapOriginX, mapOriginY);
 
-    timer.setPosition({timerX, timerY});
-    target.draw(timer, states);*/
     unsigned labelSize = 14u;
     unsigned numberSize = 18u;
 
     float mapLeft = mapOriginX;
 
-    float labelY  = topMargin * 0.35f;
+    float labelY = topMargin * 0.35f;
     float numberY = labelY + 20.f;
 
     gf::Text label;
@@ -466,11 +527,11 @@ void GameEntity::render(gf::RenderTarget &target, const gf::RenderStates &states
     label.setCharacterSize(labelSize);
     label.setColor(gf::Color::White);
     if (m_timeLeftPre != 0)
-        label.setString("TIMER PRE-START : " );
+        label.setString("TIMER PRE-START : ");
     else
         label.setString("TIMER : ");
 
-    label.setPosition({ mapLeft, labelY });
+    label.setPosition({mapLeft, labelY});
     target.draw(label, states);
 
     unsigned timeValue = (m_timeLeftPre != 0) ? m_timeLeftPre : m_timeLeft;
@@ -480,160 +541,25 @@ void GameEntity::render(gf::RenderTarget &target, const gf::RenderStates &states
     value.setCharacterSize(numberSize);
     value.setColor(gf::Color::White);
     value.setString(std::to_string(timeValue));
-    value.setPosition({ mapLeft, numberY });
+    value.setPosition({mapLeft, numberY});
     target.draw(value, states);
 
-    float tilePx = logicalTileSize; // logique == pixels fixes
+    // les vies
 
-    if (m_inkyTexture.getSize().x > 0)
+    if (m_myRole == PlayerRole::Ghost)
     {
-        float s = tilePx / float(m_inkyTexture.getSize().x);
-        m_inkySprite.setScale({s, s});
-    }
-    if (m_clydeTexture.getSize().x > 0)
-    {
-        float s = tilePx / float(m_clydeTexture.getSize().x);
-        m_clydeSprite.setScale({s, s});
-    }
-    if (m_pinkyTexture.getSize().x > 0)
-    {
-        float s = tilePx / float(m_pinkyTexture.getSize().x);
-        m_pinkySprite.setScale({s, s});
-    }
-    if (m_blinkyTexture.getSize().x > 0)
-    {
-        float s = tilePx / float(m_blinkyTexture.getSize().x);
-        m_blinkySprite.setScale({s, s});
-    }
-
-    auto pacTexSize = m_pacmanRightTexture.getSize();
-    if (pacTexSize.x > 0)
-    {
-        float fw = float(pacTexSize.x) / 4.f;
-        float fh = float(pacTexSize.y);
-        m_pacmanSprite.setScale({tilePx / fw, tilePx / fh});
-    }
-
-    int ghostIndex = 0;
-    PlayerData client;
-    for (auto &s : m_states)
-    {
-        if (s.id == m_clientId)
-        {
-            client = s;
-            break;
-        }
-    }
-    int posX = abs(floor(client.x)) / 50;
-    int posY = abs(floor(client.y)) / 50;
-
-    for (const auto &s : m_states)
-    {
-        if (s.x == 0.f && s.y == 0.f) continue;
-        
-        auto &m = pos.at(s.id);
-
-        auto now = std::chrono::steady_clock::now();
-        float elapsed = std::chrono::duration<float>(now - m.startTime).count();
-
-        float speedFactor = SPEEDFACTOR; // 0.5 = moitié de vitesse
-        float t = std::clamp(elapsed / m.expectedDuration * speedFactor, 0.f, 1.f);
-        gf::Vector2f currentPos = m.startPos + (m.destPos - m.startPos) * t;
-
-        float px = mapOriginX + (currentPos.x / 50.f) * logicalTileSize;
-        float py = mapOriginY + (currentPos.y / 50.f) * logicalTileSize;
-
-        int s_posX = static_cast<int>(currentPos.x / 50.f);
-        int s_posY = static_cast<int>(currentPos.y / 50.f);
-
-
-        // --- rendu Pac-Man / fantômes ---
-        if (s.role == PlayerRole::PacMan)
-        {
-            if (posIsInRange(posX, posY, s_posX, s_posY, VISION_RANGE_PLAYER) || client.role == PlayerRole::PacMan)
-            {
-                gf::Vector2f moveVec = m.destPos - m.startPos;
-
-                if (std::abs(moveVec.x) > std::abs(moveVec.y)) {
-                    if (moveVec.x > 0 && m_pacmanDir != 'R') {
-                        m_pacmanDir = 'R';
-                        m_pacmanSprite.setAnimation(m_pacmanRightAnim);
-                    } else if (moveVec.x < 0 && m_pacmanDir != 'L') {
-                        m_pacmanDir = 'L';
-                        m_pacmanSprite.setAnimation(m_pacmanLeftAnim);
-                    }
-                } else if (std::abs(moveVec.y) > 0.001f) {
-                    if (moveVec.y > 0 && m_pacmanDir != 'D') {
-                        m_pacmanDir = 'D';
-                        m_pacmanSprite.setAnimation(m_pacmanDownAnim);
-                    } else if (moveVec.y < 0 && m_pacmanDir != 'U') {
-                        m_pacmanDir = 'U';
-                        m_pacmanSprite.setAnimation(m_pacmanUpAnim);
-                    }
-                }
-
-
-                m_pacmanSprite.setPosition({px, py});
-                target.draw(m_pacmanSprite, states);
-
-                gf::Text scoreText;
-                scoreText.setFont(m_font);
-                scoreText.setCharacterSize(16u);
-                scoreText.setColor(gf::Color::White);
-                scoreText.setString(std::to_string(s.score));
-                scoreText.setPosition({px + 5.f, py - 18.f});
-                target.draw(scoreText, states);
-
-                m_lastPacmanX = px;
-                m_lastPacmanY = py;
-                m_hasLastPacmanPos = true;
-            }
-        }
-        else
-        {
-            if (posIsInRange(posX, posY, s_posX, s_posY, VISION_RANGE_PLAYER) || client.role == PlayerRole::PacMan)
-            {
-                if (ghostIndex == 0)
-                {
-                    m_inkySprite.setPosition({px, py});
-                    target.draw(m_inkySprite, states);
-                }
-                else if (ghostIndex == 1)
-                {
-                    m_clydeSprite.setPosition({px, py});
-                    target.draw(m_clydeSprite, states);
-                }
-                else if (ghostIndex == 2)
-                {
-                    m_pinkySprite.setPosition({px, py});
-                    target.draw(m_pinkySprite, states);
-                }
-                else
-                {
-                    m_blinkySprite.setPosition({px, py});
-                    target.draw(m_blinkySprite, states);
-                }
-            }
-            ++ghostIndex;
-        }
-
-        m.startPos = currentPos;
-        m.startTime = now;
-    }
-
-    //les vies
-
-    if (m_myRole == PlayerRole::Ghost) {
         renderMyLife(target, states, logicalTileSize, mapOriginX, mapOriginY, topMargin);
         renderPacmanLife(target, states, logicalTileSize, mapOriginX, mapOriginY, topMargin);
-    } else if (m_myRole == PlayerRole::PacMan) {
+    }
+    else if (m_myRole == PlayerRole::PacMan)
+    {
         renderPacmanLife(target, states, logicalTileSize, mapOriginX, mapOriginY, topMargin);
-    } else {
+    }
+    else
+    {
         renderPacmanLife(target, states, logicalTileSize, mapOriginX, mapOriginY, topMargin);
     }
 
-    //mode chasseur
+    // mode chasseur
     renderPacManPower(target, states, mapOriginX, logicalTileSize, topMargin);
-
-
 }

@@ -1,8 +1,7 @@
 #include "Board.h"
 
 Board::Board(unsigned int w, unsigned int h)
-: width(w), height(h), grid({w, h}) {
-
+: width(w), height(h), grid({w, h}), pacgommes({}){
     // -- Generateur de labyrinthe ---
     generateMaze();
     //generateTestMaze();
@@ -55,7 +54,7 @@ void Board::placeRandomPacGommes() {
             unsigned int y = distY(gen);
 
             Case& c = getCase(x, y);
-            Position pos(x, y);
+            gf::Vector2i pos(x, y);
 
             if (c.getType() == CellType::Floor &&
                 pacgommes.find(pos) == pacgommes.end()) {
@@ -467,9 +466,9 @@ bool Board::isHole(unsigned int x, unsigned int y) const
     return (x == 0 || y == 0 || x == width - 1 || y == height - 1);
 }
 
-std::vector<Position> Board::getHoles() const
+std::vector<gf::Vector2i> Board::getHoles() const
 {
-    std::vector<Position> holes;
+    std::vector<gf::Vector2i> holes;
 
     for (unsigned int x = 0; x < width; ++x)
     {
@@ -552,11 +551,11 @@ void Board::printWithPlayers(const std::vector<Player> &players) const {
 }
 
 bool Board::hasPacgomme(unsigned int x, unsigned int y) const {
-    return pacgommes.find(Position(x, y)) != pacgommes.end();
+    return pacgommes.find(gf::Vector2i(x, y)) != pacgommes.end();
 }
 
 PacGommeType Board::takePacGomme(unsigned int x, unsigned int y) {
-    Position pos(x, y);
+    gf::Vector2i pos(x, y);
     auto it = pacgommes.find(pos);
     if (it == pacgommes.end())
         return PacGommeType::Basic;
@@ -568,7 +567,7 @@ PacGommeType Board::takePacGomme(unsigned int x, unsigned int y) {
 
 
 bool Board::removePacgomme(unsigned int x, unsigned int y) {
-    Position pos(x, y);
+    gf::Vector2i pos(x, y);
     auto it = pacgommes.find(pos);
     if (it == pacgommes.end())
         return false;
@@ -593,10 +592,10 @@ BoardCommon Board::toCommonData()
 void Board::linkHoles() {
     auto holes = getHoles();
 
-    std::vector<Position> left;
-    std::vector<Position> right;
-    std::vector<Position> top;
-    std::vector<Position> bottom;
+    std::vector<gf::Vector2i> left;
+    std::vector<gf::Vector2i> right;
+    std::vector<gf::Vector2i> top;
+    std::vector<gf::Vector2i> bottom;
 
     for (const auto& h : holes) {
         if (h.x == 0)
@@ -635,15 +634,15 @@ void Board::linkHoles() {
 }
 
 
-Position Board::getLinkedHole(unsigned int x, unsigned int y) const {
-    Position p(x, y);
+gf::Vector2i Board::getLinkedHole(unsigned int x, unsigned int y) const {
+    gf::Vector2i p(x, y);
     auto it = holeLinks.find(p);
     if (it != holeLinks.end()) return it->second;
     return p;
 }
 
 PacGommeType Board::getPacGommeType(int x, int y) const {
-    Position pos(x, y);
+    gf::Vector2i pos(x, y);
     auto it = pacgommes.find(pos);
     if (it != pacgommes.end()) {
         return it->second;
