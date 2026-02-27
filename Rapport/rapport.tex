@@ -1,4 +1,4 @@
-\documentclass[a4paper, 11pt]{report}
+\documentclass[a4paper, 11pt]{article}
 \usepackage[utf8]{inputenc}   % Pour lire les fichiers UTF-8
 \usepackage[T1]{fontenc}      % Pour une meilleure gestion des caractères accentués
 \usepackage{textcomp}         % Pour quelques symboles supplémentaires
@@ -18,7 +18,6 @@
 \usepackage{forest}
 \usepackage{listings}
 \usepackage{xcolor}
-\usepackage[section]{placeins}
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{fancybox}
@@ -28,6 +27,7 @@
 \usepackage{graphicx}
 \usepackage{adjustbox}
 \usepackage{float}
+\usepackage[section]{placeins} % OK
 
 
 \usepackage{csquotes}
@@ -93,32 +93,29 @@
     
 
 
-\chapter*{Remerciements}
-\addcontentsline{toc}{chapter}{Remerciements}
+\section*{Remerciements}
+\addcontentsline{toc}{section}{Remerciements}
+\newpage
 
 
 \tableofcontents
 \listoffigures
+\newpage
 
-\chapter*{Introduction}
-\addcontentsline{toc}{chapter}{Introduction}
+
+
+\section*{Introduction}
+\addcontentsline{toc}{section}{Introduction}
 
 
 
 \vfill
 
 
-\chapter{Présentation du projet}
+\section{Présentation du projet}
 
-\section{Contexte académique}
 
-Ce projet a été réalisé dans le cadre du semestre six de la licence informatique de l’Université Marie \& Louis Pasteur. Il s’inscrit dans un enseignement visant à mettre en pratique nos connaissances à travers la réalisation d’un gros projet à plusieurs.
-
-Le travail a été mené en groupe de trois étudiants de mi-octobre à la fin du mois de mars, sous l’encadrement de Julien Bernard, maître de conférences à l’Université Marie \& Louis Pasteur. Le projet porte sur le développement d’un jeu vidéo en réseau.
-
-Les objectifs de ce projet sont de consolider nos compétences en programmation C++, approfondir la découverte du développement de jeux vidéo, ainsi qu’à mettre en place une architecture réseau client–serveur. Le projet permet également de développer des compétences telles que le travail en équipe et la gestion d’un projet informatique sur une longue période.
-
-\section{Présentation générale du jeu \texttt{Pac-Man}}
+\subsection{Présentation générale du jeu \texttt{Pac-Man}}
 
 Le jeu \texttt{Pac-Man}, apparu au début des années 1980, est un jeu d’arcade dans lequel le joueur contrôle un personnage évoluant dans un labyrinthe. L’objectif principal est de parcourir l’ensemble du labyrinthe afin de consommer toutes les \texttt{pac-gommes} qui s’y trouvent, tout en évitant d’entrer en contact avec des fantômes. Ces derniers constituent les adversaires du joueur et cherchent à bloquer ou intercepter ses déplacements. Certaines \texttt{pac-gommes} spéciales permettent temporairement à \texttt{Pac-Man} d’inverser les rôles en devenant capable de manger les fantômes, ajoutant ainsi une dimension stratégique au gameplay.
 
@@ -133,7 +130,16 @@ Dans le cadre de ce projet, le jeu a été adapté pour le multijoueur. Une part
 
 Le choix de \texttt{Pac-Man} comme sujet pour une version en réseau est stratégique car ses règles simples et très connues, ce qui permet une facilité d'implémentation par rapport a d'autre jeux. De plus, le gameplay se prête à une séparation des rôles entre plusieurs joueurs.
 
-\section{Objectifs généraux du projet}
+\subsection{Contexte académique}
+
+Ce projet a été réalisé dans le cadre du semestre six de la licence informatique de l’Université Marie \& Louis Pasteur. Il s’inscrit dans un enseignement visant à mettre en pratique nos connaissances à travers la réalisation d’un gros projet à plusieurs.
+
+Le travail a été mené en groupe de trois étudiants de mi-octobre à la fin du mois de mars, sous l’encadrement de Julien Bernard, maître de conférences à l’Université Marie \& Louis Pasteur. Le projet porte sur le développement d’un jeu vidéo en réseau.
+
+Les objectifs de ce projet sont de consolider nos compétences en programmation C++, approfondir la découverte du développement de jeux vidéo, ainsi qu’à mettre en place une architecture réseau client–serveur. Le projet permet également de développer des compétences telles que le travail en équipe et la gestion d’un projet informatique sur une longue période.
+
+
+\subsection{Objectifs généraux du projet}
 
 Les objectifs du projet peuvent être divisés en deux catégories : 
 \begin{itemize}
@@ -146,17 +152,20 @@ Du point de vue fonctionnel, l’objectif était de concevoir un jeu Pac-Man jou
 
 Sur le plan technique, le projet visait à mettre en place une architecture réseau client–serveur. Le serveur devait être capable de gérer les connexions des joueurs, la création et la gestion des parties, ainsi que l’échange des données nécessaires au jeu.
 
-\chapter{Définition du sujet et problématique}
+\newpage
 
-\section{Problématique du jeu en réseau}
 
-La conception d’un jeu multijoueur en temps réel implique plusieurs contraintes. La difficultée majeur concerne la synchronisation des états du jeu entre les clients. Chaque joueur doit avoir une vision cohérente de l’ensemble de la partie (les positions de Pac-Man, des fantômes et l’état des pac-gommes, ect). Pour garantir cette cohérence, nous avons opté pour un serveur autoritaire : toutes les décisions sont validées côté serveur, qui diffuse ensuite les informations à tous les clients. Qui, de leur côté, envoient uniquement leurs intentions de déplacement, qui sont ensuite traitées et synchronisées par le serveur. Les données transitent via des buffers et des queues avant d’être appliquées. Cela permet un traitement ordonné des événements du jeu.
+\section{Définition du sujet et problématique}
 
-\section{Choix techniques}
+\subsection{Problématique du jeu en réseau}
 
-Le projet a été développé en C++ en utilisant la bibliothèque \textit{Gamedev Framework} (gf), qui est adaptée au développement de jeux vidéo et est compatible avec l’architecture réseau. La communication réseau repose sur le protocole TCP, assurant la sûreté des échanges entre le serveur et les clients. Les messages sont sérialisés afin de structurer les informations transmises.
+La conception d’un jeu multijoueur en temps réel implique plusieurs contraintes. La difficultée majeur concerne la synchronisation des états du jeu entre les clients. Chaque joueur doit avoir une vision cohérente de l’ensemble de la partie (les positions de Pac-Man, des fantômes et l’état des pac-gommes, ect). Pour garantir cette cohérence, nous avons opté pour un serveur autoritaire : toutes les décisions sont validées côté serveur, qui diffuse ensuite les informations à tous les clients. Qui, de leur côté, envoient uniquement leurs intentions de déplacement, qui sont ensuite traitées et synchronisées par le serveur. Les données transitent via des buffers et des files avant d’être appliquées. Cela permet un traitement ordonné des événements du jeu.
 
-Le serveur a été conçu selon un modèle multithread ou chaine de responsabilitée, reflétant la logique de fonctionnement du jeu : un thread\footnote{Un thread (fil d’exécution) est une unité d’exécution légère au sein d’un processus. Dans une architecture client-serveur, il permet par exemple de gérer plusieurs connexions ou tâches simultanément (réception réseau, logique de jeu, envoi des mises à jour) tout en partageant la même mémoire.} principal gère le serveur et le lobby, tandis que d’autres threads s’occupent des rooms, de la boucle de jeu, des fantômes contrôlés par l’IA et de la communication avec les clients. Cette architecture permet de traiter simultanément plusieurs interactions des joueurs et d’assurer une exécution fluide et cohérente des parties.
+\subsection{Choix techniques}
+
+Le projet devait être développé en C++ en utilisant la bibliothèque \textit{Gamedev Framework} (gf), qui est adaptée au développement de jeux vidéo et est compatible avec l’architecture réseau. La communication réseau repose sur le protocole TCP, assurant la sûreté des échanges entre le serveur et les clients. Les messages sont sérialisés afin de structurer les informations transmises.
+
+Nous avons par contre choisi de concevoir le serveur selon un modèle multithread avec une chaine de responsabilitée pour gérer les packets, reflétant la logique de fonctionnement du jeu : un thread\footnote{Un thread (fil d’exécution) est une unité d’exécution légère au sein d’un processus. Dans une architecture client-serveur, il permet par exemple de gérer plusieurs connexions ou tâches simultanément (réception réseau, logique de jeu, envoi des mises à jour) tout en partageant la même mémoire.} principal gère le serveur et le lobby, tandis que d’autres threads s’occupent des rooms, de la boucle de jeu, des fantômes contrôlés par l’IA et de la communication avec les clients. Cette architecture permet de traiter simultanément plusieurs interactions des joueurs et d’assurer une exécution fluide et cohérente des parties.
 
 \begin{figure}[H]
     \centering
@@ -164,7 +173,7 @@ Le serveur a été conçu selon un modèle multithread ou chaine de responsabili
     \caption{Exemple de Chaine de responsabilité}
 \end{figure}
 
-\section{Répartition des rôles}
+\subsection{Répartition des rôles}
 
 La réalisation de ce projet a été organisée de manière collaborative entre les trois membres du groupe. 
 
@@ -175,25 +184,26 @@ Auriane Peter s’est concentrée sur le développement du client, en implément
 Benoît Litampha a assuré la communication entre le serveur et le client, participant également à certaines tâches sur le serveur et le client lorsque nécessaire. 
 
 Cette répartition a permis une progression simultanée sur plusieurs fronts du projet, tout en gardant une cohérence globale de l’application.
+\newpage
 
-%\chapter{L'Organisation du stage}
+%\section{L'Organisation du stage}
 
 
-\chapter{Architecture et conception}
+\section{Architecture et conception}
 
-\section{conception du jeu}
+\subsection{conception du jeu}
 
 Les règles du jeu ont été définies afin de mettre en place un équilibre entre tension et stratégie.
 Chaque camp dispose d’objectifs et contraintes différents, créant une structure de compétition.
 
-\subsection{Conditions de victoire}
+\subsubsection{Conditions de victoire}
 
 Pac-Man gagne la partie s’il parvient à manger tout les pac-gommes du plateau ou s’il survit jusqu’à la fin du timer. 
 Les fantômes, eux, gagnent en épuisant toutes les vies de Pac-Man avant la fin du temps imparti.
 
 Ce double système de victoire met une pression permanente : Pac-Man doit optimiser ses déplacements, tandis que les fantômes doivent coordonner leurs actions pour limiter ses déplacements.
 
-\subsection{Pac-gommes spéciales}
+\subsubsection{Pac-gommes spéciales}
 
 Certaines pac-gommes déclenchent un mode temporaire appelé « chasseur ».
 Durant cette période, Pac-Man devient capable de manger les fantômes.
@@ -202,21 +212,21 @@ Les fantômes éliminés réapparaissent mais ont aussi des vies, maintenant ain
 
 Ce mécanisme introduit un changement brutale du gameplay, les chasseurs deviennent les chassés et inversement.
 
-\subsection{Asymétrie de vision}
+\subsubsection{Asymétrie de vision}
 
 Le système repose également sur une différence de vision.
 Pac-Man a une vue globale du plateau, tandis que les fantômes ne voient uniquement environnement limités, ils ne peuvent voir qu'a une certaines distance d'eux même, la vison des fantomes n'est pas partagée entre eux.
 
-\subsection{Cohérence du système}
+\subsubsection{Cohérence du système}
 
 La combinaison de ces règles avec la génération procédurale du plateau et l’architecture hybride de l’intelligence artificielle et des joueurs, produit un gameplay varié et imprévisible.
 Les interactions entre le timer, le manque de vision et inversement temporaire des rôles permettent de nombreuse stratégies et augmentent la rejouabilité du jeu.
 
 
 
-\section{Structure du serveur}
+\subsection{Structure du serveur}
 
-\subsection{Architecture multithread}
+\subsubsection{Architecture multithread}
 
 Le serveur repose sur une architecture multithread\footnote{Un programme multithread exécute plusieurs fils d'exécution (threads) en parallèle au sein d’un même processus.} conçue pour supporter plusieurs connexions simultanées sans dégradation des performances. 
 La couche réseau est strictement séparée de la logique de jeu afin d’éviter qu’une opération bloquante, attente de paquet\footnote{Un paquet réseau est une unité de données formatée et structurée, transmise à travers un réseau. Il contient généralement une en-tête (header) avec des informations de routage et de contrôle, ainsi qu’une charge utile (payload) correspondant aux données transportées.}, latence élevée ou déconnexion, n’impacte l’exécution globale du système.
@@ -236,7 +246,7 @@ Cette architecture permet l’exécution simultanée de plusieurs parties indép
     \caption{Chaîne de responsabilité côté serveur}
 \end{figure}
 
-\subsection{Architecture modulaire}
+\subsubsection{Architecture modulaire}
 
 L’architecture du serveur est organisée en plusieurs couches distinctes possédant chacune une responsabilité. 
 Cette structuration modulaire garantit lisibilité, extensibilité et maintenabilité.
@@ -263,7 +273,7 @@ Chaque couche délègue les traitements spécialisés au niveau inférieur, ce q
 
 \end{figure}
 
-\subsection{Structure du plateau}
+\subsubsection{Structure du plateau}
 
 Le plateau est modélisé sous forme d’une grille en deux dimensions, composée de cases murales et de cases traversables. 
 Cette représentation constitue la base logique du système.
@@ -273,7 +283,7 @@ La cohérence entre la logique côté serveur et l’affichage côté client off
 
 Le plateau constitue une structure centrale sur laquelle reposent la génération procédurale du labyrinthe et les mécanismes décisionnels des fantômes.
 
-\subsection{Boucle de jeu}
+\subsubsection{Boucle de jeu}
 
 La boucle de jeu constitue le cœur du serveur et repose sur un modèle à mise à jour périodique, appelé \textit{tick serveur}. 
 Contrairement à une architecture purement événementielle, l’état du monde est recalculé à intervalle régulier selon une fréquence fixe. 
@@ -304,7 +314,7 @@ L’intégralité de ces calculs étant effectuée côté serveur, toute tentati
 Ces derniers ne réalisent aucun calcul logique : ils se contentent d’afficher l’état reçu. 
 Cette architecture s’inscrit dans le modèle de serveur autoritaire défini précédemment.
 
-\subsection{Plateau et génération procédurale}
+\subsubsection{Plateau et génération procédurale}
 
 Le plateau repose sur une génération procédurale de labyrinthe fondée sur une variante de l’algorithme de Prim. 
 Ce choix permet de produire automatiquement des cartes connexes avec une forte variabilité entre les parties.
@@ -362,7 +372,7 @@ Des portails latéraux sont également intégrés sur les bords du plateau, ce q
 Le plateau est une structure centrale du système : il sert de support aux collisions, au placement des pac-gommes, ainsi qu’aux algorithmes de poursuite des fantômes. 
 La génération procédurale contribue à la rejouabilité et à la diversité stratégique des parties.
 
-\subsection{Intelligence artificielle des fantômes}
+\subsubsection{Intelligence artificielle des fantômes}
 
 L’intelligence artificielle des fantômes repose sur une architecture hybride qui mélange pathfinding classique, système d’influence local et prise de décision hiérarchique. 
 L’objectif n’est pas uniquement de poursuivre efficacement Pac-Man, mais de produire une intelligences artificielle adaptable et collective.
@@ -374,12 +384,6 @@ L’objectif n’est pas uniquement de poursuivre efficacement Pac-Man, mais de 
 Lorsque Pac-Man est en mode chasseur, la priorité absolue devient la fuite stratégique vers la hut. 
 Le plus court chemin est alors calculé à l’aide d’un algorithme de Breadth First Search (BFS), garantissant une trajectoire optimale dans un graphe non pondéré.
 Ce choix permet la compatibilité avec les labyrinthes générés procéduralement.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.8\textwidth]{images/code_bfs.png}
-    \caption{fonction implémentant BFS}
-\end{figure}
 
 En situation normale, si Pac-Man est détecté dans un rayon de vision défini, le fantôme active un mode de poursuite. 
 Un BFS à profondeur limitée est exécuté afin de simuler une perception réduite de l’environnement. 
@@ -399,6 +403,7 @@ Les traces laissées par Pac-Man génèrent une force attractive, tandis que la 
 Le fantôme sélectionne localement la case voisine maximisant ce score selon une approche gloutonne.
 
 Ce mécanisme s’inspire des modèles de colonies de fourmis, où l’information est distribuée dans l’environnement. Cela permet de faire une forme d'intelligence collectives peu couteuse.
+Ce qui ma donner l'idée d'appliqué ce système et une video sur Youtube : "J'ai codé une simulation de 869 fourmis", de Code Boy%\cite{fourmis}
 
 \paragraph{Comportement émergent}
 
@@ -418,7 +423,7 @@ Un bruit aléatoire est également introduit afin d’éviter les cycles déterm
     \caption*{Rouge pour PacMan et Bleu pour les fantômes}
 \end{figure}
 
-\subsection{Rooms : gestion des parties}
+\subsubsection{Rooms : gestion des parties}
 
 Afin de supporter plusieurs parties simultanées, le serveur repose sur un système de \textit{rooms}. 
 Une room représente une instance autonome de jeu possédant son propre état, ses propres joueurs et son propre cycle d’exécution. 
@@ -457,12 +462,12 @@ Cette capacité de configuration facilite les phases de test, l’équilibrage d
 
 
 
-\section{Structure du client}
+\subsection{Structure du client}
 
 Affichage, gestion des entrées utilisateur,
 réception et traitement des messages réseau.
 
-\section{Protocoles et échanges réseau}
+\subsection{Protocoles et échanges réseau}
 
 Description des trames, types de messages,
 gestion des événements (connexion, mouvement, fin de partie).
@@ -487,14 +492,15 @@ Exemple illustré avec ServerListRoomPlayers
 Pour chaque modification on retransmet toutes les données
 
 
-%\section{L'application}
+%\subsection{L'application}
 
-%\section{La gestion des tickets}
+%\subsection{La gestion des tickets}
+\newpage
 
 
-\chapter{Bilan et perspectives}
+\section{Bilan et perspectives}
 
-\section{Compétences acquises}
+\subsection{Compétences acquises}
 
 La réalisation de ce projet nous a permis de mobiliser et d’approfondir plusieurs compétences acquises au cours de notre formation.
 
@@ -504,14 +510,14 @@ Le projet a également renforcé nos compétences en architecture logicielle. La
 
 Enfin, le travail de conception globale du système, la génération procédurale du plateau, l'implémentation d’une intelligence artificielle, la définition des règles de synchronisation, nous a permis de développer une approche méthodique dans l’analyse des besoins, la modélisation et la résolution de problèmes complexes.
 
-\section{Résultat final}
+\subsection{Résultat final}
 
 Le projet aboutit à un jeu multijoueur fonctionnel capable de gérer plusieurs connexions simultanées. Les principales fonctionnalités prévues ont été implémentées : gestion des lobbies et des parties, synchronisation en temps réel des joueurs, génération procédurale du labyrinthe, ainsi qu’un système d’intelligence artificielle pour les entités ennemies.
 
 La cohérence du jeu est assurée par les mise à jour périodique côté serveur, ce qui garantit que les états partagés aux clients sont bien valide. Les collision, le déplacement et
 les interactions ont été validés et intégrés de manière stable.
 
-\section{Améliorations possibles}
+\subsection{Améliorations possibles}
 
 Plusieurs axes d’évolution peuvent être envisagés pour enrichir le gameplay et la rejouabilité.
 
@@ -523,8 +529,11 @@ De plus, Pac-Man pourrait accomplir des missions ou tâches déclenchant des ale
 
 
 % Page de conclusion 
-\chapter*{Conclusion}
-\addcontentsline{toc}{chapter}{Conclusion}
+\newpage
+
+
+\section*{Conclusion}
+\addcontentsline{toc}{section}{Conclusion}
 
 Ce projet a permis de mettre en pratique les connaissances acquises durant notre formation, notamment en développement réseau, de la programmation multithread et de la conception logicielle et objet.
 
@@ -537,17 +546,36 @@ Ainsi, ce projet constitue à la fois un aboutissement des compétences acquises
 
 
 % Page de conclusion 
-\chapter*{Sitographie}
-\addcontentsline{toc}{chapter}{Sitographie} % Ajout de la sitographie sur la table des matières sans ètre numéroté
+\newpage
 
+\section*{Sitographie}
+\addcontentsline{toc}{section}{Sitographie} % Ajout de la sitographie sur la table des matières sans ètre numéroté
+
+\begin{thebibliography}{9}
+
+\bibitem{gf}
+Gamedev Framework (gf) 1.2.0,
+\url{https://gamedevframework.github.io/v1.2.0/},
+consulté le 26 février 2026.
+
+\bibitem{fourmis}
+Youtube,
+J'ai codé une simulation de 869 fourmis,
+de Code Boy,
+\url{https://youtu.be/M9ydYnN9_uc?si=7sbFe6XdOyjvBXNl},
+consulté le 26 février 2026.
+
+
+
+\end{thebibliography}
 
 % Page de résumé
 \newpage
 \begin{center}
     \vspace*{\fill} % Espace vertical
-    \section*{Résumé}
+    \subsection*{Résumé}
     \addcontentsline
-    {toc}{chapter}{Résumé}
+    {toc}{section}{Résumé}
     \begin{justify}
 
         Le projet de la Licence 3 Informatique a été pour nous l’occasion de concevoir et développer un jeu multijoueur inspiré de Pac-Man, en mettant l’accent sur les problématiques de synchronisation réseau, de génération procédurale et d’intelligence artificielle.
@@ -561,17 +589,17 @@ Ainsi, ce projet constitue à la fois un aboutissement des compétences acquises
     \end{justify}
     \vspace*{\fill} % Espace vertical
 
-    \section*{Mots-clés}
+    \subsection*{Mots-clés}
     \addcontentsline
-    {toc}{chapter}{Mots-Clés}
+    {toc}{section}{Mots-Clés}
     \begin{center}
      C++ - PacMan - Gamedev Framework - Réseau - IA
     \end{center}
     \vspace*{\fill} % Espace vertical
 
-    \section*{Abstract}
+    \subsection*{Abstract}
     \addcontentsline
-    {toc}{chapter}{Abstract}
+    {toc}{section}{Abstract}
     \begin{justify}
 The third-year Computer Science project provided us with the opportunity to design and develop a multiplayer game inspired by Pac-Man, with a particular focus on network synchronization, procedural generation, and artificial intelligence.
 
@@ -583,9 +611,9 @@ The development was carried out primarily in C++ using the Gamedev framework, al
     \end{justify}
     \vspace*{\fill} % Espace vertical
 
-    \section*{Key-Words}
+    \subsection*{Key-Words}
     \addcontentsline
-    {toc}{chapter}{Key-Words}
+    {toc}{section}{Key-Words}
     \begin{center}
     C++ - PacMan - Gamedev Framework - Network - AI
     \end{center}
