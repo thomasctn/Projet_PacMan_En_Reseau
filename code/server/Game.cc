@@ -126,6 +126,8 @@ bool Game::requestMove(uint32_t playerId, Direction dir)
     // =====================================================
     // Collision JOUEURS (symétrique)
     // =====================================================
+    bool pacmanDiedThisFrame = false;
+
     for (auto& [otherId, otherPtr] : players)
     {
         if (otherId == playerId)
@@ -141,42 +143,43 @@ bool Game::requestMove(uint32_t playerId, Direction dir)
 
         if (otherX == gridX && otherY == gridY)
         {
-            // Appel des deux côtés (IMPORTANT)
             p.eat(std::nullopt, &other);
             other.eat(std::nullopt, &p);
 
-            // --- Gestion mort other ---
+            // --- Détection des morts ---
             if (other.hasJustDied())
             {
-                if (other.isAlive())
+                if (other.getRole() == PlayerRole::PacMan)
+                    pacmanDiedThisFrame = true;
+
+                if (!other.isAlive())
                 {
-                    spawnPlayer(other);
-                }
-                else
-                {
-                    other.setPos({0.f,0.f});
                     gf::Log::info("Player %d est définitivement mort\n", other.getId());
+                    other.setPos({0.f, 0.f});
                 }
 
                 other.clearDeathFlag();
             }
 
-            // --- Gestion mort p ---
             if (p.hasJustDied())
             {
-                if (p.isAlive())
+                if (p.getRole() == PlayerRole::PacMan)
+                    pacmanDiedThisFrame = true;
+
+                if (!p.isAlive())
                 {
-                    spawnPlayer(p);
-                }
-                else
-                {
-                    p.setPos({0.f,0.f});
                     gf::Log::info("Player %d est définitivement mort\n", p.getId());
+                    p.setPos({0.f, 0.f});
                 }
 
                 p.clearDeathFlag();
             }
         }
+    }
+
+    if (pacmanDiedThisFrame)
+    {
+        resetRound();
     }
     
 
@@ -460,5 +463,20 @@ void Game::updateMovement(double dt) {
         requestMove(id, p.getBufferedDir());
 
         p.setMoveRequest(false);
+    }
+}
+
+void Game::resetRound()
+{
+    gf::Log::info("Un PacMan est mort → Reset de la manche\n");
+
+    for (auto& [id, playerPtr] : players)
+    {
+        Player& p = *playerPtr;
+
+        if (!p.isAlive())
+            continue;
+
+        spawnPlayer(p);
     }
 }

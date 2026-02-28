@@ -80,6 +80,8 @@ public:
 
     bool isAllPacmanDead();
     bool isAllGhostDead();
+    void resetRound();
+
 
 
 private:
