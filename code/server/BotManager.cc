@@ -90,6 +90,9 @@ const GraphTraceMap& BotManager::getTraces() const {
 
 // ---------------- Update ----------------
 void BotManager::update(double dt) {
+    if (!game.isGameStarted()){
+        return;
+    }
     for (auto& [botId, bot] : bots) {
         Player& p = game.getPlayerInfo(botId);
 
