@@ -47,7 +47,6 @@ public:
     void setMoveRate(double newVal) {moveRate = newVal;}
     void setJustDied(bool d) {justDied = d;}
     void setOnPowerModeEvent(std::function<void(Player&, const std::string&, int)> event) {onPowerModeEvent = event;}
-
     Player(const Player&) = delete;
     Player(Player&&) = default;
 

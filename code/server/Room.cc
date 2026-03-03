@@ -165,7 +165,13 @@ void Room::startGame() {
             game->addPlayer(playerId, 100.0f, 100.0f, role);
 
             Player& p = game->getPlayerInfo(playerId);
-
+            // --- Initialisation des HP selon le rôle ---
+            if (p.getRole() == PlayerRole::PacMan) {
+                p.setHP(settings.nbLifePacman);
+            } 
+            else if (p.getRole() == PlayerRole::Ghost) {
+                p.setHP(settings.nbLifeGhost);
+}
             // --- Attacher le callback pour le mode chasseur ---
             if (p.getRole() == PlayerRole::PacMan) {
                 p.setOnPowerModeEvent([this](Player& player, const std::string& event, int secondsLeft) {
@@ -212,7 +218,7 @@ void Room::startGame() {
         // Ajouter le joueur bot dans le Game
         game->addPlayer(botId, 0.f, 0.f, PlayerRole::Ghost);
         Player& bot = game->getPlayerInfo(botId);
-
+        bot.setHP(settings.nbLifeGhost);
         bot.setBot(true); // important
 
         // Créer le BotController et l'enregistrer dans BotManager
@@ -605,11 +611,13 @@ void Room::setSettings(const RoomSettings& newSettings){
     settings.nbLifeGhost = newSettings.nbLifeGhost;
 
     gf::Log::info(
-        "[Room %u] Règles mises à jour : roomSize=%u nbBot=%u duration=%u\n",
+        "[Room %u] Règles mises à jour : roomSize=%u nbBot=%u duration=%u nbLifePacman=%u nbLifeGhost=%u\n",
         id,
         settings.roomSize,
         settings.nbBot,
-        settings.gameDuration
+        settings.gameDuration,
+        settings.nbLifePacman,
+        settings.nbLifeGhost
     );
 
     // Broadcast à tous les clients
