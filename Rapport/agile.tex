@@ -120,7 +120,7 @@ Le premier sprint a constitué une étape pour poser une nouvelle base. il visai
 
 Le prototype initial se limitait à une connexion simple avec échanges de messages basiques, sans gestion multi-parties ni organisation modulaire. La principale difficulté a donc été de refondre cette base sans introduire de régressions. Le serveur a été restructuré autour de modules distincts : gestion des connexions, lobby, rooms, instances de jeu et boucle principale. Cette séparation des responsabilités a clarifié la logique métier et limité le couplage interne.
 
-L’introduction du lobby a nécessité une réorganisation des états serveur (connecté, lobby, en partie) et l’isolation complète des instances de jeu, chaque room disposant de sa propre boucle et de son propre état. La boucle serveur, cœur de l’architecture autoritaire, centralisait les décisions logiques et la synchronisation. Malgré des difficultés liées aux transitions d’états et à la synchronisation lors de créations simultanées de rooms, les itérations successives ont permis de stabiliser l’ensemble. À la fin du sprint, l’architecture était modulaire, le lobby fonctionnel et les bases techniques solidement établies pour la suite du développement.
+L’introduction du lobby a nécessité une réorganisation des états serveur (connecté, lobby, en partie) et l’isolation complète des instances de jeu, chaque room disposant de sa propre boucle et de son propre état. La boucle serveur, c\oe ur de l’architecture autoritaire, centralisait les décisions logiques et la synchronisation. Malgré des difficultés liées aux transitions d’états et à la synchronisation lors de créations simultanées de rooms, les itérations successives ont permis de stabiliser l’ensemble. À la fin du sprint, l’architecture était modulaire, le lobby fonctionnel et les bases techniques solidement établies pour la suite du développement.
 
 \section{Sprint 2 : Développement du client et intégration des bots}
 
@@ -180,6 +180,6 @@ Au-delà des résultats techniques obtenus, ce projet a permis de développer un
 
 L’expérience acquise constitue un socle solide pour aborder des développements futurs, qu’il s’agisse de projets académiques plus avancés ou d’applications professionnelles impliquant des architectures distribuées et des contraintes de robustesse élevées.
 
-En définitive, ce projet illustre l’importance d’une architecture bien pensée, d’une organisation méthodique et d’une capacité d’adaptation constante dans la réussite d’un développement logiciel complexe.
+Pour finir, ce projet illustre l’importance d’une architecture pensée, d’une organisation clair et d’une grande capacité d’adaptation dans la réussite d’un développement logiciel.
 
 \end{document}
