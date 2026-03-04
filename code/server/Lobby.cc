@@ -140,7 +140,7 @@ void Lobby::handleClientLeaveRoom(PacketContext &ctx)
             gf::Log::info("[Lobby] Joueur %u retiré de la room %u\n", ctx.senderId, roomId);
         }
         if (roomIt->second->players.empty() && roomId != defaultRoom) {
-            rooms.erase(roomId);
+            destroyRoom(roomId);
         }
         broadcastRoomsList();
     }
