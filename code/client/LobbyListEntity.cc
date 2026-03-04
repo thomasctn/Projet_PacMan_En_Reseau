@@ -8,14 +8,10 @@
 #include <gf/Log.h>
 
 LobbyListEntity::LobbyListEntity()
-: m_font("../common/fonts/arial.ttf")
-, m_createWidget("Créer une room", m_font)
-, m_lastAction(LobbyListAction::None)
-, m_lastRoomId(0)
+    : m_font("../common/fonts/arial.ttf"), m_createWidget("Créer une room", m_font), m_lastAction(LobbyListAction::None), m_lastRoomId(0)
 {
-    m_createWidget.setCallback([this]() {
-        m_lastAction = LobbyListAction::CreateRoom;
-    });
+    m_createWidget.setCallback([this]()
+                               { m_lastAction = LobbyListAction::CreateRoom; });
 
     m_container.addWidget(m_createWidget);
 
@@ -23,9 +19,9 @@ LobbyListEntity::LobbyListEntity()
     m_createWidget.setAnchor(gf::Anchor::Center);
 }
 
-void LobbyListEntity::setRooms(const std::vector<RoomData>& rooms) {
+void LobbyListEntity::setRooms(const std::vector<RoomData> &rooms)
+{
     m_rooms = rooms;
-
     while (m_joinWidgets.size() < m_rooms.size()) {
         auto ptr = std::make_unique<gf::TextButtonWidget>("Joindre", m_font);
         ptr->setCharacterSize(18);
@@ -45,28 +41,30 @@ void LobbyListEntity::setRooms(const std::vector<RoomData>& rooms) {
     }
 }
 
-void LobbyListEntity::pointTo(gf::Vector2f position) {
+void LobbyListEntity::pointTo(gf::Vector2f position)
+{
     m_container.pointTo(position);
 }
 
-void LobbyListEntity::triggerAction() {
+void LobbyListEntity::triggerAction()
+{
     m_container.triggerAction();
 }
 
-LobbyListAction LobbyListEntity::getAndResetLastAction() {
+LobbyListAction LobbyListEntity::getAndResetLastAction()
+{
     LobbyListAction a = m_lastAction;
     m_lastAction = LobbyListAction::None;
     return a;
 }
 
-unsigned int LobbyListEntity::getLastRoomId() const {
+unsigned int LobbyListEntity::getLastRoomId() const
+{
     return m_lastRoomId;
 }
 
-void LobbyListEntity::render(gf::RenderTarget& target, const gf::RenderStates& states) {
-    const float LOGICAL_W = 1280.f;
-    const float LOGICAL_H = 720.f;
-
+void LobbyListEntity::render(gf::RenderTarget &target, const gf::RenderStates &states)
+{
     float margin = 16.f;
     float y = margin;
 
@@ -77,7 +75,7 @@ void LobbyListEntity::render(gf::RenderTarget& target, const gf::RenderStates& s
 
     m_createWidget.setCharacterSize(26);
     m_createWidget.setAnchor(gf::Anchor::Center);
-    m_createWidget.setPosition({ bx + bw * 0.5f, by + bh * 0.5f });
+    m_createWidget.setPosition({bx + bw * 0.5f, by + bh * 0.5f});
 
     m_createWidget.setDefaultTextColor(gf::Color::White);
     m_createWidget.setSelectedTextColor(gf::Color::Black);
@@ -96,53 +94,54 @@ void LobbyListEntity::render(gf::RenderTarget& target, const gf::RenderStates& s
     header.setCharacterSize(18);
     header.setColor(gf::Color::White);
     header.setString("Rooms disponibles :");
-    header.setPosition({ margin, y });
+    header.setPosition({margin, y});
     target.draw(header, states);
+    y += 8;
 
-    y += 28.f;
+    for (size_t i = 0; i < m_rooms.size(); i++)
+    {
+        gf::Vector2f rowPos(margin, y + (LOGICAL_ROW_HEIGHT + LOGICAL_ROW_SPACING) * i);
+        renderRoomRow(target, states, rowPos, m_rooms[i],i);
+    }
+}
 
-    float rowH = std::max(28.f, bh * 0.8f);
+void LobbyListEntity::renderRoomRow(gf::RenderTarget &target, const gf::RenderStates &states, gf::Vector2f position, RoomData &data, size_t i)
+{
+    float margin = 24.f;
     float btnW = LOGICAL_W * 0.2f;
 
-    for (size_t i = 0; i < m_rooms.size(); ++i) {
-        const RoomData& rd = m_rooms[i];
+    gf::RoundedRectangleShape rowBg({LOGICAL_W - margin * 2.f, LOGICAL_ROW_HEIGHT},8.f);
+    rowBg.setPosition(position);
+    rowBg.setOutlineThickness(1.f);
+    rowBg.setOutlineColor(gf::Color::Blue);
+    rowBg.setColor(gf::Color::Black);
+    target.draw(rowBg, states);
 
-        float rowX = margin;
-        float rowY = y + float(i) * (rowH + 8.f);
+    gf::Text roomText;
+    roomText.setFont(m_font);
+    roomText.setCharacterSize(16);
+    roomText.setColor(gf::Color::White);
+    roomText.setString(data.hostName + " (" + std::to_string(data.nbPlayer) + " / " + std::to_string(data.roomSize) + ")");
+    roomText.setPosition({position.x + 8.f, position.y + (LOGICAL_ROW_HEIGHT / 2)});
+    target.draw(roomText, states);
 
-        gf::RectangleShape rowBg({ LOGICAL_W - margin * 2.f, rowH });
-        rowBg.setPosition({ rowX, rowY });
-        rowBg.setColor((i % 2 == 0) ? gf::Color::fromRgb(30,30,30) : gf::Color::fromRgb(45,45,45));
-        target.draw(rowBg, states);
+    auto &w = *m_joinWidgets[i];
 
-        gf::Text roomText;
-        roomText.setFont(m_font);
-        roomText.setCharacterSize(16);
-        roomText.setColor(gf::Color::Black);
-        roomText.setString(rd.hostName + " (" + std::to_string(rd.nbPlayer) + " / " + std::to_string(rd.roomSize) + ")");
-        roomText.setPosition({ rowX + 8.f, rowY + rowH * 0.175f });
-        target.draw(roomText, states);
+    float joinX = position.x + rowBg.getSize().x * 0.8;
+    float joinY = position.y + (LOGICAL_ROW_HEIGHT * 0.2f) * 0.5f;
 
-        if (i < m_joinWidgets.size()) {
-            auto& w = *m_joinWidgets[i];
+    w.setCharacterSize(16);
+    w.setAnchor(gf::Anchor::Center);
+    w.setPosition({joinX + btnW * 0.5f, joinY + (LOGICAL_ROW_HEIGHT * 0.8f) * 0.5f});
 
-            float joinX = LOGICAL_W - margin - btnW;
-            float joinY = rowY + (rowH - rowH * 0.8f) * 0.5f;
+    w.setDefaultTextColor(gf::Color::White);
+    w.setSelectedTextColor(gf::Color::Black);
+    w.setDefaultBackgroundColor(gf::Color::Black);
+    w.setSelectedBackgroundColor(gf::Color::White);
+    w.setBackgroundOutlineThickness(2.f);
+    w.setDefaultBackgroundOutlineColor(gf::Color::White);
+    w.setSelectedBackgroundOutlineColor(gf::Color::White);
+    w.setPadding(16 * .4f);
 
-            w.setCharacterSize(16);
-            w.setAnchor(gf::Anchor::Center);
-            w.setPosition({ joinX + btnW * 0.5f, joinY + (rowH * 0.8f) * 0.5f });
-
-            w.setDefaultTextColor(gf::Color::White);
-            w.setSelectedTextColor(gf::Color::Black);
-            w.setDefaultBackgroundColor(gf::Color::Black);
-            w.setSelectedBackgroundColor(gf::Color::White);
-            w.setBackgroundOutlineThickness(16 * .05f);
-            w.setDefaultBackgroundOutlineColor(gf::Color::White);
-            w.setSelectedBackgroundOutlineColor(gf::Color::White);
-            w.setPadding(16 * .4f);
-
-            target.draw(w, states);
-        }
-    }
+    target.draw(w, states);
 }

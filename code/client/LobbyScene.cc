@@ -95,6 +95,7 @@ void LobbyScene::doUpdate(gf::Time)
         case ServerLeaveRoom::type:
             gf::Log::info("Serveur: quitté la room\n");
             m_game.requestScene(SceneRequest::GoToLobbyList);
+            m_game.lobbyListScene.resizeYourself();
             break;
 
         case ServerGameStart::type:

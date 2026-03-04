@@ -26,6 +26,7 @@ public:
     unsigned int getLastRoomId() const;
 
     void render(gf::RenderTarget& target, const gf::RenderStates& states) override;
+    void renderRoomRow(gf::RenderTarget& target, const gf::RenderStates& states,gf::Vector2f position, RoomData& data, size_t i);
 
 private:
     gf::Font m_font;
@@ -37,4 +38,8 @@ private:
 
     LobbyListAction m_lastAction;
     unsigned int m_lastRoomId;
+    const unsigned int LOGICAL_ROW_SPACING = 8u;
+    const float LOGICAL_W = 1280.f;
+    const float LOGICAL_H = 720.f;
+    const float LOGICAL_ROW_HEIGHT = LOGICAL_H * 0.064f;
 };
