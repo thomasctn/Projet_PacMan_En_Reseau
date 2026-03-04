@@ -467,29 +467,81 @@ Cette capacité de configuration facilite les phases de test, l’équilibrage d
 Affichage, gestion des entrées utilisateur,
 réception et traitement des messages réseau.
 
+\clearpage
 \subsection{Protocoles et échanges réseau}
+\paragraph{Type de connexion}
 
-Description des trames, types de messages,
-gestion des événements (connexion, mouvement, fin de partie).
+Les échanges de données entre le client et le serveur s'effectue via des socket, en utilisant les classes fournies par \textit{GamedevFramework}.
+
+\textit{GamedevFramework} offre le choix entre deux protocoles de transport :\\
+\begin{itemize}
+  \item Le \textbf{TCP} avec \textit{gf::TcpSocket} et \textit{gf::TcpListener}
+  \item Le \textbf{UDP} avec \textit{gf::UdpSocket}\\
+\end{itemize}
+
+Pour ce projet, le protocol \textbf{TCP} est choisi, car la vitesse qu'offre UDP n'est pas nécessaire pour un tel projet.
+
+Le serveur contient une socket de connexion \textbf{TCP} (\textit{gf::TcpListener}), initialisé en même temps que lui. Cette socket gère les connexions des clients dans un thread, en assosiant une socket de communication pour chaque client. Le client, de son coté, initialise directement une socket de communication, utilisée dans la boucle principale.
+
+\paragraph{Structure de données}
+Pour s'échanger les données, le serveur et le client utilise des structure \textit{communes} et des structure de \textit{communication}.\\
+
+\begin{itemize}
+
+\item Les structure \textit{communes} sont des structures contenant des données utilisé à la fois par le client et le serveur. Parmi eux, il y a, par exemple la structure PlayerData, contenant les informations relatives à un joueur (position, points de vie, etc...).
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{images/lc_pd.png}
+    \caption{Structure \textit{commune} \textit{PlayerData}}
+\end{figure}
 
 
-Utilisation de \href{https://gamedevframework.github.io/v1.2.0/classgf_1_1_tcp_socket.html}{gf::TCPSocket} et \href{https://gamedevframework.github.io/v1.2.0/classgf_1_1_tcp_listener.html}{gf::TcpListener}, permettant de faire une tramsmission de données fiable avec le protocol TCP
-Socket de connnexion + communication coté serveur, communication uniquement pour le client
-Un thread coté client et serveur pour empiler les packet reçu, puis dépilement dans la boucle de jeu pour être traité
+\item Les strucutes de \textit{communication} sont les structures sérialisé pour être envoyé, et reçu avant d'être désérialisé avec pour être utilisé. Ces structures contiennent la plupart du temps une ou plusieurs structures \textit{communes}, mais ils ont aussi un champs \textit{type} du type \textit{gf::Id}, afin d'être indentifié lors de la déserialisation.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{images/lc_slrp.png}
+    \caption{Structure de \textit{communication} \textit{ServerListRoomPlayers}}
+\end{figure}
+\end{itemize}
 
-Structures de données à la fois utilisé par le serveur et le client (BoardCommonn, PlayerData, RoomSettings, etc...), pas transmit tel quel mais utilisé par les strucutes de com
-Exemple illustré avec PlayerData
+Ces deux types de structures ont un opérateur | avec un type \textit{Archive} implémenté, afin de pouvoir être sérialisé et désérialisé automatiquement
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{images/lc_o_pd.png}
+    \caption{L'opérateur | pour la structure \textit{PlayerData}}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{images/lc_o_slpr.png}
+    \caption{L'opérateur | pour la structure \textit{ServerListRoomPlayers}}
+\end{figure}
 
-Structures de communication, contenant parfois ces strucutes communes. gf::Id, pour pouvoir les identifier lors de la déserialisation.
-Exemple avec ServerListRoomPlayers
+\paragraph{Sérialisation et désérialisation}
 
-Surchage de l'opétaeur | avec la classe Archive pour les 2 types de structures, nécessaire pour la sérialisation/déserialisation
-Exemple illustré avec PlayerData et ServerListRoomPlayers
+La sérialisation et désérialisation des structures de communication sont faite graces au classe \textit{gf::Serializer}, \textit{gf::Deserializer} et \textit{gf::Packet}, via la fonction \textit{gf::Packet::as} , et la fonction \textit{gf::Packet::is}, fournies par \textit{GamedevFramework}
 
-Sérialisation/Désérialisation avec gf::Packet.is() et gf::Packet.as().
-Exemple illustré avec ServerListRoomPlayers
+\paragraph{Protocole}
 
-Pour chaque modification on retransmet toutes les données
+Pour chaque tentative d'action (se déplacer, rejoindre une Room, etc...), le client envoi au serveur une requête, sous la forme d'une structure de "communication", contenant les information de l'action à effectuer. Le serveur, de son coté, reçoit cette requête, et l'empile dans la file, pour être traité avec les requêtes des autres clients dans la boucle de jeu.
+Pour chaque packet dépilé, le serveur cherche à l'identifier dans un switch case, en regardant si le type du packet correspond à celui d'une des structures de "communication" pouvant être envoyé par le client, avant de le désérialisé, et traiter les données.\\
+
+Si la requête du client nécessite une mise à jour des autres client (Par exemple, le déplacement d'un joueur), le serveur broadcast, pour informer tous les clients.\\
+
+De plus, dans la majorité des cas, le serveur ne transmet pas aux clients la modification lié à l'action d'un client, mais l'entièreté des données. Par exemple, lorsqu'un joueur rejoind une partie ou change de rôle, le serveur envoi l'intégralité des données des joueurs de la partie à chaque client, au lieu de juste envoyer les données du joueur en question.
+Cette approche est privilégié à celle de la transmission de chaque modification pour la simplicité et la faible quantité de données à transmettre.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\textwidth]{images/ds_client.png}
+    \caption{Version simplifié de la ligne de vie du client}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\textwidth]{images/ds_client.png}
+    \caption{Version simplifié de la ligne de vie du serveur}
+\end{figure}
+
+
 
 
 %\subsection{L'application}
