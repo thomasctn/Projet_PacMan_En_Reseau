@@ -2,3 +2,5 @@ dans build/ <-- IMPORTANT
 rm -rf *
 cmake ..
 make -j $(nproc) 2>log.txt
+
+ou dans code/ faire ./compilie.sh
