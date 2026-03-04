@@ -101,14 +101,15 @@ void LobbyListEntity::render(gf::RenderTarget &target, const gf::RenderStates &s
     for (size_t i = 0; i < m_rooms.size(); i++)
     {
         gf::Vector2f rowPos(margin, y + (LOGICAL_ROW_HEIGHT + LOGICAL_ROW_SPACING) * i);
-        renderRoomRow(target, states, rowPos, m_rooms[i],i);
+        renderRoomRow(target, states, rowPos,i);
     }
 }
 
-void LobbyListEntity::renderRoomRow(gf::RenderTarget &target, const gf::RenderStates &states, gf::Vector2f position, RoomData &data, size_t i)
+void LobbyListEntity::renderRoomRow(gf::RenderTarget &target, const gf::RenderStates &states, gf::Vector2f position, size_t i)
 {
     float margin = 24.f;
     float btnW = LOGICAL_W * 0.2f;
+    RoomData& data = m_rooms[i];
 
     gf::RoundedRectangleShape rowBg({LOGICAL_W - margin * 2.f, LOGICAL_ROW_HEIGHT},8.f);
     rowBg.setPosition(position);

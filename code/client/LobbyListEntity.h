@@ -26,7 +26,7 @@ public:
     unsigned int getLastRoomId() const;
 
     void render(gf::RenderTarget& target, const gf::RenderStates& states) override;
-    void renderRoomRow(gf::RenderTarget& target, const gf::RenderStates& states,gf::Vector2f position, RoomData& data, size_t i);
+    void renderRoomRow(gf::RenderTarget& target, const gf::RenderStates& states,gf::Vector2f position, size_t i);
 
 private:
     gf::Font m_font;
