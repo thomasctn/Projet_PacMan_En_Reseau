@@ -464,6 +464,136 @@ Cette capacité de configuration facilite les phases de test, l’équilibrage d
 
 \subsection{Structure du client}
 
+
+\subsubsection{Bases et Objectifs du Client}
+
+Le client a pour rôle principal d’être l’interface entre l’utilisateur et le serveur.
+Il ne décide pas des règles du jeu ni de la validité des actions cela est le rôle du serveur : il capture les entrées du joueur, les transmet au serveur, reçoit les états calculés côté serveur, puis les transforme en représentation visuelle pour le joueur.
+Dans le cadre d’un Pac-Man multijoueur, le client doit gérer des contraintes spécifiques : latence réseau, cohérence des états, fluidité visuelle, transitions entre différentes phases de jeu et gestion d’une interface utilisateur complète (menu, lobby, partie, fin de jeu).
+
+Le client doit également gérer l’ensemble du cycle de vie d’une session de jeu.
+Cela inclut une scène d’accueil, une scène présentant les règles afin de clarifier le fonctionnement de la version multijoueur de Pacman, une page de liste de lobbys, une scène de configuration de salle, la transition vers la partie, puis l’écran de fin affichant le résultat.
+Le client constitue ainsi une interface complète permettant au joueur de naviguer entre différents contextes sans jamais interagir directement avec la logique serveur.
+
+Tout en accomplissant ces objectifs variés, le client doit maintenir une séparation nette entre les différents éléments nécessaires à ces objectifs comme l'acquisition des entrées, la communication réseau (réception et envoi) ainsi que le rendu graphique.
+En séparant proprement les différents éléments du client, une organisation modulaire est mise en place qui facilite les changements et les évolutions du projet.
+
+
+\subsubsection{Architecture logicielle et SceneManager}
+
+L’architecture du client repose sur une classe centrale ClientGame héritant de gf::SceneManager. 
+Ce choix structure l’application autour d’un gestionnaire de scènes qui va à lui seul piloter le cycle de vie complet du jeu.
+Le SceneManager maintient une pile de scènes actives et délègue à la scène courante la gestion des événements, des mises à jour en fonction des packets réseau reçus et du rendu.
+
+Chaque scène représente un contexte fonctionnel distinct : WelcomeScene, LobbyListScene, LobbyScene, RulesScene, GameScene, EndScene.
+Chacune encapsule sa propre logique, ses entités graphiques et ses traitements d’événements. Cette organisation permet une séparation nette des responsabilités : une scène gère son état, son affichage et ses interactions, sans dépendre d’un état global centralisé.
+
+Le SceneManager permet de remplacer ou empiler des scènes via des méthodes comme replaceAllScenes, pushScene ou popAllScenes. 
+Le cycle de vie devient explicite : on entre dans la scène, intéragit avec elle, puis sortons proprement.
+
+La base du programme reflète cette structuration. 
+La fonction main ne contient aucune logique métier ni aucun traitement graphique.
+Elle instancie simplement ClientGame, récupère éventuellement les paramètres réseau (IP et port), puis appelle run.
+Ainsi, toute la logique applicative est déléguée à l’architecture interne du client.
+Le main devient un simple déclencheur, ce qui confirme que l’organisation repose entièrement sur le SceneManager et ses scènes.
+
+\paragraph{Interaction avec le réseau et les actions}
+
+Bien que Le SceneManager n’intègre pas directement la logique réseau, il permet aux scène d'exploiter proprement et indépendamment cette dernières.
+Le thread réseau alimente une file de paquets partagée.
+Chaque scène peut consommer ces paquets selon ses besoins et envoie ses packets, en fonctions des actions réalisées par le joueur.
+
+Les actions sont également gérées par leur scènes respectives, permettant une clareté vis-à-vis de leur utilité.
+
+\paragraph{Comparaison brève avec l’architecture initiale}
+
+La première implémentation centralisait l’ensemble du rendu dans un unique module renderer.cc
+Une variable d’état globale déterminait quelle portion de code exécuter grâce à une structure conditionnelle de type "Si".
+
+Cette solution fonctionnait pour un prototype, mais montrait rapidement ses limites. L'affichage, logique partielle et la gestion d’événements étaient centralisées dans un seul fichier.
+Tout le système réseau également.
+L’ajout d’une nouvelle scène impliquait de modifier un fichier déjà volumineux, ce qui réduisait grandement la lisibilité.
+Avec l’augmentation du nombre de scènes, la structure conditionnelle devenait difficile à maintenir.
+
+Le passage au SceneManager apporte de nombreuses améliorations comme une séparation claire des responsabilitées (chaque scène gère ses actions, interactions réseau et affichage), facilité d'ajout de nouvelles scènes, un cycle de vie géré par une seule entité et des transitions "automatiquement" gérées par les scènes.
+
+\subsubsection{Scènes et Entités}
+
+La conception du client repose sur une séparation claire entre la logique et la représentation visuelle.
+Cette distinction se matérialise par la relation entre GameScene et GameEntity.
+
+\paragraph{Scène}
+
+La scène correspond à un espace décisionnel : elle traite les événements, consomme les paquets réseau, met à jour les structures de données représentant l’état courant de la partie et déclenche les transitions vers une autre scène si nécessaire. Elle est responsable de la cohérence logique.
+
+\paragraph{Entité}
+
+L’entité, quant à elle, fait seulement de la représentation. Elle traduit la logique décidée par la scène en éléments graphiques concrets : sprites, tuiles, animations, positions affichées.
+Elle ne possède pas la responsabilité de déterminer ou est un joueur, ou quels sont les paramètres actuels d'un lobby.
+Elle reçoit un état déjà validé et le rend visible au joueur.
+
+\paragraph{Une séparation essentielle}
+
+Cette distinction est essentielle pour plusieurs raisons.
+D’abord, elle évite le mélange entre logique réseau et logique graphique.
+Une entité ne dépend pas directement du socket ni des paquets.
+Elle reçoit un état déjà interprété par la scène.
+
+Ensuite, cette séparation améliore la maintenabilité : modifier le rendu n’implique pas de toucher à la logique réseau, et inversement.
+
+Enfin, elle rend le système plus évolutif. Il serait possible d’adapter le rendu (par exemple changer une animation ou le style graphique) sans impacter la gestion des paquets ou la synchronisation.
+
+\subsubsection{Réseau coté Client : réception}
+
+La réception réseau côté client repose sur une architecture volontairement séparée de la boucle principale.
+Le socket TCP est configuré en mode non bloquant, puis un thread dédié est lancé via startNetworkReceiver.
+Ce thread exécute en continu recvPacket, récupère les paquets entrants et les insère dans une file partagée (m packetQueue) protégée par mutex.Cette séparation garantit que la boucle principale du SceneManager ne sera jamais bloquée par une attente réseau.
+
+Le choix d’un thread distinct permet d’isoler les opérations d’entrée/sortie (I/O) du rendu graphique et du traitement logique.
+La scène active, dans sa méthode doUpdate, consomme ensuite les paquets disponibles via tryPopPacket.
+
+Chaque scène décide explicitement quels types de paquets elle traite. Par exemple, LobbyListScene interprète ServerListRooms, tandis que GameScene traite ServerGameState, ServerGameEnd ou les événements liés au pouvoir de Pac-Man.
+Ce modèle offre un contrôle précis : une scène ne traite que les messages pertinents à son contexte, aucun autre.
+
+La synchronisation est assurée par un std::mutex protégeant l’accès à la file. Cette précaution évite toute condition de course entre le thread réseau (producteur) et la scène active (consommateur).
+L’ordonnancement des paquets est préservé naturellement par la structure FIFO de la file, tandis que TCP garantit l’ordre et la fiabilité de livraison.
+
+
+\subsubsection{Réseau coté Client : envois}
+
+Les envois côté client sont volontairement limités et contrôlés.
+Contrairement à la réception asynchrone, l’émission dépend du contexte et du rythme de jeu.
+Autrement dit, ce sont les scènes qui décident quand et quoi envoyer.
+Chaque scène est donc responsable des messages correspondant à son domaine fonctionnel.
+
+
+\paragraph{Envoi périodique}
+Dans GameScene par exemple, un horodatage (m lastSend) régule la fréquence des transmissions.
+L’envoi d’un ClientMove n’a lieu que si une touche directionnelle est active et si l’intervalle minimal est respecté.
+L’objectif est d’éviter un envoi par frame graphique tout en garantissant une fréquence stable compatible avec la logique serveur.
+
+\paragraph{Envoi événementiel}
+
+Dans le cas du lobby, le fonctionnement est différent.
+L’entité détecte une interaction (bouton +/-, ready, changement de rôle) 
+et expose cette action via un enum \texttt{LobbyAction}.
+La scène récupère alors l'action qui vient d'être effectuée puis la transforme en message réseau et l'envoi.
+L'envoi est donc déclenché uniquement quand une action de la part du joueur à lieu.
+
+\paragraph{Principe d'envoi}
+
+Que ce soit en envoi périodique ou événementiel, le principe d'envoie est toujours le même. 
+Quand on détecte une action utilisateur et/ou une période écoulée, on crée un gf::Packet qu'on encapsule dans une structure crée spécifiquement pour la communication client -> serveur,
+et on appelle sendPacket pour l'envoyer au serveur. 
+Ce sera ensuite au serveur de gérer notre envoi.
+
+C'est uniquement ce qui est reçu par le Client et donc décidé par le Serveur qui sera effectivement affiché.
+L'envoi permet uniquement de transmettre au serveur une intention du client.
+
+\subsubsection{Input, Actions, et EventTypes}
+
+\subsubsection{Rendu des Entités}
+
 Affichage, gestion des entrées utilisateur,
 réception et traitement des messages réseau.
 

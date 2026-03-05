@@ -174,10 +174,8 @@ LobbyAction LobbyEntity::getAndResetLastAction()
 
 void LobbyEntity::render(gf::RenderTarget &target, const gf::RenderStates &states)
 {
-    // ✅ Zone logique fixe
     const float margin = 16.f;
 
-    // Calculs logiques pour UI
     float uiOffsetX = LOGICAL_W * 0.05f;
     float uiOffsetY = LOGICAL_H * 0.05f;
 
