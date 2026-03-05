@@ -28,3 +28,13 @@ Rapport/.bin
 !Rapport/.bin/main.pdf
 !Rapport/.bin/agile.pdf
 Rapport/%*
+
+*.aux
+*.log
+*.out
+*.toc
+*.synctex.gz
+*.fls
+*.fdb_latexmk
+*.bbl
+*.blg
