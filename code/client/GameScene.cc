@@ -138,3 +138,11 @@ void GameScene::resizeYourself(){
     m_game.handleResize(size.x, size.y);
     getWorldView() = m_game.getMainView();
 }
+
+void GameScene::doShow()
+{
+    std::thread([&]() {
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+            resizeYourself();
+        }).detach();
+}

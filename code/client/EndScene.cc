@@ -66,3 +66,11 @@ void EndScene::resizeYourself(){
     getWorldView() = m_game.getMainView();
 }
 
+void EndScene::doShow()
+{
+    std::thread([&]() {
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+            resizeYourself();
+        }).detach();
+}
+

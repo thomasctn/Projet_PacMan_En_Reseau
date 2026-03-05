@@ -10,9 +10,10 @@ class GameScene : public gf::Scene {
 public:
     explicit GameScene(ClientGame& game);
 
-  void setInitialState(const std::vector<PlayerData>& players,const BoardCommon& board,const std::unordered_map<gf::Vector2i, gf::Vector2i>& holeLinks);
+    void setInitialState(const std::vector<PlayerData>& players,const BoardCommon& board,const std::unordered_map<gf::Vector2i, gf::Vector2i>& holeLinks);
 
     void resizeYourself() ;
+    virtual void doShow() override;
 
 private:
     void doProcessEvent(gf::Event& event) override;

@@ -99,3 +99,11 @@ void WelcomeScene::resizeYourself(){
     m_game.handleResize(size.x, size.y);
     getWorldView() = m_game.getMainView();
 }
+
+void WelcomeScene::doShow()
+{
+    std::thread([&]() {
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+            resizeYourself();
+        }).detach();
+}

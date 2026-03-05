@@ -291,3 +291,11 @@ void LobbyScene::setRoomID(uint32_t id)
     m_roomID = id;
     m_entity.setRoomID(id);
 }
+
+void LobbyScene::doShow()
+{
+    std::thread([&]() {
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+            resizeYourself();
+        }).detach();
+}

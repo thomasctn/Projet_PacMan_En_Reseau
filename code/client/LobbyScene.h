@@ -22,6 +22,8 @@ public:
     void setRoomSettings(const RoomSettings& settings);
     void setRoomID(uint32_t id);
 
+    virtual void doShow() override;
+
 private:
     void doProcessEvent(gf::Event& event) override;
     void doUpdate(gf::Time time) override;
