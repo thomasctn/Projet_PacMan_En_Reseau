@@ -13,6 +13,7 @@ class RulesScene : public gf::Scene {
 public:
     explicit RulesScene(ClientGame& game);
     void resizeYourself() ;
+    virtual void doShow() override;
 
 
 private:

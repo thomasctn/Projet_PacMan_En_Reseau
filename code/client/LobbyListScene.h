@@ -13,6 +13,7 @@ public:
     explicit LobbyListScene(ClientGame& game);
     LobbyListEntity& getEntity() { return m_entity; }
     void resizeYourself() ;
+    virtual void doShow() override;
 
 
 

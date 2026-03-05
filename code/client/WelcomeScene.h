@@ -14,6 +14,7 @@ public:
     explicit WelcomeScene(ClientGame& game);
     void resizeYourself() ;
 
+    virtual void doShow() override;
 
 private:
     void doProcessEvent(gf::Event& event) override;

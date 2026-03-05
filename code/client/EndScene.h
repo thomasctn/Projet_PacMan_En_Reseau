@@ -16,6 +16,7 @@ public:
     void initEnd(GameEndReason reason, int lastScore);
     void resizeYourself() ;
 
+    virtual void doShow() override;
 
 private:
     void doProcessEvent(gf::Event& event) override;
