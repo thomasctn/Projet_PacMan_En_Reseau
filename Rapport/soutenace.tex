@@ -196,27 +196,42 @@ Encadrant : Julien Bernard\\
 
 \section{Reseau}
 
-\begin{frame}{Benoit 1}
+\begin{frame}{Protocole}
 
-    TODO
+    Communication avec socket
+    Choix entre UDP et TCP, TCP choisit pour sa fiabilité\\
+    L'ip et le port peuvent être précisé pour le client ou le serveur en ligne de commande\\
+    Descrition des la structure du ClientNetwork et ServerNetwork :\\
+    - Une socket de comm dans le client, socket de connexion + socket de comm pour chaque client dans le serv\\
+    - Thread pour empiler les packets
     
 \end{frame}
 
-\begin{frame}{Benoit 2}
+\begin{frame}{Structures}
 
-    TODO
+    2 types de structure :
+    Structures communes contenant les données communes entre client/server\\
+    Exemple avec PlayerData\\
+    Structures de comm utilisé pour les échanges réseau (ServerXXX = envoyé par le server, ClientXXX = envoyé par le client)
+    Exemple avec ServerListPlayersRoom
+
+
     
 \end{frame}
 
-\begin{frame}{Benoit 3}
+\begin{frame}{Serialisation/déserialisation}
 
-    TODO
+    Un Operateur | avec un type Archive, gf::packet.is() pour sérialiser, gf::packet.as() pour déserialiser\\
+    Switch case avec le type du packet pour l'identifier avec l'id de la structure\\
+    Exemple avec ClientMove et ServerListPlayersRoom
     
 \end{frame}
 
-\begin{frame}{Benoit 4}
+\begin{frame}{Exemple concrèt}
 
-    TODO
+    Un exemple concrèt lorsque le server broadcast la liste des joueurs avec ServerListPlayersRoom :\\
+    - Le serv récupère les données de chaque joueurs pour construire la structure, sérialisation avec packet.is(), puis envoie à chaque client\\
+    - Le client reçoit ce packet et l'empile, puis dans la boucle de jeu dépile et identifie la structure avec gf::Id pour la déserialiser et afficher la liste des joueurs
     
 \end{frame}
 
