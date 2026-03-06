@@ -70,25 +70,21 @@ void ClientGame::requestScene(SceneRequest req) {
             // remplace la pile entière par la scène LobbyList
             replaceAllScenes(lobbyListScene);
             lobbyListScene.getEntity().setRooms(m_lastRooms);
-            lobbyListScene.resizeYourself();
             
             break;
 
         case SceneRequest::GoToLobby:
             replaceAllScenes(lobbyScene);
-            lobbyScene.resizeYourself();
             break;
 
         case SceneRequest::GoToWelcome:
             replaceAllScenes(welcomeScene);
-            welcomeScene.resizeYourself();
             break;
 
         case SceneRequest::GoToRules:
             gf::Log::info("go go go to rules!\n");
 
             replaceAllScenes(rulesScene);
-            rulesScene.resizeYourself();
             break;
 
           
@@ -101,14 +97,12 @@ void ClientGame::requestScene(SceneRequest req) {
 void ClientGame::goToGameScene(const std::vector<PlayerData>& players,const BoardCommon& board,const std::unordered_map<gf::Vector2i, gf::Vector2i>& holeLinks){
     gameScene.setInitialState(players, board, holeLinks);
     replaceAllScenes(gameScene);
-    gameScene.resizeYourself();
 
 }
 
 void ClientGame::goToEndScene(GameEndReason& endReason){
     endScene.initEnd(endReason, lastScore);
     replaceAllScenes(endScene);
-    endScene.resizeYourself();
 }
 
 

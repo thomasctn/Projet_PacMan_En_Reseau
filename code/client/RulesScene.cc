@@ -2,9 +2,6 @@
 #include "RulesScene.h"
 #include "ClientGame.h"
 
-bool firstFrame_RulesScene = true;
-
-
 RulesScene::RulesScene(ClientGame& game)
 : gf::Scene(gf::vec(1280,720))  
 , m_game(game)
@@ -46,11 +43,6 @@ void RulesScene::doProcessEvent(gf::Event& event) {
 }
 
 void RulesScene::doUpdate(gf::Time time) {
-    if (firstFrame_RulesScene) {
-        resizeYourself();
-        firstFrame_RulesScene = false;
-    }
-
     //logique du bouton
     if (m_entity.wasClicked()) {
         m_entity.resetClick();
@@ -67,7 +59,7 @@ void RulesScene::resizeYourself(){
 void RulesScene::doShow()
 {
     std::thread([&]() {
-            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+            std::this_thread::sleep_for(std::chrono::microseconds(1));
             resizeYourself();
         }).detach();
 }

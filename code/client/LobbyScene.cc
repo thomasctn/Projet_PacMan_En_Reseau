@@ -3,8 +3,6 @@
 
 #include <gf/Log.h>
 
-bool firstFrame_LobbyScene = true;
-
 LobbyScene::LobbyScene(ClientGame &game)
     : gf::Scene(gf::vec(1280, 720)), m_game(game), m_font("../common/fonts/arial.ttf"), m_entity()
 {
@@ -63,12 +61,6 @@ void LobbyScene::doProcessEvent(gf::Event &event)
 void LobbyScene::doUpdate(gf::Time)
 {
 
-    if (firstFrame_LobbyScene)
-    {
-        resizeYourself();
-        firstFrame_LobbyScene = false;
-    }
-
     gf::Packet packet;
 
     // --- Réception réseau ---
@@ -95,7 +87,6 @@ void LobbyScene::doUpdate(gf::Time)
         case ServerLeaveRoom::type:
             gf::Log::info("Serveur: quitté la room\n");
             m_game.requestScene(SceneRequest::GoToLobbyList);
-            m_game.lobbyListScene.resizeYourself();
             break;
 
         case ServerGameStart::type:
@@ -295,7 +286,7 @@ void LobbyScene::setRoomID(uint32_t id)
 void LobbyScene::doShow()
 {
     std::thread([&]() {
-            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+            std::this_thread::sleep_for(std::chrono::milliseconds(0));
             resizeYourself();
         }).detach();
 }

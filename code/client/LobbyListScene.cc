@@ -2,9 +2,6 @@
 #include "ClientGame.h"
 #include <gf/Log.h>
 
-bool firstFrame_LobbyListScene = true;
-
-
 LobbyListScene::LobbyListScene(ClientGame& game)
 : gf::Scene(gf::vec(1280, 720))
 , m_game(game)
@@ -47,11 +44,6 @@ void LobbyListScene::doProcessEvent(gf::Event& event) {
 
 
 void LobbyListScene::doUpdate(gf::Time time) {
-    if (firstFrame_LobbyListScene) {
-        resizeYourself();
-        firstFrame_LobbyListScene = false;
-    }
-
 
     (void) time;
 
@@ -116,7 +108,7 @@ void LobbyListScene::resizeYourself(){
 void LobbyListScene::doShow()
 {
     std::thread([&]() {
-            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+            std::this_thread::sleep_for(std::chrono::microseconds(1));
             resizeYourself();
         }).detach();
 }

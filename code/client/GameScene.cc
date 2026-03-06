@@ -2,8 +2,6 @@
 #include "ClientGame.h"
 #include <gf/Log.h>
 
-bool firstFrame_GameScene = true;
-
 GameScene::GameScene(ClientGame& game)
 : gf::Scene(gf::vec(1280, 720))
 , m_game(game)
@@ -35,12 +33,6 @@ void GameScene::doProcessEvent(gf::Event& event) {
 }
 
 void GameScene::doUpdate(gf::Time time) {
-    if (firstFrame_GameScene) {
-        resizeYourself();
-        firstFrame_GameScene = false;
-    }
-
-
     //gf::Log::info("gamescene DO UPDATE\n");
 
     //paquets reseau
@@ -142,7 +134,7 @@ void GameScene::resizeYourself(){
 void GameScene::doShow()
 {
     std::thread([&]() {
-            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+            std::this_thread::sleep_for(std::chrono::microseconds(0));
             resizeYourself();
         }).detach();
 }
