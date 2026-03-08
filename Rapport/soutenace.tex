@@ -12,6 +12,8 @@
 % =====================
 \usepackage[french]{babel}
 \usepackage[T1]{fontenc}
+\usepackage{lmodern}
+
 
 % =====================
 % Packages utiles
@@ -102,64 +104,195 @@ Encadrant : Julien Bernard\\
 
 \begin{frame}{Git \& discord}
 
-    TODO
+    on a utiliser git pour versionner
+    discord pour communiquer entre nous ainsi quavec le tuteur du projet
+    de plus on fesait des reunion chaque semaine ou toute sles 2 semaine enfin davoir des retour.
+    en parrallele on communiquait quotidiennement entre nous pour definir l'avancer du projet
 
 \end{frame}
 
 \begin{frame}{PacMan}
 
-    TODO
+    copie du rapport
 
 \end{frame}
 
 \begin{frame}{Organisation}
 
-    TODO
+    thomas server
+    aurianne client
+    benoit les deux + reseau
 
 \end{frame}
 
 \section{Server}
 
-\begin{frame}{thread}
+\begin{frame}{Architecture du serveur}
 
-    TODO
+\centering
+\includegraphics[width=\textwidth,height=0.75\textheight,keepaspectratio]{UML/PacMan_UML_Server_Reseau.png}
 
-\end{frame}
+\vspace{0.4cm}
 
-\begin{frame}{Modules}
+Client $\rightarrow$ Server $\rightarrow$ Lobby $\rightarrow$ Room $\rightarrow$ Game
 
-    TODO
-    
 \end{frame}
 
 \begin{frame}{Boucle de jeu}
 
-    TODO
-    
+\textbf{Serveur autoritaire}
+
+\begin{itemize}
+    \item Le \textbf{serveur décide de tout}
+    \item Les \textbf{clients affichent uniquement l'état reçu}
+    \item Permet d'\textbf{éviter la triche} et les désynchronisations
+\end{itemize}
+
+\vspace{0.4cm}
+
+\textbf{Tick serveur}
+
+\begin{itemize}
+    \item La boucle de jeu fonctionne avec des \textbf{mises à jour périodiques}
+    \item Un \textbf{thread serveur} met à jour l'état du jeu :
+    \begin{itemize}
+        \item positions des joueurs et fantômes
+        \item pac-gommes
+        \item timers
+        \item score et conditions de victoire
+    \end{itemize}
+\end{itemize}
+
+\vspace{0.4cm}
+
+\textbf{États de la partie}
+
+\begin{itemize}
+    \item Avant la partie (préparation)
+    \item Partie en cours
+    \item Fin de partie
+\end{itemize}
+
+\end{frame}
+\begin{frame}{IA des fantômes - Principe}
+
+Avoir des fantômes capables de s'adapter au nombre de joueurs et de produire
+une forme d'\textbf{intelligence collective}.
+
+\vspace{0.4cm}
+
+\textbf{Inspiration : les fourmis}
+
+\begin{itemize}
+    \item Dans la nature, les fourmis utilisent des \textbf{phéromones} pour communiquer.
+    \item Chaque fourmi laisse une trace que les autres peuvent suivre.
+\end{itemize}
+
+\vspace{0.4cm}
+
+\textbf{Adaptation dans le jeu}
+
+\begin{itemize}
+    \item Les entités laissent des \textbf{traces} sur le plateau.
+    \item Chaque trace possède :
+    \begin{itemize}
+        \item une \textbf{intensité} qui diminue avec le temps
+        \item un \textbf{propriétaire}
+        \item une \textbf{couleur}
+    \end{itemize}
+    \item \textcolor{red}{Rouge} : Pac-Man \quad | \quad \textcolor{blue}{Bleu} : fantômes
+\end{itemize}
+
 \end{frame}
 
-\begin{frame}{IA 1}
+\begin{frame}{IA des fantômes - Prise de décision}
 
-    TODO
-    
+\begin{columns}
+
+\column{0.5\textwidth}
+
+Les fantômes choisissent leur déplacement selon le score :
+
+\[
+Score = \textcolor{red}{Attraction} - \textcolor{blue}{Répulsions}
+\]
+
+\begin{itemize}
+    \item Les traces de \textbf{Pac-Man} créent une \textcolor{red}{attraction}
+    \item Les traces des \textbf{fantômes} créent une \textcolor{blue}{répulsion}
+    \item La \textcolor{blue}{répulsion} est plus forte pour les \textbf{traces du fantôme lui-même}
+\end{itemize}
+
+\column{0.5\textwidth}
+
+\centering
+\includegraphics[width=\linewidth]{images/trace.png}
+
+\end{columns}
+
 \end{frame}
 
-\begin{frame}{IA 2}
+\begin{frame}{Génération procédurale du plateau}
 
-    TODO
-    
+\begin{columns}
+
+\column{0.5\textwidth}
+
+\textbf{Variante de l'algorithme de Prim}
+
+\begin{itemize}
+    \item Plateau initialement rempli de murs
+    \item Choix d'une case de départ
+    \item Ajout des murs adjacents dans une liste
+    \item Ouverture progressive de murs aléatoires
+\end{itemize}
+
+\textbf{Résultat :}
+\begin{itemize}
+    \item Labyrinthe connexe
+    \item Aucune zone isolée
+\end{itemize}
+
+\column{0.5\textwidth}
+
+\centering
+\includegraphics[width=\linewidth]{images/plateau_42_1.png}
+
+\end{columns}
+
 \end{frame}
 
-\begin{frame}{GP}
 
-    TODO
-    
-\end{frame}
+\begin{frame}{Adaptations pour le gameplay}
 
-\begin{frame}{GP}
+\begin{columns}
 
-    TODO
-    
+\column{0.5\textwidth}
+
+\textbf{Contraintes du jeu}
+
+\begin{itemize}
+    \item Zone centrale fixe : \textbf{hut $3\times3$}
+    \item Vérification de l'accès aux \textbf{coins de départ}
+\end{itemize}
+
+\vspace{0.4cm}
+
+\textbf{Améliorations}
+
+\begin{itemize}
+    \item Ajout de \textbf{cycles}
+    \item Réduction des \textbf{culs-de-sac}
+    \item Ajout de \textbf{portails latéraux}
+\end{itemize}
+
+\column{0.5\textwidth}
+
+\centering
+\includegraphics[width=\linewidth]{images/plateau_42_4.png}
+
+\end{columns}
+
 \end{frame}
 
 \section{Client}

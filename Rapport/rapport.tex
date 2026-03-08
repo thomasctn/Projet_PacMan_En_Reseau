@@ -266,16 +266,6 @@ Chaque couche délègue les traitements spécialisés au niveau inférieur, ce q
 
 \end{figure}
 
-\subsection{Structure du plateau}
-
-Le plateau est modélisé sous forme d’une grille en deux dimensions, composée de deux type de cases, les cases que l'on peut traversée comme le sol et les cases qu'on ne peut pas traverser comme les murs. 
-Cette représentation constitue la base logique du système.
-
-Il sert de référence unique pour la détection des collisions, la mise à jour des déplacements, le placement des éléments interactifs ainsi que pour les algorithmes d’intelligence artificielle. 
-La cohérence entre la logique côté serveur et l’affichage côté client offre une synchronisation fiable du jeu.
-
-Le plateau constitue une structure centrale sur laquelle reposent la génération procédurale du labyrinthe et les mécanismes décisionnels des fantômes.
-
 \subsection{Boucle de jeu}
 
 La boucle de jeu constitue le cœur du serveur et repose sur un modèle à mise à jour périodique, appelé \textit{tick serveur}. 
