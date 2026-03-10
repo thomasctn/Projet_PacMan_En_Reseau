@@ -1,0 +1,137 @@
+@startuml
+' Mise en page
+left to right direction
+
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+skinparam ArrowColor #333333
+skinparam ArrowThickness 1
+skinparam ClassFontSize 12
+skinparam ClassFontName Arial
+skinparam ClassBackgroundColor #fdfdfd
+skinparam ClassBorderColor #444444
+
+' =======================
+' Classes principales
+' =======================
+
+rectangle "Serveur" {
+
+class ServerNetwork {
+
+    + run()
+    + send()
+    + stop()
+    - handleNewClient()
+    - handleClientData()
+}
+
+class Lobby {
+
+    + handlePacket()
+    + broadcastRoomsList()
+    + sendRoomsList()
+    - createRoom()
+    - destroyRoom()
+}
+
+class Room {
+    - id : int
+    - settings : RoomSettings
+
+    + handlePacket()
+    + broadcastState()
+    + handleClientChange()
+    + endGame()
+    - startGame()
+}
+}
+rectangle "Jeu" {
+
+class Game {
+
+    + requestMove()
+    + startGameLoop()
+    + stopGameLoop()
+    - processInputs()
+}
+
+class Board {
+
+    + openBorderExits()
+    - generatePrimMaze()
+    - addLoops()
+    - fillDeadEnds()
+}
+
+class Player {
+    - id : int
+    - role : PlayerRole
+    - x : float
+    - y : float
+
+    + eat()
+}
+}
+rectangle "Bot" {
+
+class BotManager {
+    - traceMap : GraphTraceMap
+
+    + generateGraph()
+    + update()
+    + updateTraces()
+}
+
+class BotController {
+    + update()
+}
+
+class GraphTraceMap {
+    - traces : Map
+
+    + add()
+    + get()
+    + decay()
+}
+}
+class InputQueue {
+}
+
+
+' =======================
+' Relations
+' =======================
+
+' Composition (l’objet appartient au parent)
+ServerNetwork *-- Lobby
+Lobby *-- Room
+Room *-- Game
+Room *-- BotManager
+Room *-- InputQueue
+Game *-- Board
+Game *-- Player
+BotManager *-- BotController
+BotManager *-- GraphTraceMap
+
+
+
+' Association / dépendance
+BotController --> Game
+
+' Liens invisibles pour éviter étirement horizontal
+ServerNetwork -[hidden]- Game
+Player -[hidden]- BotController
+InputQueue -[hidden]- ServerNetwork
+InputQueue -[hidden]- BotManager
+
+
+GraphTraceMap -[hidden]- Lobby
+
+
+
+
+
+
+
+@enduml
