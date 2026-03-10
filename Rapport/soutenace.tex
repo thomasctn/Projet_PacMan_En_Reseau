@@ -24,6 +24,27 @@
 \usepackage{pgfplots}
 \pgfplotsset{compat=1.18}
 \usepackage[table]{xcolor}
+\usepackage{listings}
+\definecolor{codebg}{RGB}{248,248,248}
+\definecolor{codecomment}{RGB}{0,128,0}
+\definecolor{codekeyword}{RGB}{0,0,180}
+\definecolor{codestring}{RGB}{163,21,21}
+\lstdefinestyle{cppstyle}{
+    language=C++,
+    backgroundcolor=\color{codebg},
+    basicstyle=\ttfamily\tiny,
+    keywordstyle=\color{codekeyword}\bfseries,
+    commentstyle=\color{codecomment}\itshape,
+    stringstyle=\color{codestring},
+    tabsize=2,
+    showspaces=false,
+    showstringspaces=false,
+    breaklines=true,
+    frame=single,
+    columns=fullflexible
+}
+
+\lstset{style=cppstyle}
 
 % =====================
 % Couleurs personnalisées
@@ -396,35 +417,118 @@ Score = \textcolor{red}{Attraction} - \textcolor{blue}{Répulsions}
 
 \section{Reseau}
 
-\begin{frame}{Protocole}
+\begin{frame}[fragile]{Architecture}
+    \begin{columns}
+    \column{0.60\textwidth}
+    \textbf{Communication avec socket}
+        \begin{itemize}
+            \item Choix entre UDP et TCP : TCP choisit pour sa fiabilité
+            \item Ip et port précisé en ligne de commande
+        \end{itemize}
 
-    Communication avec socket
-    Choix entre UDP et TCP, TCP choisit pour sa fiabilité\\
-    L'ip et le port peuvent être précisé pour le client ou le serveur en ligne de commande\\
-    Descrition du fonctionnement de ClientNetwork et ServerNetwork :\\
-    - Une socket de comm dans le client, socket de connexion + socket de comm pour chaque client dans le serv\\
-    - Thread pour empiler les packets
-    
+    \textbf{Classes Spécialisées}
+        \begin{itemize}
+            \item ServerNetwork pour la gestion des nouveaux client et des packets
+            \item ClientNetwork pour la gestions des packets
+        \end{itemize}
+
+    \textbf{Multi-Threading}
+        \begin{itemize}
+            \item Fonctions de ServerNetwork et ClientNetwork exécuté dans un thread
+            \item Dépilement des packets dans la boucle principale
+        \end{itemize}
+
+    \column{0.3\textwidth}
+    \end{columns}
 \end{frame}
 
-\begin{frame}{Structures}
+\begin{frame}[fragile]{Structures}
 
-    2 types de structure :
-    Structures communes contenant les données communes entre client/server\\
-    Exemple avec PlayerData\\
-    Structures de comm utilisé pour les échanges réseau (ServerXXX = envoyé par le server, ClientXXX = envoyé par le client)
-    Exemple avec ServerListPlayersRoom
+\begin{columns}
 
+\column{0.60\textwidth}
+\textbf{Structures communes}
+\begin{itemize}
+    \item Utilisé à la fois par le client et le serveur
+    \item Peut être généré dynamiquement par un objet du serveur
+\end{itemize}
+\vspace{0.4cm}
 
+\textbf{Structures de Communication}
+
+\begin{itemize}
+    \item Utilisé pour les échanges réseaux
+    \item Un champ gf::id pour les identifier lors de la désérialisation
     
+    \item Nomenclature spécifique :
+    \begin{itemize}
+            \item{ServerXXX = envoyé par le server}
+            \item{ClientXXX = envoyé par le client}
+    \end{itemize}
+\end{itemize}
+
+\column{0.30\textwidth}
+\centering
+\begin{lstlisting}[linewidth=3cm]
+struct PlayerData
+{
+    uint32_t id;
+    float x, y;
+    uint32_t color;
+    std::string name;
+    PlayerRole role;
+    int score;
+    bool ready = false;
+    unsigned int hp = 0;
+};
+\end{lstlisting}
+\centering
+\begin{lstlisting}[linewidth=3.6cm]
+struct ServerListRoomPlayers
+{
+  static constexpr gf::Id type = "ServerListRoomPlayers"_id;
+  std::vector<PlayerData> players;
+};
+\end{lstlisting}
+\end{columns}
 \end{frame}
 
-\begin{frame}{Serialisation/déserialisation}
+\begin{frame}[fragile]{Serialisation/Déserialisation}
+    \begin{columns}
+    \column{0.60\textwidth}
+    \textbf{Opérateur}
+    \begin{itemize}
+        \item Operateur | avec un type Archive
+    \end{itemize}
 
-    Un Operateur | avec un type Archive, gf::packet.is() pour sérialiser, gf::packet.as() pour déserialiser\\
-    Switch case avec le type du packet pour l'identifier avec l'id de la structure\\
-    Exemple avec ClientMove et ServerListPlayersRoom
-    
+    \textbf{Sérialisation/Envoi}
+    \begin{itemize}
+        \item Fonction \textit{gf::Packet::is(obj)} pour sérialiser en suite d'octet
+        \item Fonction \textit{gf::TcpSocket::sendPacket(packet)} pour envoyer le packet
+    \end{itemize}
+    \textbf{Déserialisation}
+    \begin{itemize}
+        \item Switch case pour identifier le type
+        \item Fonction \textit{gf::Packet::as(objType)} pour désérialiser
+    \end{itemize} 
+
+    \column{0.30\textwidth}
+\begin{lstlisting}[linewidth=4.5cm]
+template <typename Archive>
+Archive &operator|(Archive &ar, PlayerData &data)
+{
+    return ar | data.id 
+            | data.x
+            | data.y
+            | data.color
+            | data.name
+            | data.role
+            | data.score
+            | data.ready
+            | data.hp;
+}
+\end{lstlisting}
+\end{columns}
 \end{frame}
 
 \begin{frame}{Exemple concrèt}
