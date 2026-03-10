@@ -121,12 +121,13 @@ BotController --> Game
 
 ' Liens invisibles pour éviter étirement horizontal
 ServerNetwork -[hidden]- Game
-Player -[hidden]- BotController
+Room -[hidden]- BotController
+GraphTraceMap -[hidden]- Lobby
+
 InputQueue -[hidden]- ServerNetwork
 InputQueue -[hidden]- BotManager
 
 
-GraphTraceMap -[hidden]- Lobby
 
 
 
