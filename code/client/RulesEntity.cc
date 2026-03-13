@@ -121,7 +121,7 @@ void RulesEntity::render(gf::RenderTarget& target, const gf::RenderStates& state
     playBox.setPosition({ playBoxLeft, playBoxTop });
     playBox.setColor(gf::Color::Transparent);
     playBox.setOutlineThickness(2.f);
-    playBox.setOutlineColor(gf::Color::White);
+    playBox.setOutlineColor(gf::Color::Blue);
 
     target.draw(playBox, states);
 
@@ -174,7 +174,7 @@ void RulesEntity::render(gf::RenderTarget& target, const gf::RenderStates& state
     winBox.setPosition({ winBoxLeft, winY - 10.f }); 
     winBox.setColor(gf::Color::Transparent);
     winBox.setOutlineThickness(2.f);
-    winBox.setOutlineColor(gf::Color::White);
+    winBox.setOutlineColor(gf::Color::Blue);
 
     target.draw(winBox, states);
 

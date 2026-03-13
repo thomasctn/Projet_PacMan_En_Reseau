@@ -23,7 +23,6 @@
 \usepackage{booktabs}
 \usepackage{pgfplots}
 \pgfplotsset{compat=1.18}
-\usepackage[table]{xcolor}
 \usepackage{listings}
 \definecolor{codebg}{RGB}{248,248,248}
 \definecolor{codecomment}{RGB}{0,128,0}
@@ -119,7 +118,7 @@ Encadrant : Julien Bernard\\
 
 \begin{itemize}
 \item Contexte du projet
-\item Objectifs
+\item Objectifs coucou
 \item Organisation
 \end{itemize}
 
@@ -429,13 +428,13 @@ subsectionstyle=show/shaded/hide
 \begin{columns}    
 \column{0.4\textwidth}
 \centering
-\includegraphics[width=\linewidth]{images/shéma_scenemanager.png}
+\includegraphics[width=0.5\linewidth]{images/diag_class_scenes.drawio.png}
 
 \column{0.6\textwidth}
 
 \textbf{Fonctionnement du SceneManager}
 
-Le SceneManager gère quelle scène s'affiche :
+Le SceneManager gère quelle scène s'affiche puis:
 
 \begin{itemize}
     \item Chaque étape de jeu : \textbf{une scène}
@@ -449,8 +448,38 @@ Met aussi en place le réseau
 
 \end{frame}
 
+\begin{frame}{Input}
+
+\begin{columns} 
+    \column{0.45\textwidth}
+    Système d'\textbf{Actions} :
+
+    Mapping clavier -> actions (up, down, left, right)
+
+    Événements gérés par chaque scène :
+    \begin{itemize}
+        \item Passage de la souris 
+        \item Clics de la souris 
+        \item Redimmension de la fenêtre
+    \end{itemize}
+
+    Une partie est \textbf{envoyé au serveur}
+
+    \column{0.55\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{images/lobby.png}
+    
+\end{columns}
+\end{frame}
+
 \begin{frame}{Envoi}
 
+
+\begin{columns} 
+    \column{0.55\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{images/game.png}
+    \column{0.45\textwidth}
     Les scènes envoient les messages au serveur
 
     Deux modèles :
@@ -463,7 +492,7 @@ Met aussi en place le réseau
     Principe d'envoi est \textbf{le même}
 
     L'envoi transmet l'intention du client au serveur
-
+\end{columns} 
 
     
 \end{frame}
@@ -496,36 +525,21 @@ Met aussi en place le réseau
 \end{frame}
 
 
-\begin{frame}{Input}
 
-
-    Système d'\textbf{Actions} :
-
-    Mapping clavier -> actions (up, down, left, right)
-
-    Événements gérés par chaque scène :
-    \begin{itemize}
-        \item Passage de la souris 
-        \item Clics de la souris 
-        \item Redimmension de la fenêtre
-    \end{itemize}
-
-    Au final, server determine ce qui est effectif
-    
-\end{frame}
 
 \begin{frame}{Entité}
 
-Les entités gèrent le \textbf{rendu}
+\centering
 
-Les scènes gèrent la \textbf{logique}
+\includegraphics[height=0.45\textheight]{images/rules.png}
+\vspace{0.5cm}
+Chaque scène a une entité :
 
-Chaque scène a une entité
-
-L'entité traduit la logique décidée en éléments graphiques concrets
-
-Elle interagit directement avec le client : lien clics clients - logique évenement
-
+Les entités ont \textbf{peu de travail :}
+\begin{itemize}
+    \item Traduit la logique en \textbf{éléments graphiques concrets}
+    \item Interagit directement avec le client : \textbf{clics client -> scène}
+\end{itemize}
 
     
 \end{frame}

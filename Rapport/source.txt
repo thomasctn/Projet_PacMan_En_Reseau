@@ -1,3 +1,0 @@
-IMAGE :
-20/02/2026
-https://refactoring.guru/fr/design-patterns/chain-of-responsibility
