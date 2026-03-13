@@ -545,25 +545,25 @@ subsectionstyle=show/shaded/hide
 \setbeamertemplate{footline}[frame number]
 
 
-\begin{frame}[fragile]{Architecture}
+\begin{frame}[fragile]{Architecture réseau}
     \begin{columns}
-    \column{0.60\textwidth}
+    \column{0.70\textwidth}
     \textbf{Communication avec socket}
         \begin{itemize}
             \item Choix entre UDP et TCP : TCP choisit pour sa fiabilité
-            \item Ip et port précisé en ligne de commande
+            \item \textcolor{blue}{\texttt{gf::TcpListener}} et \textcolor{blue}{\texttt{gf::TcpSocket}} pour la connexion/communication
         \end{itemize}
 
     \textbf{Classes Spécialisées}
         \begin{itemize}
-            \item ServerNetwork pour la gestion des nouveaux client et des packets
-            \item ClientNetwork pour la gestions des packets
+            \item \textbf{ServerNetwork} pour la gestion des nouveaux client set des packets (envoi/réception)
+            \item \textbf{ClientNetwork} pour la gestion des packets (réception)
         \end{itemize}
 
     \textbf{Multi-Threading}
         \begin{itemize}
-            \item Fonctions de ServerNetwork et ClientNetwork exécuté dans un thread
-            \item Dépilement des packets dans la boucle principale
+            \item Fonctions de \textbf{ServerNetwork} et \textbf{ClientNetwork} exécuté dans un thread
+            \item Dépilement des packets dans les boucles principales
         \end{itemize}
 
     \column{0.3\textwidth}
@@ -577,21 +577,21 @@ subsectionstyle=show/shaded/hide
 \column{0.60\textwidth}
 \textbf{Structures communes}
 \begin{itemize}
-    \item Utilisé à la fois par le client et le serveur
-    \item Peut être généré dynamiquement par un objet du serveur
+    \item Utilisées à la fois par le client et le serveur
+    \item Peuvent être généré dynamiquement par le serveur
 \end{itemize}
 \vspace{0.4cm}
 
 \textbf{Structures de Communication}
 
 \begin{itemize}
-    \item Utilisé pour les échanges réseaux
-    \item Un champ \textit{gf::id} pour les identifier lors de la désérialisation
+    \item Utilisées pour les échanges réseaux
+    \item Un champ \textcolor{blue}{\texttt{gf::id}} pour les identifier lors de la désérialisation
     
     \item Nomenclature spécifique :
     \begin{itemize}
-            \item{ServerXXX = envoyé par le server}
-            \item{ClientXXX = envoyé par le client}
+            \item \textit{ServerXXX} = envoyée par le serveur
+            \item \textit{ClientXXX} = envoyée par le client
     \end{itemize}
 \end{itemize}
 
@@ -626,18 +626,18 @@ struct ServerListRoomPlayers
     \column{0.60\textwidth}
     \textbf{Opérateur}
     \begin{itemize}
-        \item Operateur | avec un type Archive
+        \item Operateur | avec un type \textit{Archive}
     \end{itemize}
 
     \textbf{Sérialisation/Envoi}
     \begin{itemize}
-        \item Fonction \textit{gf::Packet::is(obj)} pour sérialiser en suite d'octet
-        \item Fonction \textit{gf::TcpSocket::sendPacket(packet)} pour envoyer le packet
+        \item Fonction \textcolor{blue}{\texttt{gf::Packet::is(obj)}} pour sérialiser en suite d'octet
+        \item Fonction \textcolor{blue}{\texttt{gf::TcpSocket::sendPacket(packet)}} pour envoyer le packet
     \end{itemize}
     \textbf{Déserialisation}
     \begin{itemize}
         \item Switch case pour identifier le type
-        \item Fonction \textit{gf::Packet::as(objType)} pour désérialiser
+        \item Fonction \textcolor{blue}{\texttt{gf::Packet::as(objType)}} pour désérialiser
     \end{itemize} 
 
     \column{0.30\textwidth}
@@ -660,12 +660,10 @@ Archive &operator|(Archive &ar, PlayerData &data)
 \end{frame}
 
 \begin{frame}[fragile]{Exemple concret : Envoi de la liste des joueurs}
-    \begin{columns}
-        \centering
-        \column{0.50\textwidth}
-        \textbf{Dans le serveur}
-        \begin{lstlisting}[linewidth=5cm,
-            basicstyle=\scriptsize]
+\begin{columns}
+\column{0.50\textwidth}
+\textbf{Dans le serveur}
+\begin{lstlisting}[linewidth=5cm,basicstyle=\scriptsize]
 void Room::broadcastRoomPlayers() {
     ServerListRoomPlayers list;
     for (uint32_t pid : players) {
@@ -678,12 +676,10 @@ void Room::broadcastRoomPlayers() {
     for (uint32_t pid : players) {
         network.send(pid, packet);
 }
-        \end{lstlisting}
-        \centering
-        \column{0.50\textwidth}
-            \textbf{Dans le client}
-                \begin{lstlisting}[linewidth=5cm,
-            basicstyle=\tiny]
+\end{lstlisting}
+\column{0.50\textwidth}
+\textbf{Dans le client}
+\begin{lstlisting}[linewidth=5cm,basicstyle=\tiny]
 void LobbyScene::doUpdate(gf::Time)
 {
  gf::Packet packet;
@@ -699,8 +695,8 @@ void LobbyScene::doUpdate(gf::Time)
       break;
      }
     ...
-        \end{lstlisting}
-    \end{columns}
+\end{lstlisting}
+\end{columns}
     
 \end{frame}
 
