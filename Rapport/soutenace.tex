@@ -79,7 +79,9 @@ Université Marie \& Louis Pasteur, UFR Sciences et Techniques
 % ---------------------
 % Page de titre
 % ---------------------
-\begin{frame}
+\setbeamertemplate{footline}{}
+
+\begin{frame}[noframenumbering]
 \titlepage
 
 
@@ -102,14 +104,16 @@ Encadrant : Julien Bernard\\
 % ---------------------
 % Plan
 % ---------------------
-\begin{frame}{Plan}
+\begin{frame}[noframenumbering]{Plan}
 \tableofcontents
 \end{frame}
 
 % ---------------------
 % Introduction
 % ---------------------
-\section{Introduction}
+\setbeamertemplate{footline}[frame number]
+
+\section*{Introduction}
 
 \begin{frame}{Introduction}
 
@@ -122,6 +126,17 @@ Encadrant : Julien Bernard\\
 \end{frame}
 
 \section{Présentation \& organisation}
+
+\setbeamertemplate{footline}{}
+
+\begin{frame}[noframenumbering]{Plan}
+\tableofcontents[
+currentsection,
+sectionstyle=show/shaded,
+subsectionstyle=show/shaded/hide
+]
+\end{frame}
+\setbeamertemplate{footline}[frame number]
 
 \begin{frame}{Git \& Discord}
 
@@ -214,6 +229,18 @@ Encadrant : Julien Bernard\\
 \end{frame}
 
 \section{Server}
+
+\setbeamertemplate{footline}{}
+
+\begin{frame}[noframenumbering]{Plan}
+\tableofcontents[
+currentsection,
+sectionstyle=show/shaded,
+subsectionstyle=show/shaded/hide
+]
+\end{frame}
+\setbeamertemplate{footline}[frame number]
+
 
 \begin{frame}{Architecture du serveur}
 
@@ -385,6 +412,18 @@ Score = \textcolor{red}{Attraction} - \textcolor{blue}{Répulsions}
 
 \section{Client}
 
+\setbeamertemplate{footline}{}
+
+\begin{frame}[noframenumbering]{Plan}
+\tableofcontents[
+currentsection,
+sectionstyle=show/shaded,
+subsectionstyle=show/shaded/hide
+]
+\end{frame}
+\setbeamertemplate{footline}[frame number]
+
+
 \begin{frame}{SceneManager}
 
 \begin{columns}    
@@ -491,7 +530,20 @@ Elle interagit directement avec le client : lien clics clients - logique évenem
     
 \end{frame}
 
+
 \section{Reseau}
+
+\setbeamertemplate{footline}{}
+
+\begin{frame}[noframenumbering]{Plan}
+\tableofcontents[
+currentsection,
+sectionstyle=show/shaded,
+subsectionstyle=show/shaded/hide
+]
+\end{frame}
+\setbeamertemplate{footline}[frame number]
+
 
 \begin{frame}[fragile]{Architecture}
     \begin{columns}
@@ -652,7 +704,7 @@ void LobbyScene::doUpdate(gf::Time)
     
 \end{frame}
 
-\section{Conclusion}
+\section*{Conclusion}
 
 \begin{frame}{Conclusion}
 
@@ -668,6 +720,10 @@ void LobbyScene::doUpdate(gf::Time)
     
 \end{frame}
 
+\begin{frame}{Remerciement}
 
+    TODO
+    
+\end{frame}
 
 \end{document}
