@@ -387,31 +387,107 @@ Score = \textcolor{red}{Attraction} - \textcolor{blue}{Répulsions}
 
 \begin{frame}{SceneManager}
 
-    TODO
+\begin{columns}    
+\column{0.4\textwidth}
+\centering
+\includegraphics[width=\linewidth]{images/shéma_scenemanager.png}
+
+\column{0.6\textwidth}
+
+\textbf{Fonctionnement du SceneManager}
+
+Le SceneManager gère quelle scène s'affiche :
+
+\begin{itemize}
+    \item Chaque étape de jeu : \textbf{une scène}
+    \item La scène se \textbf{gère elle même}
+    \item \textbf{Séparation} entre logique / rendu
+\end{itemize}
+
+Met aussi en place le réseau
+
+\end{columns}
+
+\end{frame}
+
+\begin{frame}{Envoi}
+
+    Les scènes envoient les messages au serveur
+
+    Deux modèles :
+
+    \begin{itemize}
+        \item événementiel (menus, lobby)
+        \item périodique (mouvements en jeu)
+    \end{itemize}
+
+    Principe d'envoi est \textbf{le même}
+
+    L'envoi transmet l'intention du client au serveur
+
+
     
 \end{frame}
 
 \begin{frame}{Reception}
 
-    TODO
-    
+\begin{columns}    
+
+        
+        \column{0.5\textwidth}
+        
+        Réception dans un \textbf{Thread dédié}
+        
+        Paquets stockés dans une file partagée :
+        
+        \begin{itemize}
+            \item Scène consomme paquets \textbf{selon leur type}
+            \item Gère seulement ce \textbf{qui les concerne}
+        \end{itemize}
+
+        La scène se met à jour en fonction de ce qu'elle a reçu
+        
+        
+
+\column{0.5\textwidth}
+\centering
+\includegraphics[width=\linewidth]{images/filerecu.png}
+\end{columns}
+
 \end{frame}
 
-\begin{frame}{Envoi}
-
-    TODO
-    
-\end{frame}
 
 \begin{frame}{Input}
 
-    TODO
+
+    Système d'\textbf{Actions} :
+
+    Mapping clavier -> actions (up, down, left, right)
+
+    Événements gérés par chaque scène :
+    \begin{itemize}
+        \item Passage de la souris 
+        \item Clics de la souris 
+        \item Redimmension de la fenêtre
+    \end{itemize}
+
+    Au final, server determine ce qui est effectif
     
 \end{frame}
 
 \begin{frame}{Entité}
 
-    TODO
+Les entités gèrent le \textbf{rendu}
+
+Les scènes gèrent la \textbf{logique}
+
+Chaque scène a une entité
+
+L'entité traduit la logique décidée en éléments graphiques concrets
+
+Elle interagit directement avec le client : lien clics clients - logique évenement
+
+
     
 \end{frame}
 

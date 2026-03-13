@@ -1,0 +1,43 @@
+\frametitle{Exemple concret : Envoi de la liste des joueurs}
+\begin{columns}
+        \centering
+        \column{0.50\textwidth}
+        \textbf{Dans le serveur}
+        \begin{lstlisting}[linewidth=5cm,
+            basicstyle=\scriptsize]
+void Room::broadcastRoomPlayers() {
+    ServerListRoomPlayers list;
+    for (uint32_t pid : players) {
+        PlayerData pdata;
+        ...
+        list.players.push_back(pdata);
+    }
+    gf::Packet packet;
+    packet.is(list);
+    for (uint32_t pid : players) {
+        network.send(pid, packet);
+}
+        \end{lstlisting}
+        \centering
+        \column{0.50\textwidth}
+            \textbf{Dans le client}
+                \begin{lstlisting}[linewidth=5cm,
+            basicstyle=\tiny]
+void LobbyScene::doUpdate(gf::Time)
+{
+ gf::Packet packet;
+ while (m_game.tryPopPacket(packet)) {
+    switch (packet.getType()) {
+     case ServerRoomSettings::type:
+      ...
+     case ServerListRoomPlayers::type:
+     {
+      auto data =
+            packet.as<ServerListRoomPlayers>();
+      setPlayers(data.players);
+      break;
+     }
+    ...
+        \end{lstlisting}
+    \end{columns}
+

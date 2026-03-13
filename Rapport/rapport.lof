@@ -1,0 +1,17 @@
+\babel@toc {french}{}\relax 
+\contentsline {figure}{\numberline {1}{\ignorespaces PacMan : le jeu original\relax }}{5}{figure.caption.5}%
+\contentsline {figure}{\numberline {2}{\ignorespaces Exemple de Chaine de responsabilité\relax }}{7}{figure.caption.6}%
+\contentsline {figure}{\numberline {3}{\ignorespaces Chaîne de responsabilité côté serveur\relax }}{10}{figure.caption.7}%
+\contentsline {figure}{\numberline {4}{\ignorespaces Diagrammes de classe de l'architecture réseau\relax }}{11}{figure.caption.8}%
+\contentsline {figure}{\numberline {5}{\ignorespaces Plateau apès l'algorithme de Prim\relax }}{13}{figure.caption.9}%
+\contentsline {figure}{\numberline {6}{\ignorespaces Plateau apès génération de la hut\relax }}{14}{figure.caption.10}%
+\contentsline {figure}{\numberline {7}{\ignorespaces Plateau apès ajout de cycles\relax }}{15}{figure.caption.11}%
+\contentsline {figure}{\numberline {8}{\ignorespaces Plateau apès suppression des culs-de-sac et ajout des portails\relax }}{16}{figure.caption.12}%
+\contentsline {figure}{\numberline {9}{\ignorespaces Vue des traces\relax }}{18}{figure.caption.17}%
+\contentsline {figure}{\numberline {10}{\ignorespaces Vue de la Room\relax }}{19}{figure.caption.21}%
+\contentsline {figure}{\numberline {11}{\ignorespaces Structure \textit {commune} \textit {PlayerData}\relax }}{24}{figure.caption.32}%
+\contentsline {figure}{\numberline {12}{\ignorespaces Structure de \textit {communication} \textit {ServerListRoomPlayers}\relax }}{24}{figure.caption.33}%
+\contentsline {figure}{\numberline {13}{\ignorespaces L'opérateur | pour la structure \textit {PlayerData}\relax }}{25}{figure.caption.34}%
+\contentsline {figure}{\numberline {14}{\ignorespaces L'opérateur | pour la structure \textit {ServerListRoomPlayers}\relax }}{25}{figure.caption.35}%
+\contentsline {figure}{\numberline {15}{\ignorespaces Version simplifié de la ligne de vie du client\relax }}{26}{figure.caption.38}%
+\contentsline {figure}{\numberline {16}{\ignorespaces Version simplifié de la ligne de vie du serveur\relax }}{27}{figure.caption.39}%
