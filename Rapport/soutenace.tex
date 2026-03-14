@@ -114,13 +114,58 @@ Encadrant : Julien Bernard\\
 
 \section*{Introduction}
 
+
+
 \begin{frame}{Introduction}
 
+    Jeu d’arcade apparu dans les \textbf{années 1980}
+
+\begin{columns}
+
+\column{0.5\textwidth}
+
 \begin{itemize}
-\item Contexte du projet
-\item Objectifs coucou
-\item Organisation
+    \item \texttt{Pac-Man} (le joueur) évolue dans un \textbf{labyrinthe}
+    \item Objectif : manger toutes les \textbf{pac-gommes}
+    \item Éviter les \textbf{fantômes}
+    \item Certaines pac-gommes permettent de \textbf{manger les fantômes}
 \end{itemize}
+
+\vspace{0.3cm}
+
+\textbf{Objectifs :}
+\begin{itemize}
+    \item Jeu fonctionnel en réseau
+    \item Génération procédurale du plateau
+    \item Intelligence artificielle des fantômes
+\end{itemize}
+
+\column{0.5\textwidth}
+
+\centering
+\includegraphics[width=0.9\textwidth]{images/pac_man_original.png}
+
+\vspace{0.2cm}
+\small Jeu original \texttt{Pac-Man}
+
+\end{columns}
+
+\end{frame}
+
+\begin{frame}{Règles et déroulement du Jeu}
+
+    \textbf{Adaptation du projet :}
+    \begin{itemize}
+        \item 1 joueur \texttt{Pac-Man}
+        \item Plusieurs joueurs \texttt{Fantômes}
+        \item Fantômes contrôlés par \textbf{IA} si joueurs insuffisants
+    \end{itemize}
+    
+\vspace{0.5cm}
+    \textbf{Déroulement d'une partie :}
+
+    Connexion > Liste des Rooms > Room > Jeu > Fin de jeu
+
 
 \end{frame}
 
@@ -164,41 +209,6 @@ subsectionstyle=show/shaded/hide
 
 \end{frame}
 
-\begin{frame}{Présentation du jeu \texttt{Pac-Man}}
-
-    Jeu d’arcade apparu dans les \textbf{années 1980}
-
-\begin{columns}
-
-\column{0.5\textwidth}
-
-\begin{itemize}
-    \item \texttt{Pac-Man} (le joueur) évolue dans un \textbf{labyrinthe}
-    \item Objectif : manger toutes les \textbf{pac-gommes}
-    \item Éviter les \textbf{fantômes}
-    \item Certaines pac-gommes permettent de \textbf{manger les fantômes}
-\end{itemize}
-
-\vspace{0.3cm}
-
-\textbf{Adaptation du projet :}
-\begin{itemize}
-    \item 1 joueur \texttt{Pac-Man}
-    \item plusieurs joueurs \texttt{Fantômes}
-    \item fantômes contrôlés par \textbf{IA} si joueurs insuffisants
-\end{itemize}
-
-\column{0.5\textwidth}
-
-\centering
-\includegraphics[width=0.9\textwidth]{images/pac_man_original.png}
-
-\vspace{0.2cm}
-\small Jeu original \texttt{Pac-Man}
-
-\end{columns}
-
-\end{frame}
 
 \begin{frame}{Organisation du projet}
 
