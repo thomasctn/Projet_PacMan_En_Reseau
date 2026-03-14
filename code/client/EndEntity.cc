@@ -9,6 +9,8 @@
 
 EndEntity::EndEntity()
 : m_font("../common/fonts/arial.ttf")
+, m_font_motion_control("../common/fonts/motion-control.bold.otf")
+, m_font_mc_italic("../common/fonts/motion-control.bolditalic.otf")
 , m_enterWidget("Retour au Lobby", m_font)
 {
     m_enterWidget.setCallback([this](){
@@ -42,29 +44,52 @@ void EndEntity::render(gf::RenderTarget& target, const gf::RenderStates& states)
     const float LOGICAL_W = 1280.f;
     const float LOGICAL_H = 720.f;
 
-    unsigned int titleSize = 64u;
+    float leftX  = LOGICAL_W * 0.2f;
+    float rightX = LOGICAL_W * 0.55f;
+    //titre a gauche
+    unsigned int titleSize = 120u;
+
     gf::Text title;
-    title.setFont(m_font);
+    title.setFont(m_font_mc_italic);
     title.setCharacterSize(titleSize);
-    title.setString("Fin de Jeu");
-    title.setAnchor(gf::Anchor::Center);
     title.setColor(gf::Color::White);
-    title.setPosition({ LOGICAL_W * 0.5f, LOGICAL_H * 0.15f });
+    title.setAnchor(gf::Anchor::TopLeft);
+
+    title.setString("FIN\nDE JEU");
+    title.setPosition({ leftX, LOGICAL_H * 0.3f });
+
     target.draw(title, states);
 
-    unsigned int reasonSize = 32u;
+    //rectangle autour
+    float playBoxWidth = 300.f;
+    float playBoxHeight = 250.f;
+    float playBoxLeft = leftX -20.f;
+    float playBoxTop = LOGICAL_H * 0.3f -90.f;
+    gf::RoundedRectangleShape playBox({ playBoxWidth, playBoxHeight }, 14.f);
+    playBox.setPosition({ playBoxLeft, playBoxTop });
+    playBox.setColor(gf::Color::Transparent);
+    playBox.setOutlineThickness(2.f);
+    playBox.setOutlineColor(gf::Color::Blue);
+
+    target.draw(playBox, states);
+
+
+    //la raison
+    unsigned int reasonSize = 36u;
+
     gf::Text reasonText;
-    reasonText.setFont(m_font);
+    reasonText.setFont(m_font_motion_control);
     reasonText.setCharacterSize(reasonSize);
     reasonText.setColor(gf::Color::White);
     reasonText.setAnchor(gf::Anchor::TopLeft);
+
 
     std::string reasonStr;
     switch (m_endReason) {
         case GameEndReason::ALL_DOT_EATEN: 
             reasonStr = "Pacman a mangé toutes les pacgommes.\nPacman gagne !"; break;
         case GameEndReason::TIME_OUT:       
-            reasonStr = "Le temps est écoulé.\nLes fantômes gagnent !"; break;
+            reasonStr = "Le temps est écoulé sans \n que pacman ai mangé toutes \nles pacgommes.\nLes fantômes gagnent !"; break;
         case GameEndReason::PACMAN_DEATH:   
             reasonStr = "Pacman est mort trop de fois.\nLes fantômes gagnent!"; break;
         case GameEndReason::ALL_GHOST_DEATH:
@@ -74,17 +99,21 @@ void EndEntity::render(gf::RenderTarget& target, const gf::RenderStates& states)
     }
 
     reasonText.setString(reasonStr);
-    reasonText.setPosition({ LOGICAL_W * 0.1f, LOGICAL_H * 0.25f });
+    reasonText.setPosition({ rightX, LOGICAL_H * 0.25f });
     target.draw(reasonText, states);
 
-    unsigned int scoreSize = 28u;
+    //le score
+    unsigned int scoreSize = 32u;
+
     gf::Text scoreText;
-    scoreText.setFont(m_font);
+    scoreText.setFont(m_font_motion_control);
     scoreText.setCharacterSize(scoreSize);
     scoreText.setColor(gf::Color::White);
     scoreText.setAnchor(gf::Anchor::TopLeft);
-    scoreText.setString("Score final de Pacman : " + std::to_string(m_lastScore));
-    scoreText.setPosition({ LOGICAL_W * 0.1f, LOGICAL_H * 0.40f });
+
+    scoreText.setString("Score final : " + std::to_string(m_lastScore));
+    scoreText.setPosition({ rightX , LOGICAL_H * 0.50f });
+
     target.draw(scoreText, states);
 
     float bw = 400.f; // largeur du bouton

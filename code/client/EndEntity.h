@@ -30,6 +30,9 @@ public:
 
 private:
     gf::Font m_font;
+    gf::Font m_font_motion_control;
+    gf::Font m_font_mc_italic;
+    
 
     gf::WidgetContainer m_container;
     gf::TextButtonWidget m_enterWidget;
