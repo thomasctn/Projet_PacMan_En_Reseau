@@ -48,7 +48,7 @@ public:
         return actions; 
     }
     void goToGameScene(const std::vector<PlayerData>& players, const BoardCommon& board,const std::unordered_map<gf::Vector2i, gf::Vector2i>& holeLinks);
-    void goToEndScene(GameEndReason& endReason);
+    void goToEndScene(GameEndReason& endReason, int lastScore);
     bool tryPopPacket(gf::Packet& out);
     void startNetwork(const std::string& host, const std::string& port);
     WelcomeScene welcomeScene; //toutes mes scenes
@@ -93,7 +93,6 @@ private:
 
 
     RoomSettings roomSettings;
-    int lastScore = 0;
     uint32_t myId = 0;
 
     gf::ActionContainer actions;

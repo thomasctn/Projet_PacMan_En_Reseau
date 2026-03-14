@@ -100,7 +100,7 @@ void ClientGame::goToGameScene(const std::vector<PlayerData>& players,const Boar
 
 }
 
-void ClientGame::goToEndScene(GameEndReason& endReason){
+void ClientGame::goToEndScene(GameEndReason& endReason, int lastScore){
     endScene.initEnd(endReason, lastScore);
     replaceAllScenes(endScene);
 }

@@ -68,7 +68,7 @@ void GameScene::doUpdate(gf::Time time) {
             case ServerGameEnd::type: {
                 auto data = packet.as<ServerGameEnd>();
                 gf::Log::info("Game end reçu, raison: %d\n", static_cast<int>(data.reason));
-                m_game.goToEndScene(data.reason);
+                m_game.goToEndScene(data.reason, m_entity.getLastScore());
                 break;
             }
 

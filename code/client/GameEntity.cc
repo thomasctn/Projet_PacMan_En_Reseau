@@ -395,6 +395,7 @@ void GameEntity::renderSprites(gf::RenderTarget &target, const gf::RenderStates 
             scoreText.setCharacterSize(16u);
             scoreText.setColor(gf::Color::White);
             scoreText.setString(std::to_string(s.score));
+            lastScore=s.score;
             scoreText.setPosition({px + 5.f, py - 18.f});
             target.draw(scoreText, states);
 

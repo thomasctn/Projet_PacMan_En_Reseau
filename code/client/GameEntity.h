@@ -39,7 +39,7 @@ public:
     void startPacmanPower();
     void updatePacmanPower(int timeLeft);
     void endPacmanPower();
-    
+    int getLastScore() {return lastScore;};
 void render(gf::RenderTarget& target, const gf::RenderStates& states) override;
 
 private:
@@ -62,6 +62,8 @@ private:
     unsigned int m_timeLeft = 0;
     std::unordered_map<gf::Vector2i, gf::Vector2i> m_holeLinks;
     uint32_t m_clientId = 0;
+
+    int lastScore;
 
     int m_myHp = 2;
     PlayerData m_clientData;
