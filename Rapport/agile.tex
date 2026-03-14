@@ -92,7 +92,9 @@
 \tableofcontents
 \newpage
 
-\section{Introduction}
+\section*{Introduction}
+\addcontentsline{toc}{section}{Introduction}
+
 
 Le projet de Licence 3 Informatique avait pour objectif la conception et le développement d’un jeu multijoueur en réseau inspiré du jeu d’arcade Pac-Man. 
 Ce projet mobilise de nombreuses compétences techniques tel que l'architecture client-serveur, synchronisation réseau, génération procédurale de contenu, intelligence artificielle et conception d’interface graphique.
@@ -100,29 +102,38 @@ Ce projet mobilise de nombreuses compétences techniques tel que l'architecture 
 Le principal défi technique résidait dans la mise en place d’un client-serveur autoritaire capable de gérer plusieurs connexions simultanées tout en garantissant la cohérence du jeu. 
 
 Le projet s’est déroulé en deux grandes phases. Une première phase, de mi-octobre à décembre, a permis de concevoir un prototype minimal client-serveur servant de base technique. 
-Une seconde phase plus intensive, organisée en trois sprints d’une semaine chacun au mois de janvier, a permis de transformer ce prototype en une version fonctionnelle et stable du jeu.
+Une seconde phase plus intensive, organisée en trois sprints d’une semaine durant le mois de janvier, a permis de transformer ce prototype en une version fonctionnelle et stable du jeu.
 
 Ce rapport présente l’organisation Agile adoptée, le déroulement des différents sprints, les difficultés rencontrées ainsi que les adaptations mises en place.
 
 \section{Organisation du projet et approche Agile}
 
-Le projet a été en suivant une organisation inspirée des méthodes Agile, avec une progression de type incrémentale afin de valider régulièrement les choix techniques et d’adapter le développement aux difficultés rencontrées. Plutôt que de se baser sur un cahier des charges figé, l’équipe a avancé par itérations successives, chaque sprint visant un objectif fonctionnel précis et donnant lieu à une version exécutable, même partielle. Cette approche a réduit les risques liés à l’architecture réseau et évité l’accumulation d’erreurs détectées trop tardivement, tout en s’inspirant du cadre Scrum adapté au contexte universitaire, reposant sur des cycles courts et une communication continue.
+Le projet a été en suivant une organisation inspirée des méthodes Agile, avec une progression de type incrémentale afin de valider régulièrement les choix techniques et d’adapter le développement aux difficultés rencontrées. Plutôt que de se baser sur un cahier des charges figé, bien qu'il soit défini, l’équipe a avancé par itérations successives, chaque sprint visant un objectif fonctionnel précis et donnant lieu à une version exécutable, même partielle. Cette approche a réduit les risques liés à l’architecture réseau et évité l’accumulation d’erreurs détectées trop tardivement, tout en s’inspirant du cadre Scrum qui est adapté au contexte universitaire et qui repose sur des cycles courts et une communication continue.
 
-L’équipe était composée de trois étudiants, nous avons répartit les tâches comme il suit : Thomas s’est chargé principalement du développement serveur, incluant la gestion des connexions, la logique centrale, la génération procédurale et les intelligences artificielles ; Auriane a développé le client, gérant l’interface graphique, l’affichage et les interactions utilisateur ; Benoît est intervenu à la fois sur client et serveur, avec un focus sur la communication réseau et la cohérence des échanges. Les décisions techniques majeures étaient prises de manière collaborative pour assurer la cohérence globale du projet.
+L’équipe était composée de trois étudiants, les tâches ont été répartit  comme il suit :\\
+\begin{itemize}
+  \item Thomas s’est chargé principalement du développement serveur, incluant la gestion des connexions, la logique centrale, la génération procédurale et les intelligences artificielles.
+  \item Auriane a développé le client, gérant l’interface graphique, l’affichage et les interactions utilisateur.
+  \item Benoît est intervenu à la fois sur client et serveur, avec un focus sur la communication réseau et la cohérence des échanges.\\
+\end{itemize}
+
+Les décisions techniques majeures étaient prises de manière collaborative pour assurer la cohérence globale du projet.
 
 Lors de nos sprints, des réunions hebdomadaires avec le tuteur du projet ont permis de présenter l’avancement, valider les choix et ajuster les priorités.
 
-La communication a été continue, principalement via Discord, pour coordonner rapidement les développements et résoudre les problèmes techniques. La gestion du code a été assurée par GitHub, pour facilité le travail en parallèle, le suivi de l’évolution et le maintien d’un historique clair des modifications. Chaque sprint suivait un cycle défini : définition des objectifs en début de semaine, développement parallèle des composantes, communication régulière pour synchroniser client et serveur, point intermédiaire avec le tuteur, puis stabilisation et validation en fin de sprint. Cette organisation a permis d’identifier rapidement les blocages techniques, notamment lors de la refonte du prototype serveur pour le lobby ou de la mise en place du gestionnaire de scènes côté client.
+La communication a été continue, principalement via Discord, pour coordonner rapidement les développements et résoudre les problèmes techniques. La gestion du code a été assurée par le gestionnaire de versionnement Git, pour facilité le travail en parallèle, le suivi de l’évolution et le maintien d’un historique clair des modifications. Chaque sprint suivait un cycle défini : définition des objectifs en début de semaine, développement parallèle des composantes, communication régulière pour synchroniser client et serveur, point intermédiaire avec le tuteur, puis stabilisation et validation en fin de sprint. Cette organisation a permis d’identifier rapidement les blocages techniques, notamment lors de la refonte du prototype serveur pour le lobby ou de la mise en place du gestionnaire de scènes côté client.
 
-\section{Sprint 1 : Mise en place de l’architecture complète}
+\section{Les Sprints}
+
+\subsection{Sprint 1 : Mise en place de l’architecture complète}
 
 Le premier sprint a constitué une étape pour poser une nouvelle base. il visait à transformer le prototype minimal en une vrai architecture client-serveur complète et structurée. L’objectif était de permettre la gestion de connexions multiples, l’intégration d’un système de lobby, la création et la gestion de rooms, l’instanciation de parties indépendantes, l’exécution d’une boucle de jeu serveur ainsi que la génération procédurale du plateau.
 
 Le prototype initial se limitait à une connexion simple avec échanges de messages basiques, sans gestion multi-parties ni organisation modulaire. La principale difficulté a donc été de refondre cette base sans introduire de régressions. Le serveur a été restructuré autour de modules distincts : gestion des connexions, lobby, rooms, instances de jeu et boucle principale. Cette séparation des responsabilités a clarifié la logique métier et limité le couplage interne.
 
-L’introduction du lobby a nécessité une réorganisation des états serveur (connecté, lobby, en partie) et l’isolation complète des instances de jeu, chaque room disposant de sa propre boucle et de son propre état. La boucle serveur, c\oe ur de l’architecture autoritaire, centralisait les décisions logiques et la synchronisation. Malgré des difficultés liées aux transitions d’états et à la synchronisation lors de créations simultanées de rooms, les itérations successives ont permis de stabiliser l’ensemble. À la fin du sprint, l’architecture était modulaire, le lobby fonctionnel et les bases techniques solidement établies pour la suite du développement.
+L’introduction du lobby a nécessité une réorganisation des états serveur (connecté, lobby, en partie) et l’isolation complète des instances de jeu, chaque room disposant de sa propre boucle et de son propre état. La boucle serveur, le c\oe ur de l’architecture autoritaire, centralisait les décisions logiques et la synchronisation. Malgré des difficultés liées aux transitions d’états et à la synchronisation lors de créations simultanées de rooms, les itérations successives ont permis de stabiliser l’ensemble. À la fin du sprint, l’architecture était modulaire, le lobby fonctionnel et les bases techniques solidement établies pour la suite du développement.
 
-\section{Sprint 2 : Développement du client et intégration des bots}
+\subsection{Sprint 2 : Développement du client et intégration des bots}
 
 Le second sprint avait pour objectif de rendre le système réellement jouable. Après la stabilisation de l’architecture serveur, cette phase s’est concentrée sur la conception d’un client structuré et sur l’intégration de bots contrôlés par intelligence artificielle. Les priorités étaient la mise en place d’une architecture client claire, l’implémentation d’un gestionnaire de scènes (menu, lobby, room, partie), la synchronisation fiable avec l’état autoritaire du serveur et le développement de comportements autonomes pour les bots. Cette étape renforçait l’interdépendance entre client et serveur, rendant la communication réseau centrale.
 
@@ -132,7 +143,7 @@ La synchronisation a constitué un enjeu majeur : le client envoyait uniquement 
 
 Malgré des difficultés liées au gestionnaire de scènes et aux adaptations continues du protocole réseau, les itérations courtes ont permis de stabiliser l’ensemble. À la fin du sprint, le projet disposait d’un client fonctionnel, de bots intégrés et d’un système jouable de bout en bout, marquant le passage à une expérience interactive complète.
 
-\section{Sprint 3 : Stabilisation, amélioration visuelle et débogage intensif}
+\subsection{Sprint 3 : Stabilisation, amélioration visuelle et débogage intensif}
 
 Le troisième et dernier sprint a été consacré à la stabilisation du système et à l’amélioration de l’expérience utilisateur. Contrairement aux phases précédentes, centrées sur l’architecture et l’intégration des fonctionnalités, cette étape visait la qualité, la robustesse et la finalisation du projet : correction des incohérences client-serveur, fluidité de l’interface, ergonomie optimisée et stabilisation de la boucle de jeu et des transitions d’états.
 
@@ -165,7 +176,9 @@ Cette réalisation a favorisé le développement de compétences clés telles qu
 Avec un regard critique, plusieurs axes d’amélioration peuvent être envisagés pour un projet similaire : la mise en place d’un outil formel de gestion de tâches, une définition plus précise des critères de validation de chaque sprint, une formalisation plus rigoureuse du protocole réseau dès les premières étapes et l’intégration de tests automatisés afin de sécuriser les refactorisations. Ces évolutions contribueraient à renforcer la robustesse organisationnelle et technique de l’ensemble.
 
 Enfin, ce projet représente une synthèse des compétences acquises au cours de la formation et illustre la complexité réelle d’un développement logiciel impliquant architecture distribuée, gestion d’état et interaction utilisateur. L’approche Agile adoptée a permis de transformer une idée initiale en un système cohérent et fonctionnel malgré les contraintes temporelles et techniques, constituant ainsi une base solide pour aborder des projets de plus grande envergure avec rigueur méthodologique et maîtrise technique.
-\section{Conclusion}
+
+\section*{Conclusion}
+\addcontentsline{toc}{section}{Conclusion}
 
 Le développement du jeu Pac-Man multijoueur en réseau a constitué une expérience complète d’ingénierie logicielle, mobilisant à la fois des compétences techniques avancées et une organisation méthodologique structurée.
 
