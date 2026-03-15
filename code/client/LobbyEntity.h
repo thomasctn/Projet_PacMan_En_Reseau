@@ -47,6 +47,9 @@ public:
   void setRoomSettings(const RoomSettings &settings);
   void setClientId(uint32_t id);
 
+  void startRefused() { startIsRefused = true;};
+  void resetStartRefused() {startIsRefused = false;};
+
   LobbyAction getAndResetLastAction();
 
   void render(gf::RenderTarget &target, const gf::RenderStates &states) override;
@@ -57,6 +60,7 @@ private:
   void renderRoleSelectionAndReady(gf::RenderTarget &target, const gf::RenderStates &states, gf::Vector2f position);
   void renderSettingsRow(gf::RenderTarget &target, const gf::RenderStates &states, gf::Vector2f position, std::string stgName, gf::TextButtonWidget &minusBtn, gf::TextButtonWidget &plusBtn, int currentValue);
   void renderSettings(gf::RenderTarget &target, const gf::RenderStates &states, gf::Vector2f position);
+  void renderStartRefused(gf::RenderTarget &target, const gf::RenderStates &states, gf::Vector2f position);
   void defaultButtonColor(gf::TextButtonWidget &w);
 
 public:
@@ -112,4 +116,5 @@ private:
   PlayerData m_client;
   RoomSettings m_roomSettings{};
   uint32_t m_clientId = 0;
+  bool startIsRefused = false;
 };

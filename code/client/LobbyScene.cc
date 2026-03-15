@@ -84,6 +84,14 @@ void LobbyScene::doUpdate(gf::Time)
             break;
         }
 
+        case ServerStartGameRefused::type:
+        {
+            auto data = packet.as<ServerStartGameRefused>();
+            // data.reason
+            m_entity.startRefused();
+            break;
+        }
+
         case ServerLeaveRoom::type:
             gf::Log::info("Serveur: quitté la room\n");
             m_game.requestScene(SceneRequest::GoToLobbyList);
@@ -104,6 +112,7 @@ void LobbyScene::doUpdate(gf::Time)
 
             gf::Log::info("Game start reçu -> passage en Playing\n");
             // Passer les données à GameScene AVANT de changer de scène
+            m_entity.resetStartRefused();
             m_game.goToGameScene(data.players, data.board, data.holeLinks);
             break;
         }

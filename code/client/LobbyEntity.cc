@@ -195,6 +195,9 @@ void LobbyEntity::render(gf::RenderTarget &target, const gf::RenderStates &state
     renderSettings(target, states, settingsPos);
     renderPlayerList(target, states, playerListPos);
     renderRoleSelectionAndReady(target, states, changeRolePos);
+
+    if(startIsRefused)
+        renderStartRefused(target, states, changeRolePos);
 }
 
 void LobbyEntity::renderPlayerRow(gf::RenderTarget &target, const gf::RenderStates &states, gf::Vector2f position, const PlayerData &data)
@@ -309,7 +312,7 @@ void LobbyEntity::renderRoleSelectionAndReady(gf::RenderTarget &target, const gf
     // Desciption du rôle
     m_roleDesc.setParagraphWidth(playBox.getSize().x * 0.9f);
     m_roleDesc.setPosition({position.x + playBox.getSize().x * .05f, position.y + playBox.getSize().y * .375f});
-    m_roleDesc.setString("Une description de l\'objectif du rôle et de ses pouvoirs.\n voilà...");
+    m_roleDesc.setString("Pacman doit manger toutes les pacgommes.\nLes fantômes doivent manger Pacman. ");
     target.draw(m_roleDesc, states);
 
     // Bouton changement rôle
@@ -328,6 +331,39 @@ void LobbyEntity::renderRoleSelectionAndReady(gf::RenderTarget &target, const gf
     // Bouton quitter
     m_leaveBtn.setPosition({position.x + playBox.getSize().x / 2.f, position.y + playBox.getSize().y * .9f});
     target.draw(m_leaveBtn, states);
+}
+
+void LobbyEntity::renderStartRefused(gf::RenderTarget &target, const gf::RenderStates &states, gf::Vector2f position){
+    const float LOGICAL_W = 1280.f;
+    const float LOGICAL_H = 720.f;
+
+    gf::Vector2f playBoxSize = { LOGICAL_W / 4.f, LOGICAL_H * 0.825f };
+
+    float textY = position.y + playBoxSize.y * 0.62f;
+
+    gf::Text refusedText;
+    refusedText.setFont(m_font);
+    refusedText.setCharacterSize(17);
+    refusedText.setColor(gf::Color::White);
+    refusedText.setAnchor(gf::Anchor::TopLeft);
+
+    refusedText.setString("Une partie ne peut pas démarrer\nsans qu'un joueur ait pour rôle\nPacman.");
+
+    refusedText.setPosition({position.x + playBoxSize.x * 0.08f,textY + 0.08f});
+
+    target.draw(refusedText, states);
+
+    //rectangle rouge autour du texte
+    gf::Vector2f rectSize = {playBoxSize.x * 0.9f, LOGICAL_H * 0.1f};
+
+    gf::RoundedRectangleShape rect(rectSize, 8.f);
+    rect.setPosition({position.x + playBoxSize.x * 0.05f,textY - 20.f});
+
+    rect.setColor(gf::Color::Transparent);
+    rect.setOutlineThickness(2.f);
+    rect.setOutlineColor(gf::Color::Red);
+
+    target.draw(rect, states);
 }
 
 void LobbyEntity::renderSettingsRow(gf::RenderTarget &target, const gf::RenderStates &states, gf::Vector2f position, std::string stgName, gf::TextButtonWidget &minusBtn, gf::TextButtonWidget &plusBtn, int currentValue)
