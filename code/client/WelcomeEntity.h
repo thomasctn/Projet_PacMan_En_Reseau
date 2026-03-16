@@ -29,4 +29,5 @@ private:
     bool m_clicked = false;
     bool m_rulesClicked = false; 
     gf::Font& m_font;
+    gf::Font m_font_emulogic;
 };

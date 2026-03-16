@@ -10,6 +10,7 @@ WelcomeEntity::WelcomeEntity(gf::Font& font)
 : m_enterWidget("ENTRER", font)
 , m_rulesWidget("REGLES", font)
 , m_font(font)
+, m_font_emulogic("../common/fonts/Emulogic-zrEw.ttf")
 {
     m_enterWidget.setCallback([this]() { m_clicked = true; });
     m_container.addWidget(m_enterWidget);
@@ -48,15 +49,25 @@ void WelcomeEntity::render(gf::RenderTarget& target, const gf::RenderStates& sta
     const float LOGICAL_W = 1280.f;
     const float LOGICAL_H = 720.f;
 
-    unsigned titleSize = 64u; 
+    unsigned titleSize = 70u; 
     gf::Text title;
-    title.setFont(m_font);
+    title.setFont(m_font_emulogic);
     title.setCharacterSize(titleSize);
     title.setString("PACMAN");
     title.setAnchor(gf::Anchor::Center);
     title.setColor(gf::Color::White);
     title.setPosition({ LOGICAL_W * 0.5f, LOGICAL_H * 0.2f });
     target.draw(title, states);
+
+    unsigned subTitleSize = 22u; 
+    gf::Text subtitle;
+    subtitle.setFont(m_font_emulogic);
+    subtitle.setCharacterSize(subTitleSize);
+    subtitle.setString("EN RESEAU");
+    subtitle.setAnchor(gf::Anchor::Center);
+    subtitle.setColor(gf::Color::White);
+    subtitle.setPosition({ LOGICAL_W * 0.5f, LOGICAL_H * 0.3f });
+    target.draw(subtitle, states);
 
     unsigned charSize = 26u;
 

@@ -23,4 +23,6 @@ private:
     gf::WidgetContainer m_container;
     bool m_clicked = false;
     gf::Font& m_font;
+    gf::Font m_font_emulogic;
+    
 };

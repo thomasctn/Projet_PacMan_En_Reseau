@@ -9,6 +9,7 @@
 RulesEntity::RulesEntity(gf::Font& font)
 : m_returnWidget("RETOUR", font)
 , m_font(font)
+, m_font_emulogic("../common/fonts/Emulogic-zrEw.ttf")
 {
     m_returnWidget.setCallback([this]() { m_clicked = true; });
     m_container.addWidget(m_returnWidget);
@@ -63,7 +64,7 @@ void RulesEntity::render(gf::RenderTarget& target, const gf::RenderStates& state
     const float headerTop = LOGICAL_H * 0.12f;
 
     gf::Text title;
-    title.setFont(m_font);
+    title.setFont(m_font_emulogic);
     title.setCharacterSize(92u);
     title.setString("PACMAN");
     title.setAnchor(gf::Anchor::TopLeft);
@@ -72,9 +73,9 @@ void RulesEntity::render(gf::RenderTarget& target, const gf::RenderStates& state
     target.draw(title, states);
 
     gf::Text subtitle;
-    subtitle.setFont(m_font);
+    subtitle.setFont(m_font_emulogic);
     subtitle.setCharacterSize(40u);
-    subtitle.setString("EN RÉSEAU");
+    subtitle.setString("EN RESEAU");
     subtitle.setAnchor(gf::Anchor::TopLeft);
     subtitle.setColor(gf::Color::White);
     subtitle.setPosition({ q1, headerTop + 92.f + 8.f });
