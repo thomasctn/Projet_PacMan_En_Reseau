@@ -67,7 +67,7 @@
 \institute{
 Université Marie \& Louis Pasteur, UFR Sciences et Techniques
 }
-\title{Projet L3 : PacMan en réseau}
+\title{Projet Intégrateur : PacMan en réseau}
 \date{Licence CMI Informatique -- 3\textsuperscript{ème} année \\ 2025--2026}
 
 % =====================
@@ -186,17 +186,19 @@ subsectionstyle=show/shaded/hide
 
 \begin{columns}
 
-\column{0.5\textwidth}
+\column{0.6\textwidth}
 
 \begin{itemize}
     \item \textbf{Git}
-    \vspace{0.8cm}
-    \item \textbf{Réunions régulières} (toutes les 1 à 2 semaines)
     \vspace{0.5cm}
+    \item \textbf{C++} avec le framework \textbf{GameDev}
+    \vspace{0.3cm}   
+    \item \textbf{Réunions régulières} (toutes les 1 à 2 semaines)
+    \vspace{0.3cm}
     \item \textbf{Communication quotidienne} avec \textbf{Discord}
 \end{itemize}
 
-\column{0.5\textwidth}
+\column{0.4\textwidth}
 
 \centering
 \includegraphics[width=0.6\textwidth]{images/git.png}
@@ -462,16 +464,15 @@ Met aussi en place le réseau
 
 \begin{columns} 
     \column{0.45\textwidth}
-    Système d'\textbf{Actions} :
-
-    Mapping clavier -> actions (up, down, left, right)
-
-    Événements gérés par chaque scène :
-    \begin{itemize}
+    Système d'\textbf{Événements} :
+\vspace{0.3cm}
+        \begin{itemize}
+        \item Mapping clavier -> actions (up, down, left, right)
         \item Passage de la souris 
         \item Clics de la souris 
         \item Redimmension de la fenêtre
     \end{itemize}
+\vspace{0.3cm}
 
     Une partie est \textbf{envoyé au serveur}
 
@@ -542,9 +543,9 @@ Met aussi en place le réseau
 \centering
 
 \includegraphics[height=0.45\textheight]{images/rules.png}
-\vspace{0.5cm}
-Chaque scène a une entité :
 
+Chaque scène a une entité\\
+\vspace{0.2cm}
 Les entités ont \textbf{peu de travail :}
 \begin{itemize}
     \item Traduit la logique en \textbf{éléments graphiques concrets}
