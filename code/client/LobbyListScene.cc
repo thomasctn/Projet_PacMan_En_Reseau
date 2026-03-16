@@ -94,9 +94,9 @@ void LobbyListScene::doUpdate(gf::Time time) {
         p.is(join);
         m_game.getSocket().sendPacket(p);
         gf::Log::info("ClientJoinRoom envoyé pour room %u\n", roomId);
+    } else if (act == LobbyListAction::Return) {
+        m_game.requestScene(SceneRequest::GoToWelcome);
     }
-
-
 }
 
 void LobbyListScene::resizeYourself(){

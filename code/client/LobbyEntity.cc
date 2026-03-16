@@ -312,7 +312,11 @@ void LobbyEntity::renderRoleSelectionAndReady(gf::RenderTarget &target, const gf
     // Desciption du rôle
     m_roleDesc.setParagraphWidth(playBox.getSize().x * 0.9f);
     m_roleDesc.setPosition({position.x + playBox.getSize().x * .05f, position.y + playBox.getSize().y * .375f});
-    m_roleDesc.setString("Pacman doit manger toutes les pacgommes.\nLes fantômes doivent manger Pacman. ");
+    std::string txt = "Pacman doit manger toutes les pacgommes ou tous les fantômes";
+    if(m_client.role == PlayerRole::Ghost) {
+        txt = "Les fantômes doivent manger Pacman.";
+    }
+    m_roleDesc.setString(txt);
     target.draw(m_roleDesc, states);
 
     // Bouton changement rôle

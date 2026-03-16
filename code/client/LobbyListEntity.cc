@@ -8,11 +8,14 @@
 #include <gf/Log.h>
 
 LobbyListEntity::LobbyListEntity()
-    : m_font("../common/fonts/arial.ttf"), m_createWidget("Créer une room", m_font), m_lastAction(LobbyListAction::None), m_lastRoomId(0)
+    : m_font("../common/fonts/arial.ttf"), m_createWidget("Créer une room", m_font), m_returnWidget("Retour", m_font), m_lastAction(LobbyListAction::None), m_lastRoomId(0)
 {
     m_createWidget.setCallback([this]()
                                { m_lastAction = LobbyListAction::CreateRoom; });
+    m_returnWidget.setCallback([this]()
+                               { m_lastAction = LobbyListAction::Return; });
 
+    m_container.addWidget(m_returnWidget);
     m_container.addWidget(m_createWidget);
 
     m_createWidget.setCharacterSize(24);
@@ -22,7 +25,8 @@ LobbyListEntity::LobbyListEntity()
 void LobbyListEntity::setRooms(const std::vector<RoomData> &rooms)
 {
     m_rooms = rooms;
-    while (m_joinWidgets.size() < m_rooms.size()) {
+    while (m_joinWidgets.size() < m_rooms.size())
+    {
         auto ptr = std::make_unique<gf::TextButtonWidget>("Joindre", m_font);
         ptr->setCharacterSize(18);
         ptr->setAnchor(gf::Anchor::Center);
@@ -31,13 +35,14 @@ void LobbyListEntity::setRooms(const std::vector<RoomData> &rooms)
         m_joinWidgets.push_back(std::move(ptr));
     }
 
-    for (size_t i = 0; i < m_rooms.size(); ++i) {
+    for (size_t i = 0; i < m_rooms.size(); ++i)
+    {
         unsigned int roomId = m_rooms[i].roomID;
 
-        m_joinWidgets[i]->setCallback([this, roomId]() {
+        m_joinWidgets[i]->setCallback([this, roomId]()
+                                      {
             m_lastRoomId = roomId;
-            m_lastAction = LobbyListAction::JoinRoom;
-        });
+            m_lastAction = LobbyListAction::JoinRoom; });
     }
 }
 
@@ -86,6 +91,20 @@ void LobbyListEntity::render(gf::RenderTarget &target, const gf::RenderStates &s
     m_createWidget.setSelectedBackgroundOutlineColor(gf::Color::White);
     m_createWidget.setPadding(26 * .4f);
     target.draw(m_createWidget, states);
+    
+    const unsigned btnChar = 26u;
+    m_returnWidget.setCharacterSize(26u);
+    m_returnWidget.setAnchor(gf::Anchor::TopLeft);
+    m_returnWidget.setPosition({ margin, margin });
+    m_returnWidget.setDefaultTextColor(gf::Color::White);
+    m_returnWidget.setSelectedTextColor(gf::Color::Black);
+    m_returnWidget.setDefaultBackgroundColor(gf::Color::Black);
+    m_returnWidget.setSelectedBackgroundColor(gf::Color::White);
+    m_returnWidget.setBackgroundOutlineThickness(btnChar * .05f);
+    m_returnWidget.setDefaultBackgroundOutlineColor(gf::Color::White);
+    m_returnWidget.setSelectedBackgroundOutlineColor(gf::Color::White);
+    m_returnWidget.setPadding(btnChar * .4f);
+    target.draw(m_returnWidget, states);
 
     y += bh + margin;
 
@@ -101,7 +120,7 @@ void LobbyListEntity::render(gf::RenderTarget &target, const gf::RenderStates &s
     for (size_t i = 0; i < m_rooms.size(); i++)
     {
         gf::Vector2f rowPos(margin, y + (LOGICAL_ROW_HEIGHT + LOGICAL_ROW_SPACING) * i);
-        renderRoomRow(target, states, rowPos,i);
+        renderRoomRow(target, states, rowPos, i);
     }
 }
 
@@ -109,9 +128,9 @@ void LobbyListEntity::renderRoomRow(gf::RenderTarget &target, const gf::RenderSt
 {
     float margin = 24.f;
     float btnW = LOGICAL_W * 0.2f;
-    RoomData& data = m_rooms[i];
+    RoomData &data = m_rooms[i];
 
-    gf::RoundedRectangleShape rowBg({LOGICAL_W - margin * 2.f, LOGICAL_ROW_HEIGHT},8.f);
+    gf::RoundedRectangleShape rowBg({LOGICAL_W - margin * 2.f, LOGICAL_ROW_HEIGHT}, 8.f);
     rowBg.setPosition(position);
     rowBg.setOutlineThickness(1.f);
     rowBg.setOutlineColor(gf::Color::Blue);

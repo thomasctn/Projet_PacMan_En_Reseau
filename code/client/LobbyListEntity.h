@@ -10,7 +10,8 @@
 enum class LobbyListAction {
     None,
     CreateRoom,
-    JoinRoom
+    JoinRoom,
+    Return
 };
 
 class LobbyListEntity : public gf::Entity {
@@ -31,6 +32,7 @@ public:
 private:
     gf::Font m_font;
     gf::WidgetContainer m_container;
+    gf::TextButtonWidget m_returnWidget;
     gf::TextButtonWidget m_createWidget;
     std::vector<std::unique_ptr<gf::TextButtonWidget>> m_joinWidgets;
 
