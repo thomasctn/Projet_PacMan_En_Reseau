@@ -74,7 +74,7 @@ void RulesEntity::render(gf::RenderTarget& target, const gf::RenderStates& state
     gf::Text subtitle;
     subtitle.setFont(m_font);
     subtitle.setCharacterSize(40u);
-    subtitle.setString("MULTI");
+    subtitle.setString("EN RÉSEAU");
     subtitle.setAnchor(gf::Anchor::TopLeft);
     subtitle.setColor(gf::Color::White);
     subtitle.setPosition({ q1, headerTop + 92.f + 8.f });
@@ -100,7 +100,7 @@ void RulesEntity::render(gf::RenderTarget& target, const gf::RenderStates& state
 
     std::vector<std::string> playLines ={
         "- Utilisez les flèches du clavier pour vous déplacer",
-        "- Les portails sur les bords de maps permettent à Pacman de se téléporter rapidement",
+        "- Les portails sur les bords de maps permettent de se téléporter rapidement",
         "- Les pacgommes jaunes font augmenter le score de Pacman",
         "- Les pacgommes vertes permettent à Pacman de passer en mode Chasseur et \nde manger les fantômes"
     };
@@ -156,8 +156,8 @@ void RulesEntity::render(gf::RenderTarget& target, const gf::RenderStates& state
 
     float winBulletY = winTop + 46.f;
     std::vector<std::string> winLines = {
-        "- Pacman à trois vies. Si il lui reste au moins une vie à la fin du temps imparti, il gagne.",
-        "- Si les Fantômes ont mangé Pacman 3 fois, les Fantômes gagnent."
+        "- Pacman gagne si il a mangé toutes les pacgommes ou si il a mangé tous les fantômes.",
+        "- Les Fantômes gagnent si Pacman n'a plus de vie ou si le temps est écoulé."
     };
 
     float winY = winTop + 40.f;
