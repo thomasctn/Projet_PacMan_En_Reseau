@@ -663,7 +663,7 @@ Les entités ont \textbf{peu de travail :}
 
     \textbf{Classes Spécialisées}
         \begin{itemize}
-            \item \textbf{ServerNetwork} et \textbf{ClientNetwork} pour la gestion des paquets
+            \item \textbf{ServerNetwork} et \textbf{ClientNetwork} pour la réception des paquets
         \end{itemize}
 
     \textbf{Sérialisation/désérialisation}\\
@@ -743,7 +743,7 @@ struct ServerListRoomPlayers
     \textbf{Lobby}
     \begin{itemize}
         \item \textbf{Client} : Demande de création/connexion à un salon
-        \item \textbf{Serveur} : Traitement et envoi de la réponse + la liste des joueurs
+        \item \textbf{Serveur} : Traitement et envoi de la réponse et \textbf{broadcast} de la liste des joueurs/paramètres
     \end{itemize}
     \column{0.4\textwidth}
     \includegraphics[width=\textwidth]{UML/PacMan_UML_Reseau_connexion.png}
@@ -759,12 +759,11 @@ struct ServerListRoomPlayers
         \item \textbf{Client} : Demande de changement de rôle/status/paramètres
         \item \textbf{Serveur} : Traitement et \textbf{broadcast} de la liste des joueurs/paramètres
     \end{itemize}
-        Si tous les joueurs son prêt : envoi début de partie ou erreur\\
+        Si tous les joueurs son prêt : \textbf{Broadcast} début de partie ou erreur\\
     \textbf{En jeu}
     \begin{itemize}
         \item \textbf{Client} : Demande de déplacement
-        \item \textbf{Serveur} : Vérifie la validité et gère les conséquences
-        \item \textbf{Serveur} : \textbf{Broadcast} de l'état du jeu
+        \item \textbf{Serveur} : Vérifie la validité, gère les conséquences puis \textbf{broadcast} de l'état du jeu
     \end{itemize}
      Si fin de jeu : \textbf{Broadcast} de la fin du jeu et de la raison
 

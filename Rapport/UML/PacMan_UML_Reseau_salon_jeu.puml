@@ -4,8 +4,9 @@ participant Client
 participant Serveur
 
 == Salon ==
-Client -> Serveur : Changer status/role/param
+Client -> Serveur : Changer statut/rôle/param
 activate Serveur
+Serveur -> Serveur : Vérifier changement
 Serveur --> Client : paramètes, liste joueurs
 deactivate Serveur
 opt Tous le monde prêt
