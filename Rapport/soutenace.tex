@@ -678,32 +678,34 @@ subsectionstyle=show/shaded/hide
 \setbeamertemplate{footline}[frame number]
 
 
-\begin{frame}[fragile]{Architecture réseau}
+\begin{frame}[fragile]{Architecture générale}
     \begin{columns}
-    \column{0.70\textwidth}
+    \column{0.75\textwidth}
     \textbf{Communication avec socket}
         \begin{itemize}
             \item Choix entre UDP et TCP : TCP choisit pour sa fiabilité
-            \item \textcolor{blue}{\texttt{gf::TcpListener}} et \textcolor{blue}{\texttt{gf::TcpSocket}} pour la connexion/communication
         \end{itemize}
 
     \textbf{Classes Spécialisées}
         \begin{itemize}
-            \item \textbf{ServerNetwork} pour la gestion des nouveaux clients et des packets (envoi/réception)
-            \item \textbf{ClientNetwork} pour la gestion des packets (réception)
+            \item \textbf{ServerNetwork} et \textbf{ClientNetwork} pour la gestion des paquets
         \end{itemize}
 
+    \textbf{Sérialisation/désérialisation}\\
+    \begin{itemize}
+            \item Conversion en suite d'octets pour l'envoi, reconstruction pour la réception
+    \end{itemize}
     \textbf{Multi-Threading}
-        \begin{itemize}
-            \item Fonctions de \textbf{ServerNetwork} et \textbf{ClientNetwork} exécuté dans un thread
-            \item Dépilement des packets dans les boucles principales
-        \end{itemize}
+    \begin{itemize}
+            \item Code de \textbf{ServerNetwork} et \textbf{ClientNetwork} excécutés en parrallèle de la boucle principale
+    \end{itemize}
+    
 
-    \column{0.3\textwidth}
+    \column{0.25\textwidth}
     \end{columns}
 \end{frame}
 
-\begin{frame}[fragile]{Structures}
+\begin{frame}[fragile]{Forme des Messages}
 
 \begin{columns}
 
@@ -754,83 +756,39 @@ struct ServerListRoomPlayers
 \end{columns}
 \end{frame}
 
-\begin{frame}[fragile]{Sérialisation/Déserialisation}
+\begin{frame}[fragile]{Structure des échanges}
     \begin{columns}
-    \column{0.60\textwidth}
-    \textbf{Opérateur}
-    \begin{itemize}
-        \item Operateur | avec un type \textit{Archive}
-    \end{itemize}
 
-    \textbf{Sérialisation/Envoi}
+    \column{0.55\textwidth}
+    \textbf{Initialisation}
     \begin{itemize}
-        \item Fonction \textcolor{blue}{\texttt{gf::Packet::is(obj)}} pour sérialiser en suite d'octet
-        \item Fonction \textcolor{blue}{\texttt{gf::TcpSocket::sendPacket(packet)}} pour envoyer le packet
+        \item Client : Demande de connexion
+        \item Serveur : Assignation d'un id et renvoi de l'id
     \end{itemize}
-    \textbf{Déserialisation}
+    \textbf{Lobby/Salon}
     \begin{itemize}
-        \item Switch case pour identifier le type
-        \item Fonction \textcolor{blue}{\texttt{gf::Packet::<typename>as()}} pour désérialiser
-    \end{itemize} 
+        \item a
+        \item b
+    \end{itemize}
+    \column{0.35\textwidth}
+    \end{columns}
 
-    \column{0.30\textwidth}
-\begin{lstlisting}[linewidth=4.5cm]
-template <typename Archive>
-Archive &operator|(Archive &ar, PlayerData &data)
-{
-    return ar | data.id 
-            | data.x
-            | data.y
-            | data.color
-            | data.name
-            | data.role
-            | data.score
-            | data.ready
-            | data.hp;
-}
-\end{lstlisting}
-\end{columns}
 \end{frame}
 
-\begin{frame}[fragile]{Exemple concret : Envoi de la liste des joueurs}
-\begin{columns}
-\column{0.50\textwidth}
-\textbf{Dans le serveur}
-\begin{lstlisting}[linewidth=5cm,basicstyle=\scriptsize]
-void Salon::broadcastRoomPlayers() {
-    ServerListRoomPlayers list;
-    for (uint32_t pid : players) {
-        PlayerData pdata;
-        ...
-        list.players.push_back(pdata);
-    }
-    gf::Packet packet;
-    packet.is(list);
-    for (uint32_t pid : players) {
-        network.send(pid, packet);
-}
-\end{lstlisting}
-\column{0.50\textwidth}
-\textbf{Dans le client}
-\begin{lstlisting}[linewidth=5cm,basicstyle=\tiny]
-void LobbyScene::doUpdate(gf::Time)
-{
- gf::Packet packet;
- while (m_game.tryPopPacket(packet)) {
-    switch (packet.getType()) {
-     case ServerRoomSettings::type:
-      ...
-     case ServerListRoomPlayers::type:
-     {
-      auto data =
-            packet.as<ServerListRoomPlayers>();
-      setPlayers(data.players);
-      break;
-     }
-    ...
-\end{lstlisting}
-\end{columns}
-    
+\begin{frame}[fragile]{Structure des échanges}
+    \begin{columns}
+
+    \column{0.55\textwidth}
+    \textbf{En jeu}
+    \begin{itemize}
+        \item a
+        \item b
+    \end{itemize}
+
+    \column{0.35\textwidth}
+
+    \end{columns}
+
 \end{frame}
 
 \section*{Conclusion}
