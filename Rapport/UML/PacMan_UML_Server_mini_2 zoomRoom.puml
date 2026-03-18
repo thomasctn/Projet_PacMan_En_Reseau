@@ -25,13 +25,6 @@ class Lobby {
 class Room {
     + handlePacket()
     + broadcastState()
-    + broadcastRoomPlayers()
-    + broadcastRoomSettings()
-    + broadcastPreGame()
-    + handleClientChange()
-    + handleClientReady()
-    + handleClientMove()
-    + handleClientChangeRoomSettings()
 }
 
 class Game {

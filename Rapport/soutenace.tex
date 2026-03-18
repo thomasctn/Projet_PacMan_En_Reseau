@@ -6,6 +6,28 @@
 \usetheme{Madrid}
 \usecolortheme{default}
 \setbeamertemplate{navigation symbols}{} % enlève les icônes
+% Style du plan
+\setbeamertemplate{section in toc}{
+    \vspace{0.2cm}
+    \begin{beamercolorbox}[rounded=true,shadow=true,wd=\linewidth,sep=0.1cm]{section in toc}
+        \inserttocsection
+    \end{beamercolorbox}
+}
+
+\setbeamertemplate{subsection in toc}{
+    \hspace{0.5cm}-- \inserttocsubsection\par
+}
+
+\AtBeginSection[]
+{
+\setbeamertemplate{footline}{}
+\begin{frame}{Plan}
+\tableofcontents[currentsection]
+\end{frame}
+\setbeamertemplate{footline}[frame number]
+
+}
+
 
 % =====================
 % Langue et encodage
@@ -172,17 +194,6 @@ Encadrant : Julien Bernard\\
 
 \section{Présentation et organisation}
 
-\setbeamertemplate{footline}{}
-
-\begin{frame}[noframenumbering]{Plan}
-\tableofcontents[
-currentsection,
-sectionstyle=show/shaded,
-subsectionstyle=show/shaded/hide
-]
-\end{frame}
-\setbeamertemplate{footline}[frame number]
-
 \begin{frame}{Outils et méthode}
 
 \begin{columns}
@@ -242,18 +253,6 @@ subsectionstyle=show/shaded/hide
 \end{frame}
 
 \section{Serveur}
-
-\setbeamertemplate{footline}{}
-
-\begin{frame}[noframenumbering]{Plan}
-\tableofcontents[
-currentsection,
-sectionstyle=show/shaded,
-subsectionstyle=show/shaded/hide
-]
-\end{frame}
-\setbeamertemplate{footline}[frame number]
-
 
 \begin{frame}{Architecture}
 
@@ -531,18 +530,6 @@ Score = \textcolor{red}{Attraction} - \textcolor{blue}{Répulsions}
 \end{frame}
 \section{Client}
 
-\setbeamertemplate{footline}{}
-
-\begin{frame}[noframenumbering]{Plan}
-\tableofcontents[
-currentsection,
-sectionstyle=show/shaded,
-subsectionstyle=show/shaded/hide
-]
-\end{frame}
-\setbeamertemplate{footline}[frame number]
-
-
 \begin{frame}{SceneManager}
 
 \begin{columns}    
@@ -665,18 +652,6 @@ Les entités ont \textbf{peu de travail :}
 
 
 \section{Réseau}
-
-\setbeamertemplate{footline}{}
-
-\begin{frame}[noframenumbering]{Plan}
-\tableofcontents[
-currentsection,
-sectionstyle=show/shaded,
-subsectionstyle=show/shaded/hide
-]
-\end{frame}
-\setbeamertemplate{footline}[frame number]
-
 
 \begin{frame}[fragile]{Architecture générale}
     \begin{columns}
