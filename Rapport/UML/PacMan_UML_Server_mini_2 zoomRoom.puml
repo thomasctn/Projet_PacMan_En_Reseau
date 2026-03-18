@@ -1,0 +1,56 @@
+@startuml
+' Mise en page horizontale plus lisible
+top to bottom direction
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+skinparam ArrowColor #333333
+skinparam ArrowThickness 1
+skinparam ClassFontSize 12
+skinparam ClassFontName Arial
+skinparam ClassBackgroundColor #fdfdfd
+skinparam ClassBorderColor #444444
+
+' =======================
+' Classes principales
+' =======================
+
+class ServerNetwork {
+}
+
+class Lobby {
+
+    + handlePacket()
+}
+
+class Room {
+    + handlePacket()
+    + broadcastState()
+    + broadcastRoomPlayers()
+    + broadcastRoomSettings()
+    + broadcastPreGame()
+    + handleClientChange()
+    + handleClientReady()
+    + handleClientMove()
+    + handleClientChangeRoomSettings()
+}
+
+class Game {
+}
+
+
+class BotManager {
+}
+' =======================
+' Relations
+' =======================
+
+' Composition (l’objet appartient au parent)
+ServerNetwork *-- Lobby
+Lobby *-- Room
+Room *-- Game
+Room *-- BotManager
+Room *-- InputQueue
+
+
+
+@enduml

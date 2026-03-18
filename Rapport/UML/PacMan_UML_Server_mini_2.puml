@@ -1,0 +1,91 @@
+@startuml
+' Mise en page
+left to right direction
+
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+skinparam ArrowColor #333333
+skinparam ArrowThickness 1
+skinparam ClassFontSize 12
+skinparam ClassFontName Arial
+skinparam ClassBackgroundColor #fdfdfd
+skinparam ClassBorderColor #444444
+
+' =======================
+' Classes principales
+' =======================
+
+rectangle "Serveur" {
+
+class ServerNetwork {
+}
+
+class Lobby {
+}
+
+class Room {
+}
+}
+rectangle "Jeu" {
+
+class Game {
+}
+
+class Board {
+}
+
+class Player {
+}
+}
+rectangle "Bot" {
+
+class BotManager {
+}
+
+class BotController {
+}
+
+class GraphTraceMap {
+}
+}
+class InputQueue {
+}
+
+
+' =======================
+' Relations
+' =======================
+
+' Composition (l’objet appartient au parent)
+ServerNetwork *-- Lobby
+Lobby *-- Room
+Room *-- Game
+Room *-- BotManager
+Room *-- InputQueue
+Game *-- Board
+Game *-- Player
+BotManager *-- BotController
+BotManager *-- GraphTraceMap
+
+
+
+' Association / dépendance
+BotController --> Game
+
+' Liens invisibles pour éviter étirement horizontal
+ServerNetwork -[hidden]- Game
+Room -[hidden]- BotController
+GraphTraceMap -[hidden]- Lobby
+
+InputQueue -[hidden]- ServerNetwork
+InputQueue -[hidden]- BotManager
+
+
+
+
+
+
+
+
+
+@enduml

@@ -1,0 +1,40 @@
+@startuml
+start
+
+while (running ?) is (oui)
+
+  :Update bots;
+  note right
+    updateTraces()
+    update(dt)
+  end note
+
+
+
+  if (gameStarted ?) then (non)
+
+    if (temps écoulé ?) then (oui)
+      :Démarrer partie;
+    else (non)
+      :Broadcast timer;
+    endif
+
+  else (oui)
+
+    if (fin de partie ?) then (oui)
+      stop
+    endif
+
+  endif
+
+  if (gameStarted ?) then (oui)
+    :Update mouvements joueurs;
+    :Broadcast state;
+  endif
+
+  :Sleep (tick);
+
+endwhile (non)
+
+stop
+@enduml
