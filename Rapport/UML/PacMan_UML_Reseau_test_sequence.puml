@@ -1,0 +1,82 @@
+@startuml
+
+actor Joueur
+participant Client
+participant Serveur
+participant Lobby
+participant Partie
+participant IA_Fantome
+
+== Connexion ==
+Joueur -> Client : lancer jeu
+Client -> Serveur : connexion
+
+activate Serveur
+
+alt connexion OK
+    Serveur --> Client : token session
+else échec connexion
+    Serveur --> Client : erreur
+    break
+end
+
+deactivate Serveur
+
+== Lobby ==
+Client -> Lobby : rejoindre lobby
+activate Lobby
+
+loop attente joueurs
+    Lobby -> Lobby : vérifier nombre joueurs
+
+    alt lobby plein
+        Lobby --> Client : partie prête
+        break
+    else attente
+        Lobby --> Client : patienter
+    end
+end
+
+deactivate Lobby
+
+== Lancement partie ==
+Client -> Partie : rejoindre partie
+activate Partie
+
+Partie --> Client : état initial (map)
+
+== Boucle de jeu ==
+loop game loop
+
+    Client -> Partie : input joueur
+    activate Partie
+
+    Partie -> IA_Fantome : update IA
+    activate IA_Fantome
+
+    alt joueur visible
+        IA_Fantome -> IA_Fantome : poursuite
+    else joueur perdu
+        IA_Fantome -> IA_Fantome : exploration
+    end
+
+    IA_Fantome --> Partie : position fantôme
+    deactivate IA_Fantome
+
+    Partie --> Client : état mis à jour
+
+    alt fin de partie
+        Partie --> Client : résultat
+        break
+    end
+
+    deactivate Partie
+
+end
+
+deactivate Partie
+
+== Déconnexion ==
+Client -> Serveur : déconnexion
+
+@enduml
