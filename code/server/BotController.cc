@@ -91,7 +91,6 @@ std::optional<Direction> BotController::update(Game& game, BotManager& manager) 
     }
 
 
-
     // --- PRIORITÉ 2 : Pac-Man visible dans le rayon ---
     if (pacMan) {
         Node* pacmanNode = getPacmanNode(game, manager);
