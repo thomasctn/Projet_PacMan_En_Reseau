@@ -735,32 +735,41 @@ struct ServerListRoomPlayers
     \begin{columns}
 
     \column{0.55\textwidth}
-    \textbf{Initialisation}
+    \textbf{Connexion}
     \begin{itemize}
-        \item Client : Demande de connexion
-        \item Serveur : Assignation d'un id et renvoi de l'id
+        \item \textbf{Client} : Demande de connexion
+        \item \textbf{Serveur} : Assignation d'un id et renvoi de l'id + liste des salons
     \end{itemize}
-    \textbf{Lobby/Salon}
+    \textbf{Lobby}
     \begin{itemize}
-        \item a
-        \item b
+        \item \textbf{Client} : Demande de création/connexion à un salon
+        \item \textbf{Serveur} : Traitement et envoi de la réponse + la liste des joueurs
     \end{itemize}
-    \column{0.35\textwidth}
+    \column{0.4\textwidth}
+    \includegraphics[width=\textwidth]{UML/PacMan_UML_Reseau_connexion.png}
     \end{columns}
 
 \end{frame}
 
 \begin{frame}[fragile]{Structure des échanges}
     \begin{columns}
-
     \column{0.55\textwidth}
+    \textbf{Salon}
+    \begin{itemize}
+        \item \textbf{Client} : Demande de changement de rôle/status/paramètres
+        \item \textbf{Serveur} : Traitement et \textbf{broadcast} de la liste des joueurs/paramètres
+    \end{itemize}
+        Si tous les joueurs son prêt : envoi début de partie ou erreur\\
     \textbf{En jeu}
     \begin{itemize}
-        \item a
-        \item b
+        \item \textbf{Client} : Demande de déplacement
+        \item \textbf{Serveur} : Vérifie la validité et gère les conséquences
+        \item \textbf{Serveur} : \textbf{Broadcast} de l'état du jeu
     \end{itemize}
+     Si fin de jeu : \textbf{Broadcast} de la fin du jeu et de la raison
 
-    \column{0.35\textwidth}
+    \column{0.375\textwidth}
+    \includegraphics[width=\textwidth]{UML/PacMan_UML_Reseau_salon_jeu.png}
 
     \end{columns}
 
