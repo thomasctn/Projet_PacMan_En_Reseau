@@ -1,0 +1,128 @@
+' =========================
+' RESET & BASE
+' =========================
+!theme plain
+!pragma layout smetana
+
+skinparam backgroundColor #FFFFFF
+skinparam dpi 150
+skinparam shadowing false
+skinparam roundcorner 10
+
+' =========================
+' FONT
+' =========================
+skinparam defaultFontName Arial
+skinparam defaultFontSize 14
+skinparam defaultFontColor #222222
+
+' =========================
+' COULEURS PRINCIPALES
+' =========================
+!define MAIN #1F4E79
+!define GRAY #6C7A89
+!define LIGHT_GRAY #dceeff
+!define LIGHT #EEF3F8
+
+' =========================
+' TITRES
+' =========================
+skinparam titleFontSize 18
+skinparam titleFontColor MAIN
+
+' =========================
+' FLÈCHES (GLOBAL)
+' =========================
+skinparam ArrowColor MAIN
+skinparam ArrowThickness 1.5
+
+' =========================
+' CLASSES
+' =========================
+skinparam class {
+    BackgroundColor #FFFFFF
+    BorderColor MAIN
+    FontColor #222222
+}
+
+' =========================
+' SEQUENCE DIAGRAM
+' =========================
+skinparam sequence {
+    ArrowColor MAIN
+    LifeLineBorderColor MAIN
+    LifeLineBackgroundColor LIGHT_GRAY
+    ParticipantBorderColor MAIN
+    ParticipantBackgroundColor LIGHT_GRAY
+    ParticipantFontColor #222222
+    ActorBorderColor MAIN
+    ActorBackgroundColor LIGHT_GRAY
+}
+' =========================
+' COMPONENT / RECTANGLE
+' =========================
+skinparam component {
+    BackgroundColor #FFFFFF
+    BorderColor MAIN
+}
+
+skinparam rectangle {
+    BackgroundColor #FFFFFF
+    BorderColor MAIN
+}
+
+' =========================
+' NODE / DATABASE
+' =========================
+skinparam node {
+    BackgroundColor #FFFFFF
+    BorderColor MAIN
+}
+
+skinparam database {
+    BackgroundColor #FFFFFF
+    BorderColor MAIN
+}
+
+' =========================
+' NOTES
+' =========================
+skinparam note {
+    BackgroundColor LIGHT
+    BorderColor GRAY
+    FontColor #222222
+}
+
+' =========================
+' PACKAGES
+' =========================
+skinparam package {
+    BorderColor MAIN
+    BackgroundColor #F8FAFC
+}
+
+' =========================
+' ACTIVITY DIAGRAM
+' =========================
+skinparam activity {
+    BackgroundColor #FFFFFF
+    BorderColor MAIN
+    DiamondBackgroundColor LIGHT
+    DiamondBorderColor MAIN
+}
+
+' =========================
+' USECASE
+' =========================
+skinparam usecase {
+    BackgroundColor #FFFFFF
+    BorderColor MAIN
+}
+
+' =========================
+' LEGEND
+' =========================
+skinparam legend {
+    BackgroundColor #FFFFFF
+    BorderColor GRAY
+}

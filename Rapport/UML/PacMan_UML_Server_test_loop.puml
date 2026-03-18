@@ -1,5 +1,7 @@
 @startuml
 start
+!include theme.puml
+
 
 while (running ?) is (oui)
 
