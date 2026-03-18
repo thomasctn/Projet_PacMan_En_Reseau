@@ -1,0 +1,27 @@
+@startuml
+
+actor Joueur
+participant Client
+participant Serveur
+
+== Connexion ==
+Joueur -> Client : lancer jeu
+Client -> Serveur : connexion
+activate Serveur
+Serveur -> Serveur : assigner ID
+Serveur --> Client : ID client, liste salons
+deactivate Serveur
+Client -> Client : changer scène
+activate Client
+deactivate Client
+== Lobby ==
+
+Client -> Serveur : rejoindre salon
+activate Serveur
+Serveur -> Serveur : traiter demande
+Serveur --> Client : OK, liste des joueurs
+deactivate Serveur
+Client -> Client : changer scène
+activate Client
+deactivate Client
+@enduml

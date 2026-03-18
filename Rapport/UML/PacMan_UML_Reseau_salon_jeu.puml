@@ -1,0 +1,31 @@
+@startuml
+
+participant Client
+participant Serveur
+
+== Salon ==
+Client -> Serveur : Changer status/role/param
+activate Serveur
+Serveur --> Client : paramètes, liste joueurs
+deactivate Serveur
+opt Tous le monde prêt
+alt rôles valides
+Serveur --> Client : début de partie
+Client -> Client : changer scène (jeu)
+activate Client
+deactivate Client
+else erreur
+Serveur --> Client : erreur
+end
+end
+== Jeu ==
+Client -> Serveur : demander déplacement
+activate Serveur
+Serveur -> Serveur : traiter déplacement
+Serveur --> Client : état du jeu
+deactivate Serveur
+opt Jeu fini
+Serveur --> Client : fin de jeu
+Client -> Client : changer scène (fin de jeu)
+end
+@enduml
