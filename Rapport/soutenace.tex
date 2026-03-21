@@ -535,30 +535,73 @@ Score = \textcolor{red}{Attraction} - \textcolor{blue}{Répulsions}
 \begin{columns}    
 \column{0.4\textwidth}
 \centering
-\includegraphics[width=0.5\linewidth]{images/diag_class_scenes.drawio.png}
+\includegraphics[width=0.5\linewidth]{UML/UML_etat_transition.png}
 
 \column{0.6\textwidth}
 
 \textbf{Fonctionnement du SceneManager}
+\vspace{0.3cm}
 
-Le SceneManager gère quelle scène s'affiche puis:
-
+Gère quelle scène s'affiche
 \begin{itemize}
-    \item Chaque étape de jeu : \textbf{une scène}
-    \item La scène se \textbf{gère elle même}
+    \item Une étape de jeu = \textbf{une scène}
+    \item \textbf{Autonomie}  des scènes
     \item \textbf{Séparation} entre logique / rendu
 \end{itemize}
+\vspace{0.3cm}
 
-Met aussi en place le réseau
+$\rightarrow$ Met aussi en place le réseau
 
 \end{columns}
 
 \end{frame}
+\begin{frame}{Boucle de jeu client}
+
+    \centering
+    
+    \includegraphics[height=0.8\textheight]{images/boucle_dejeu_client.png}
+    
+    \textbf{Boucle de jeu}\\
+   
+    
+        
+\end{frame}
+
+\begin{frame}{Reception}
+
+    \begin{columns}    
+    
+            
+            \column{0.4\textwidth}
+            
+            Réception dans un \textbf{Thread dédié}
+            \vspace{0.3cm}
+    
+            \textbf{Stockage} des paquets dans une file partagée :
+            
+            \begin{itemize}
+                \item \textbf{Consommation} des paquets selon leur type
+                \item \textbf{Gestion} des éléments concernés uniquement
+            \end{itemize}
+            \vspace{0.3cm}
+    
+            \textbf{Mise à jour} des scènes selon les paquets reçus
+            
+            
+    
+    \column{0.6\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{images/filerecu.png}
+    \end{columns}
+    
+    \end{frame}
+
+
 
 \begin{frame}{Input}
 
 \begin{columns} 
-    \column{0.45\textwidth}
+    \column{0.5\textwidth}
     Système d'\textbf{Événements} :
 \vspace{0.3cm}
         \begin{itemize}
@@ -569,86 +612,61 @@ Met aussi en place le réseau
     \end{itemize}
 \vspace{0.3cm}
 
-    Une partie est \textbf{envoyé au serveur}
+\textbf{Envoi partiel} des entrées au serveur
 
-    \column{0.55\textwidth}
+    \column{0.5\textwidth}
     \centering
-    \includegraphics[width=\linewidth]{images/lobby.png}
+    \includegraphics[width=\linewidth]{images/room.png}
     
 \end{columns}
 \end{frame}
-
-\begin{frame}{Envoi}
-
-
-\begin{columns} 
-    \column{0.55\textwidth}
-    \centering
-    \includegraphics[width=\linewidth]{images/game.png}
-    \column{0.45\textwidth}
-    Les scènes envoient les messages au serveur
-
-    Deux modèles :
-
-    \begin{itemize}
-        \item événementiel (menus, hall)
-        \item périodique (mouvements en jeu)
-    \end{itemize}
-
-    Principe d'envoi est \textbf{le même}
-
-    L'envoi transmet l'intention du client au serveur
-\end{columns} 
-
-    
-\end{frame}
-
-\begin{frame}{Reception}
-
-\begin{columns}    
-
-        
-        \column{0.5\textwidth}
-        
-        Réception dans un \textbf{Thread dédié}
-        
-        Paquets stockés dans une file partagée :
-        
-        \begin{itemize}
-            \item Scène consomme paquets \textbf{selon leur type}
-            \item Gère seulement ce \textbf{qui les concerne}
-        \end{itemize}
-
-        La scène se met à jour en fonction de ce qu'elle a reçu
-        
-        
-
-\column{0.5\textwidth}
-\centering
-\includegraphics[width=\linewidth]{images/filerecu.png}
-\end{columns}
-
-\end{frame}
-
-
 
 
 \begin{frame}{Entité}
 
-\centering
-
-\includegraphics[height=0.45\textheight]{images/rules.png}
-
-Chaque scène a une entité\\
-\vspace{0.2cm}
-Les entités ont \textbf{peu de travail :}
-\begin{itemize}
-    \item Traduit la logique en \textbf{éléments graphiques concrets}
-    \item Interagit directement avec le client : \textbf{clics client -> scène}
-\end{itemize}
-
+    \centering
     
+    \includegraphics[height=0.5\textheight]{images/rules.png}
+    
+    \textbf{Une entité par scène}\\
+    \vspace{0.2cm}
+    Entités à \textbf{responsabilité limitée :}
+    \begin{itemize}
+        \item Traduit la logique en \textbf{éléments graphiques concrets}
+        \item Interagit directement avec le client : \textbf{clics client $\rightarrow$ scène}
+    \end{itemize}
+    
+        
+    \end{frame}
+
+\begin{frame}{Envoi}
+
+
+        \begin{columns} 
+            \column{0.55\textwidth}
+            \centering
+            \includegraphics[width=\linewidth]{images/game.png}
+            \column{0.45\textwidth}
+            \textbf{Envoi de messages} des scènes au serveur
+            \\Deux modèles :
+        
+            \begin{itemize}
+                \item événementiel (menus, hall)
+                \item périodique (mouvements en jeu)
+            \end{itemize}
+        
+            Principe d'envoi \textbf{commun}
+        
+            \textbf{Transmission de l’intention} du client au serveur
+        \end{columns} 
+        
+            
 \end{frame}
+
+
+
+
+
 
 
 \section{Réseau}
