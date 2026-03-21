@@ -678,7 +678,7 @@ Une fois les opérateurs implémentés, les structures peuvent être empaqueté 
 \subsection{Protocole}
 \paragraph{Connexion}
 Lors de son exécution, le client cherche à se connecter au serveur à l'adresse IP et au port passés en paramètre. Le serveur, s'il existe, reçoit cette demande, et associe au client un identifiant, sous la forme d'un entier positif, avant de répondre au client avec cette identifiant et la liste des salons disponible.
-Une fois la réponse du serveur reçu, le client sauvegarde son identifiant, afin de savoir qui il est parmi la liste des jouers, puis change de scène, et liste les salons qu'il l'a reçu.\\
+Une fois la réponse du serveur reçu, le client sauvegarde son identifiant, afin de savoir qui il est parmi la liste des jouers, puis change de scène.
 \paragraph{Liste des salons}
 Dans la liste des salons, le joueur peut choisir de rejoindre un salon existant, ou un en crée un nouveau. Lorsque l'une des deux options est choisi, le client envoi une demande de création ou de jointe d'un salon au serveur. Le serveur traite cette demande, en ajoutant le joueur dans le salon créé/rejoint, et envoi au client la liste des joueurs et les paramètres du salon. Dans le cas où le joueur rejoind un salon, le serveur envoi aussi à tous les autres clients du salon la nouvelle liste des joueurs pour les tenir à jour. Si le client tente de rejoindre un salon qui n'existe pas ou qui est plein le serveur en crée un nouveau.
 Une fois la réponse du serveur reçu, le client change de scène (vers la scène du salon), et affiche les informations reçues.

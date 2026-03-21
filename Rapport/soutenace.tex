@@ -685,16 +685,12 @@ $\rightarrow$ Met aussi en place le réseau
         \begin{itemize}
             \item Choix entre UDP et TCP : TCP choisit pour sa fiabilité
         \end{itemize}
-
+    \vspace{0.3cm}
     \textbf{Classes Spécialisées}
         \begin{itemize}
             \item \textbf{ServerNetwork} et \textbf{ClientNetwork} pour la réception des paquets
         \end{itemize}
-
-    \textbf{Sérialisation/désérialisation}\\
-    \begin{itemize}
-            \item Conversion en suite d'octets pour l'envoi, reconstruction pour la réception
-    \end{itemize}
+    \vspace{0.3cm}
     \textbf{Multi-Threading}
     \begin{itemize}
             \item Code de \textbf{ServerNetwork} et \textbf{ClientNetwork} excécutés en parrallèle de la boucle principale
@@ -705,39 +701,33 @@ $\rightarrow$ Met aussi en place le réseau
     \end{columns}
 \end{frame}
 
-\begin{frame}[fragile]{Forme des Messages}
-
+\begin{frame}[fragile]{Format des Messages}
 \begin{columns}
-
 \column{0.60\textwidth}
-\textbf{Structures communes}
+\textbf{Messages : Structures C++}
 \begin{itemize}
-    \item Utilisées à la fois par le client et le serveur
-    \item Peuvent être généré dynamiquement par le serveur
-\end{itemize}
-\vspace{0.4cm}
-
-\textbf{Structures de Communication}
-
-\begin{itemize}
-    \item Utilisées pour les échanges réseaux
+    \item Connues par le client et le serveur
+    \item Contiennent des données souvent regroupées dans des structures \textit{communes}
     \item Un champ \textcolor{blue}{\texttt{gf::id}} pour les identifier lors de la désérialisation
-    
     \item Nomenclature spécifique :
     \begin{itemize}
             \item \textit{ServerXXX} = envoyée par le serveur
             \item \textit{ClientXXX} = envoyée par le client
     \end{itemize}
 \end{itemize}
+\vspace{0.25cm}
+\textbf{Sérialisation/désérialisation}
+\begin{itemize}
+    \item Nécessaire pour l'envoi/réception
+    \item \textbf{Opétateur |} avec un type \textit{Archive} pour chaque structure
+\end{itemize}
 
-\column{0.30\textwidth}
-\centering
-\begin{lstlisting}[linewidth=3cm]
+\column{0.35\textwidth}
+\begin{lstlisting}[linewidth=4cm]
 struct PlayerData
 {
     uint32_t id;
     float x, y;
-    uint32_t color;
     std::string name;
     PlayerRole role;
     int score;
@@ -745,13 +735,19 @@ struct PlayerData
     unsigned int hp = 0;
 };
 \end{lstlisting}
-\centering
-\begin{lstlisting}[linewidth=3.6cm]
+\begin{lstlisting}[linewidth=4cm]
 struct ServerListRoomPlayers
 {
   static constexpr gf::Id type = "ServerListRoomPlayers"_id;
   std::vector<PlayerData> players;
 };
+\end{lstlisting}
+\begin{lstlisting}[linewidth=4cm]
+template <typename Archive>
+Archive &operator|(Archive &ar, ServerListRoomPlayers &data)
+{
+  return ar | data.players;
+}
 \end{lstlisting}
 \end{columns}
 \end{frame}
@@ -805,7 +801,7 @@ struct ServerListRoomPlayers
 
     \textbf{Objectif principal atteint}
     \begin{itemize}
-        \item Communication client/serveur
+        \item Jeu en réseau
         \item Intelligence artificielle des fantômes
         \item Génération procédural de la carte
     \end{itemize}
@@ -819,7 +815,7 @@ struct ServerListRoomPlayers
     \begin{itemize}
         \item Plusieurs rôles fantômes
         \item Intelligence artificielle pour Pac-Man
-        \item Chambre privée
+        \item Salon privé
     \end{itemize}
 
     
