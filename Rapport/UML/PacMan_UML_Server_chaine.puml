@@ -3,6 +3,7 @@
 top to bottom direction
 
 
+!include theme.puml
 
 ' --- Style ---
 skinparam class {

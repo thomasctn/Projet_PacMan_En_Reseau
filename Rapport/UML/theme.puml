@@ -21,7 +21,7 @@ skinparam defaultFontColor #222222
 ' =========================
 !define MAIN #1F4E79
 !define GRAY #6C7A89
-!define LIGHT_GRAY #dceeff
+!define LIGHT_BLUE #dceeff
 !define LIGHT #EEF3F8
 
 ' =========================
@@ -39,11 +39,34 @@ skinparam ArrowThickness 1.5
 ' =========================
 ' CLASSES
 ' =========================
+skinparam classAttributeIconSize 0
+
 skinparam class {
-    BackgroundColor #FFFFFF
+    BackgroundColor #F9FBFD
     BorderColor MAIN
     FontColor #222222
+
+    AttributeFontColor #444444
+    MethodFontColor #444444
+
+    FontSize 14
+    AttributeFontSize 13
+    MethodFontSize 13
+
+    BorderThickness 1.5
+    DividerColor #D0D7E2
 }
+skinparam classAttributeIconSize 0
+hide circle
+skinparam linetype ortho
+skinparam class {
+    HeaderBackgroundColor LIGHT_BLUE
+}
+skinparam ArrowColor MAIN
+skinparam ArrowThickness 1.5
+skinparam ArrowFontColor #333333
+
+
 
 ' =========================
 ' SEQUENCE DIAGRAM
@@ -51,12 +74,12 @@ skinparam class {
 skinparam sequence {
     ArrowColor MAIN
     LifeLineBorderColor MAIN
-    LifeLineBackgroundColor LIGHT_GRAY
+    LifeLineBackgroundColor LIGHT_BLUE
     ParticipantBorderColor MAIN
-    ParticipantBackgroundColor LIGHT_GRAY
+    ParticipantBackgroundColor LIGHT_BLUE
     ParticipantFontColor #222222
     ActorBorderColor MAIN
-    ActorBackgroundColor LIGHT_GRAY
+    ActorBackgroundColor LIGHT_BLUE
 }
 ' =========================
 ' COMPONENT / RECTANGLE

@@ -10,6 +10,8 @@ skinparam ClassFontName Arial
 skinparam ClassBackgroundColor #fdfdfd
 skinparam ClassBorderColor #444444
 
+!include theme.puml
+
 ' =======================
 ' Classes principales
 ' =======================

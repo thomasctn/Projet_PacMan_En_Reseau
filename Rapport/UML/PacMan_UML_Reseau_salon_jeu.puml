@@ -1,7 +1,10 @@
 @startuml
+!include theme.puml
+
 
 participant Client
 participant Serveur
+
 
 == Salon ==
 Client -> Serveur : Changer statut/rôle/param

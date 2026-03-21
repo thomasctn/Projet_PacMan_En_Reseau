@@ -260,29 +260,34 @@ class PacketContext {
     - senderId : int
     - packet : Packet
 }
+!include theme.puml
+
 ' =======================
 ' Relations
 ' =======================
 
-' Composition (l’objet appartient au parent)
-ServerNetwork *-- Lobby
-Lobby *-- Room
-Room *-- Game
-Room *-- BotManager
-Room *-- InputQueue
-Game *-- Board
-Game *-- Player
-BotManager *-- BotController
-BotManager *-- GraphTraceMap
-Board *-- Case
-InputQueue *-- PlayerInput
+ServerNetwork "1" *-- "1" Lobby
 
+Lobby "1" *-- "0..*" Room
 
+Room "1" *-- "0..1" Game
+Room "1" *-- "1" BotManager
+Room "1" *-- "1" InputQueue
+
+Game "1" *-- "1" Board
+Game "1" *-- "1..*" Player
+
+BotManager "1" *-- "0..*" BotController
+BotManager "1" *-- "1" GraphTraceMap
+
+Board "1" *-- "1..*" Case
+
+InputQueue "1" *-- "0..*" PlayerInput
 
 ' Association / dépendance
-BotController --> Game
-Room --> PacketContext
-Lobby --> PacketContext
 
+BotController "0..*" --> "1" Game
+Room "1" --> "0..*" PacketContext
+Lobby "1" --> "0..*" PacketContext
 
 @enduml

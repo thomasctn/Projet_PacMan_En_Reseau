@@ -10,6 +10,7 @@ skinparam ClassFontSize 12
 skinparam ClassFontName Arial
 skinparam ClassBackgroundColor #fdfdfd
 skinparam ClassBorderColor #444444
+!include theme.puml
 
 ' =======================
 ' Classes principales
@@ -57,20 +58,23 @@ class InputQueue {
 ' =======================
 
 ' Composition (l’objet appartient au parent)
-ServerNetwork *-- Lobby
-Lobby *-- Room
-Room *-- Game
-Room *-- BotManager
-Room *-- InputQueue
-Game *-- Board
-Game *-- Player
-BotManager *-- BotController
-BotManager *-- GraphTraceMap
+ServerNetwork "1" *-- "1" Lobby
 
+Lobby "1" *-- "0..*" Room
 
+Room "1" *-- "0..1" Game
+Room "1" *-- "1" BotManager
+Room "1" *-- "1" InputQueue
 
+Game "1" *-- "1" Board
+Game "1" *-- "1..*" Player
+
+BotManager "1" *-- "0..*" BotController
+BotManager "1" *-- "1" GraphTraceMap
 ' Association / dépendance
-BotController --> Game
+
+BotController "0..*" --> "1" Game
+
 
 ' Liens invisibles pour éviter étirement horizontal
 ServerNetwork -[hidden]- Game
