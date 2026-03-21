@@ -619,7 +619,7 @@ Pour ce projet, le protocole \textbf{TCP} est préféré au protocole \textbf{UD
 
 Le serveur contient une socket de connexion \textbf{TCP} (\texttt{gf::TcpListener}), initialisé en même temps que lui. Cette socket gère les connexions des clients dans un thread, en assosiant une socket de communication pour chaque client. Le client, de son coté, initialise directement une socket de communication.
 
-\subsection{Structure des données}
+\subsection{Format des messages}
 Pour s'échanger les données, le serveur et le client utilise des structure \textit{communes} et des structure de \textit{communication}.\\
 
 \begin{itemize}
@@ -641,7 +641,7 @@ struct PlayerData
 \end{lstlisting}
 \vspace{0.5cm}
 \begin{itemize}
-\item Les \textbf{strucutes de communication} sont les structures sérialisé pour être envoyé, et reçu avant d'être désérialisé avec pour être utilisé. Ces structures contiennent la plupart du temps une ou plusieurs structures \textit{communes}, mais ils ont aussi un champs \textit{type} du type \textit{gf::Id}, afin d'être indentifié lors de la déserialisation.
+\item Les \textbf{strucutes de communication} sont les structures sérialisé pour être envoyé, et reçu avant d'être désérialisé avec pour être utilisé. Ces structures contiennent la plupart du temps une ou plusieurs structures \textit{communes}, mais ils ont aussi un champs \textit{type} du type \texttt{gf::Id}, afin d'être indentifié lors de la désérialisation.
 \end{itemize}
 \vspace{0.5cm}
 \begin{lstlisting}[xleftmargin=.075\textwidth, xrightmargin=.075\textwidth]
@@ -651,8 +651,9 @@ struct ServerListRoomPlayers
   std::vector<PlayerData> players;
 };
 \end{lstlisting}
-\vspace{0.5cm}
-Ces deux types de structures ont un \textbf{opérateur |} avec un type \textit{Archive}, afin de pouvoir être sérialisé et désérialisé automatiquement
+\paragraph{Sérialisation et désérialisation}
+Afin de pouvoir être échangé entre le serveur et le client, les structures doivent pouvoir être sérialisé en suite d'octets avant d'être envoyé, et lors de la réception, être désérialisé pour retrouver leur forme initiale.\\
+Pour cela, un \textbf{opérateur |} avec un type \textit{Archive} a été implémenté pour chaque strucutres envoyé, permettant leur sérialisation et désérialisation grâce aux fonctionnalités du \textit{GamedevFramework}
 \vspace{0.5cm}
 \begin{lstlisting}
 template <typename Archive>
@@ -672,13 +673,15 @@ Archive &operator|(Archive &ar, ServerListRoomPlayers &data)
 }
 \end{lstlisting}
 
-\subsection{Sérialisation et désérialisation}
-
-La sérialisation et désérialisation des structures de communication sont faite grâce aux classes \texttt{gf::Serializer}, \texttt{gf::Deserializer} et \texttt{gf::Packet}, via la fonction \texttt{gf::Packet::as} , et la fonction \texttt{gf::Packet::is}, fournies par \textit{GamedevFramework}
+Une fois les opérateurs implémentés, les structures peuvent être empaqueté via la fonction \texttt{gf::Packet::is(\textit{data})} et dépaqueté avec la fonction \texttt{gf::Packet::as<\textit{typename}>()}
 
 \subsection{Protocole}
-Lors de son exécution, le client cherche à se connecter au serveur à l'adresse IP et au port passé en paramètre. Le serveur, s'il existe, reçoit cette demande, et associe au client un identifiant, sous la forme d'un entier positif, avant de répondre au client avec cette identifiant et la liste des salons.
-Grâce à cette identifiant, le client peut savoir qui il est parmi la liste des jouers.
+\paragraph{Connexion}
+Lors de son exécution, le client cherche à se connecter au serveur à l'adresse IP et au port passés en paramètre. Le serveur, s'il existe, reçoit cette demande, et associe au client un identifiant, sous la forme d'un entier positif, avant de répondre au client avec cette identifiant et la liste des salons disponible.
+Une fois la réponse du serveur reçu, le client sauvegarde son identifiant, afin de savoir qui il est parmi la liste des jouers, puis change de scène, et liste les salons qu'il l'a reçu.\\
+\paragraph{Liste des salons}
+Dans la liste des salons, le joueur peut choisir de rejoindre un salon existant, ou un en crée un nouveau. Lorsque l'une des deux options est choisi, le client envoi une demande de création ou de jointe d'un salon au serveur. Le serveur traite cette demande, en ajoutant le joueur dans le salon créé/rejoint, et envoi au client la liste des joueurs et les paramètres du salon. Dans le cas où le joueur rejoind un salon, le serveur envoi aussi à tous les autres clients du salon la nouvelle liste des joueurs pour les tenir à jour. Si le client tente de rejoindre un salon qui n'existe pas ou qui est plein le serveur en crée un nouveau.
+Une fois la réponse du serveur reçu, le client change de scène (vers la scène du salon), et affiche les informations reçues.
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.75\textwidth]{UML/PacMan_UML_Reseau_Connexion}
@@ -696,7 +699,7 @@ Cette approche est privilégié à celle de la transmission de chaque modificati
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.75\textwidth]{UML/PacMan_UML_Reseau_salon_jeu}
-    \caption{Version simplifié de la connexion}
+    \caption{Échanges entre le client et le serveur lors dans le salon/en jeu}
 \end{figure}
 
 
