@@ -597,10 +597,68 @@ L'envoi permet uniquement de transmettre au serveur une intention du client.
 
 \subsection{Input, Actions, et EventTypes}
 
+La gestion des entrées repose sur une idée simple : ne pas manipuler directement les touches clavier ou les clics, mais passer par des actions plus claires. 
+Plutôt que de tester partout si une touche est pressée, on définit des actions comme upAction, downAction, leftAction ou rightAction, qui représentent directement ce que le joueur veut faire. 
+Cela rend le code plus facile à lire et évite de disperser la gestion des entrées dans toute l’application.
+
+
+Les événements manipulés côté client sont de plusieurs types.
+On retrouve d’abord les entrées clavier, utilisées principalement pendant la partie pour les déplacements.
+Les événements souris sont plutôt utilisés dans les menus et les lobbys, par exemple pour gérer le survol ou les clics sur des boutons.
+Enfin, certains événements système comme Resized ou Closed permettent de gérer respectivement l’adaptation de l’affichage et la fermeture propre du client.
+Chaque type d’événement a donc un rôle différent selon la scène active.
+
+
+Pour les entrées clavier, le système d’actions permet de simplifier la gestion des touches.
+Chaque action est liée à une touche via un Keycode, puis marquée comme continue avec setContinuous().
+Cela permet de gérer naturellement le maintien d’une touche : tant qu’elle est enfoncée, l’action reste active et peut être utilisée à chaque mise à jour.
+On évite ainsi de devoir gérer manuellement les répétitions ou les états des touches, ce qui rend le comportement plus régulier et le code plus simple à maintenir.
+
+
+Le traitement des événements se ensuite fait au niveau des scènes, dans doProcessEvent. 
+Chaque scène récupère l’événement reçu et décide ce qu’elle en fait. 
+Certaines scènes réagissent surtout à la souris, d’autres au clavier, mais toutes peuvent gérer le redimensionnement de manière cohérente.
+Par exemple, dans GameScene, les événements clavier sont transmis au conteneur d’actions via actions.processEvent(event), tandis que l’événement Resized déclenche resizeYourself() pour recalculer la vue. 
+Cette logique locale évite d’avoir un gestionnaire global qui mélange tous les cas possibles et d'augmenter l'autonomie des scènes car les scènes décident si font quelque chose avec l'événement ou non si l'événement ne la concerne pas..
+Tous les événements ne sont cependant pas traités de la même manière du point de vue réseau.
+
+
+Certains restent purement locaux, comme le mouvement de la souris ou le redimensionnement de la fenêtre, car ils ne modifient pas l’état du jeu côté serveur.
+À l’inverse, certaines actions issues des entrées utilisateur sont envoyées au serveur, comme les déplacements en jeu ou les interactions dans le lobby (changer un paramètre, se déclarer prêt, etc.).
+Dans ces cas-là, le client n’envoie pas un état complet mais une intention, et c’est le serveur qui décide de la valider ou non en renvoyant un état mis à jour.
+Cette distinction permet de limiter les communications réseau tout en gardant un modèle cohérent où le serveur reste responsable de l’état du jeu.
+
+
 \subsection{Rendu des Entités}
 
-Affichage, gestion des entrées utilisateur,
-réception et traitement des messages réseau.
+Maintenant que la logique du jeu et les échanges réseau sont gérés, il reste une dernière étape côté client : afficher l’état du jeu.
+C’est le rôle des entités (GameEntity, LobbyEntity, etc.).
+Chaque scène possède une unique entité, volontairement simple, dont le but est uniquement de traduire un état en éléments graphiques.
+Autrement dit, l’entité ne prend pas de décision : elle affiche ce que la scène lui donne.
+Par exemple, dans le lobby, si un joueur est prêt, l’entité affiche “(prêt)”, sinon “(pas prêt)”.
+Cette séparation permet de garder un rendu indépendant de la logique métier.
+
+
+Dans la plupart des entités, le rendu est organisé en plusieurs fonctions distinctes, chacune responsable d’un élément précis : pour le jeu, on a
+renderMap pour la carte, renderPacGommes pour les objets, renderSprites pour les joueurs, et d’autres fonctions pour l’interface (timer, points de vie, effets).
+Ce découpage permet de garder un code lisible et de modifier facilement une partie du rendu sans impacter le reste.
+La fonction principale render orchestre simplement ces appels dans le bon ordre.
+
+
+Un point important a mentionner concerne le déplacement des joueurs.
+Le serveur envoie des positions selon un interval de temps choisi, ce qui pourrait produire un mouvement visuellement saccadé si on affichait directement ces positions.
+Pour éviter cela, une interpolation est utilisée entre la position de départ (startPos) et la destination (destPos).
+Le temps attendu entre deux mises à jour (expectedDuration) permet de calculer une position intermédiaire fluide à chaque frame.
+Ce mécanisme, implémenté dans renderSprites, permet d’obtenir un rendu visuellement continu même si les mises à jour réseau sont espacées.
+
+
+Le rendu repose également sur l’utilisation de textures et de spritesheets.
+Les personnages utilisent des animations basées sur des tilesets (par exemple Pacman avec plusieurs frames selon la direction), tandis que la carte utilise un tileset avec des RectF pour sélectionner la bonne portion de texture selon le type de mur.
+Cela permet de réutiliser une seule image pour représenter de nombreux éléments, ce qui est à la fois plus efficace et plus simple à maintenir.
+
+
+Le rendu est effectué dans un espace logique fixe (par exemple 1280×720), puis simplement adapté à la fenêtre via le système de vue (resizeYourself).
+Cela permet de garder des proportions cohérentes quel que soit le format d’affichage.
 
 \newpage
 
