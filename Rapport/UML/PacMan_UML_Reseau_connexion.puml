@@ -12,17 +12,17 @@ activate Serveur
 Serveur -> Serveur : assigner ID
 Serveur --> Client : ID client, liste salons
 deactivate Serveur
-Client -> Client : changer scène
+Client -> Client : changer scène (menu)
 activate Client
 deactivate Client
-== Lobby ==
+== Hall ==
 
 Client -> Serveur : rejoindre salon
 activate Serveur
 Serveur -> Serveur : traiter demande
 Serveur --> Client : paramètres, liste des joueurs
 deactivate Serveur
-Client -> Client : changer scène
+Client -> Client : changer scène (salon)
 activate Client
 deactivate Client
 @enduml
