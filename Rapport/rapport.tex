@@ -696,13 +696,13 @@ Les échanges de données entre le client et le serveur s'effectue via des socke
 
 Pour ce projet, le protocole \textbf{TCP} est préféré au protocole \textbf{UDP} pour sa fiabilité.
 
-Le serveur contient une socket de connexion \textbf{TCP} (\texttt{gf::TcpListener}), initialisé en même temps que lui. Cette socket gère les connexions des clients dans un thread, en assosiant une socket de communication pour chaque client. Le client, de son coté, initialise directement une socket de communication.
+Le serveur contient une socket de connexion \textbf{TCP} (\texttt{gf::TcpListener}), initialisé en même temps que lui. Cette socket gère les connexions des clients dans un thread, en assosiant une socket de communication pour chaque nouveau client. Le client, de son coté, initialise directement une socket de communication.
 
 \subsection{Format des messages}
-Pour s'échanger les données, le serveur et le client utilise des structure \textit{communes} et des structure de \textit{communication}.\\
+Pour s'échanger les données, le serveur et le client utilise des structures \textit{communes} et des structures de \textit{communication}. Ce système est inspiré du système mit en place dans le projet \textit{Pax et Mors}\cite{ggj2020}.\\
 
 \begin{itemize}
-\item Les \textbf{structure communes} sont des structures contenant des données utilisé à la fois par le client et le serveur. Parmi eux, il y a, par exemple la structure \textit{PlayerData}, contenant les informations relatives à un joueur (position, points de vie, etc...)(voir figure \ref{fig:player_data}).
+\item Les \textbf{structure communes} sont des structures connues et utilisées à la fois par le client et le serveur. Parmi eux, il y a, par exemple la structure \textit{PlayerData}, contenant les informations relatives à un joueur (position, points de vie, etc...)(voir figure \ref{fig:player_data}).
 \end{itemize}
 \vspace{0.3cm}
 \begin{figure}[H]
@@ -724,7 +724,7 @@ struct PlayerData
 \end{figure}
 \vspace{0.3cm}
 \begin{itemize}
-\item Les \textbf{strucutes de communication} sont les structures sérialisé pour être envoyé, et reçu avant d'être désérialisé avec pour être utilisé. Ces structures contiennent la plupart du temps une ou plusieurs structures \textit{communes}, mais ils ont aussi un champs \textit{type} du type \texttt{gf::Id}, afin d'être indentifié lors de la désérialisation (voir figure \ref{fig:server_list_room_players}).
+\item Les \textbf{strucutes de communication} sont les structures utilisées pour les échanges entre le client et le serveur. Ces structures contiennent la plupart du temps une ou plusieurs structures \textit{communes}, mais ils ont aussi un champ \textit{type} du type \texttt{gf::Id}, afin d'être indentifié lors de la désérialisation (voir figure \ref{fig:server_list_room_players}).
 \end{itemize}
 \vspace{0.3cm}
 \begin{figure}[H]
@@ -740,7 +740,7 @@ struct ServerListRoomPlayers
 \end{figure}
 \paragraph{Sérialisation et désérialisation}
 Afin de pouvoir être échangé entre le serveur et le client, les structures doivent pouvoir être sérialisé en suite d'octets avant d'être envoyé, et lors de la réception, être désérialisé pour retrouver leur forme initiale.\\
-Pour cela, un \textbf{opérateur |} avec un type \textit{Archive} a été implémenté pour chaque strucutres envoyé, permettant leur sérialisation et désérialisation grâce aux fonctionnalités du \textit{GamedevFramework} (voir figure \ref{fig:operateur_ou_player_data} et \ref{fig:operateur_ou_server_list_room_player}).
+Pour cela, un \textbf{opérateur |} avec un type \textit{Archive} a été implémenté pour chaque strucutres envoyées, permettant leur sérialisation et désérialisation grâce aux fonctionnalités du \textit{GamedevFramework} (voir figure \ref{fig:operateur_ou_player_data} et \ref{fig:operateur_ou_server_list_room_player}).
 \vspace{0.5cm}
 \begin{figure}[H]
 \begin{lstlisting}
@@ -768,14 +768,14 @@ Archive &operator|(Archive &ar, ServerListRoomPlayers &data)
 \label{fig:operateur_ou_server_list_room_player}
 \end{figure}
 
-Une fois les opérateurs implémentés, les structures peuvent être empaquetées via la fonction \texttt{gf::Packet::is(\textit{data})} et dépaquetées avec la fonction \texttt{gf::Packet::as<\textit{typename}>()} pour être envoyées/reçues
+Une fois les opérateurs implémentés, les structures peuvent être empaquetées via la fonction \texttt{gf::Packet::is(\textit{data})} et dépaquetées avec la fonction \texttt{gf::Packet::as<\textit{typename}>()} pour être envoyées/reçues.
 
 \subsection{Protocole}
 \paragraph{Connexion}
 Lors de son exécution, le client cherche à se connecter au serveur à l'adresse IP et au port passés en paramètre. Le serveur, s'il existe, reçoit cette demande, et associe au client un identifiant, sous la forme d'un entier positif, avant de répondre au client avec cette identifiant et la liste des salons disponible.
 Une fois la réponse du serveur reçu, le client sauvegarde son identifiant, afin de savoir qui il est parmi la liste des joueurs, puis affiche la scène du début du jeu (voir figure \ref{fig:diagramme_seq_connexion_hall}).
 \paragraph{Hall}
-Dans le Hall, le joueur peut choisir de rejoindre un salon existant, ou un en crée un nouveau. Lorsque l'une des deux options est choisi, le client envoi une demande de création ou d'entré d'un salon au serveur. Le serveur traite cette demande, en ajoutant le joueur dans le salon créé/rejoint, et envoi au client la liste des joueurs et les paramètres du salon. Dans le cas où le joueur rejoint un salon, le serveur envoi aussi à tous les autres clients du salon la nouvelle liste des joueurs pour les tenir à jour. Si le client tente de rejoindre un salon qui n'existe pas ou qui est plein le serveur en crée un nouveau. Une fois la réponse du serveur reçu, le client change de scène (vers la scène du salon), et affiche les informations reçues (voir figure \ref{fig:diagramme_seq_connexion_hall}).
+Dans le hall, le joueur peut choisir de rejoindre un salon existant, ou un en crée un nouveau. Lorsque l'une des deux options est choisi, le client envoie une demande de création ou d'entré d'un salon au serveur. Le serveur traite cette demande, en ajoutant le joueur dans le salon créé/rejoint, et envoie au client la liste des joueurs et les paramètres du salon. Dans le cas où le joueur rejoint un salon, le serveur envoie aussi à tous les autres clients du salon la nouvelle liste des joueurs pour les tenir à jour. Si le client tente de rejoindre un salon qui n'existe pas ou qui est plein, le serveur en crée un nouveau. Une fois la réponse du serveur reçue, le client change de scène (vers la scène du salon), et affiche les informations reçues (voir figure \ref{fig:diagramme_seq_connexion_hall}).
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.75\textwidth]{UML/PacMan_UML_Reseau_Connexion}
@@ -785,16 +785,16 @@ Dans le Hall, le joueur peut choisir de rejoindre un salon existant, ou un en cr
 
 \paragraph{Salon}
 Dans le salon, le client peut soit changer de rôle, changer de statut (prêt/pas prêt), ou changer les paramètres du salon.
-Lorsqu'un client veut changer de rôle ou de statut, il envoi une demande au serveur. Le serveur reçoit cette demande, la traite, et informe tous les clients de la nouvelle liste des joueurs. Le client reçoit cette information et l'affiche\\
-Lorsqu'un client veut changer les paramètres de la partie, il y a d'abord une première vérification de son coté pour réajuster les valeurs s'il elles sont fausse (Ex : Point de vie du Pac-Man à 0). Après cela, elle envoi les paramètres souhaités au serveur. Le serveur reçoit les paramètres, et vérifie à son tour la validité des valeurs. Si elle sont bonnes, le serveur envoi à tous les clients du salon les nouveaux paramètres, ou sinon, les paramètres valides avant la demande du client. Le client reçoit la réponse et affiche les paramètres.\\
-Lorque tous les clients sont prêt, le serveur vérifie si leur rôles sont valide (s'il y a un Pac-man). Si c'est le cas, le serveur génère les données du jeu (Plateu, Joueurs), et informe les clients du début de la partie. Les client reçoivent le signal de début de partie et change de scène (vers la scène de jeu).\\
-Dans le cas où les rôles ne sont pas valide, le serveur envoi aux clients l'erreur, et les clients l'affichent (voir figure \ref{fig:diagramme_seq_salon_jeu}).
+Lorsqu'un client veut changer de rôle ou de statut, il envoie une demande au serveur. Le serveur reçoit cette demande, la traite, et informe tous les clients de la nouvelle liste des joueurs. Le client reçoit cette information et l'affiche\\
+Lorsqu'un client veut changer les paramètres de la partie, il y a d'abord une première vérification de son coté pour réajuster les valeurs s'il elles sont fausse (Ex : Point de vie du Pac-Man à 0). Après cela, elle envoie les paramètres souhaités au serveur. Le serveur reçoit les paramètres, et vérifie à son tour la validité des valeurs. Si elle sont bonnes, le serveur envoie à tous les clients du salon les nouveaux paramètres, ou sinon, les paramètres valides avant la demande du client. Le client reçoit la réponse et affiche les paramètres.\\
+Lorque tous les clients sont prêt, le serveur vérifie si leurs rôles sont valide (s'il y a exactement un Pac-man). Si c'est le cas, le serveur génère les données du jeu (Plateu, Joueurs), et informe les clients du début de la partie. Les client reçoivent le signal de début de partie et changent de scène (vers la scène de jeu).\\
+Dans le cas où les rôles ne sont pas valide, le serveur envoie aux clients l'erreur, et les clients l'affichent (voir figure \ref{fig:diagramme_seq_salon_jeu}).
 
 
 \paragraph{En jeu}
-En jeu, l'unique action que peut réaliser le client est le déplacement de son personnage. Pour chaque déplacement, le client envoi une demande au serveur. Le serveur reçoit cette demande, et vérifie si la position souhaitée par le client est valide (Pas un mur). Si c'est le cas, le serveur traite ensuite les conséquences du déplacement, notamment si le personnage entre en collision avec un autre. Après cela, le serveur envoi à tous les clients l' état du jeu.
+En jeu, l'unique action que peut réaliser le client est le déplacement de son personnage. Pour chaque déplacement, le client envoie une demande au serveur. Le serveur reçoit cette demande, et vérifie si la position souhaitée par le client est valide (Pas un mur). Si c'est le cas, le serveur traite ensuite les conséquences du déplacement, notamment si le personnage entre en collision avec un autre. Après cela, le serveur envoie à tous les clients l'état du jeu.
 Le client reçoit l'état du jeu, et l'affiche.
-Le serveur envoi aussi periodiquement aux clients le temps restant, afin de les tenir informé.
+Le serveur envoie aussi régulièrement aux clients le temps restant, afin de les tenir informé.
 Lorsqu'une des conditions de fin de jeu est atteinte (Temps écoulé, Le Pac-Man n'a plus de vie, les fantômes n'ont plus de vie, ou toutes les pacgommes ont été mangées), le serveur informe tout les clients, en leur précisant la raison, et met fin à la partie\\
 En reçevant le message de fin, le client change de scène, et affiche la raison de la fin du jeu (voir figure \ref{fig:diagramme_seq_salon_jeu}).
 
