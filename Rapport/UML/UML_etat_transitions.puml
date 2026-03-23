@@ -1,4 +1,7 @@
 @startuml
+
+!include theme.puml
+
 top to bottom direction
 
 [*] --> Welcome

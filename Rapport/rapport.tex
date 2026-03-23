@@ -97,15 +97,15 @@
 
 
     \shadowbox{\parbox{0.9\linewidth}{\centering \huge \textbf{Projet L3 : Pacman en réseau}}}\\
-    \vspace{1cm}
-    {\Large \textbf{Rapport de Projet} \\ Licence CMI Informatique - 3ème année \\ 2025-2026\par}
-    \vspace{0.5cm}
+    \vspace{0.2cm}
+    {\Large \textbf{Rapport de Projet Intégrateur} \\ Licence CMI Informatique - 3ème année \\ 2025-2026\par}
+    \vspace{0.2cm}
 
     \includegraphics[width=0.7\textwidth]{images/entete.png}\\
-    \vspace{0.5cm}
+    \vspace{0cm}
 
     {\LARGE \textbf{Thomas COUTANT}\\ \textbf{Benoît LITAMPHA}\\ \textbf{Auriane PETER}\par}
-    \vspace{1cm}
+    \vspace{0.2cm}
     {\large \textbf{Encadrant : Julien BERNARD} }\\
 
     
@@ -188,13 +188,7 @@ La conception d’un jeu multijoueur en temps réel implique plusieurs contraint
 
 Le projet devait être développé en C++ en utilisant la bibliothèque \textit{Gamedev Framework} (gf), qui est adaptée au développement de jeux vidéo et est compatible avec l’architecture réseau. La communication réseau repose sur le protocole TCP, assurant la sûreté des échanges entre le serveur et les clients. Les messages sont sérialisés afin de structurer les informations transmises.
 
-Nous avons par contre choisi de concevoir le serveur selon un modèle multithread avec une chaine de responsabilitée pour gérer les packets, reflétant la logique de fonctionnement du jeu : un thread\footnote{Un thread (fil d’exécution) est une unité d’exécution légère au sein d’un processus. Dans une architecture client-serveur, il permet par exemple de gérer plusieurs connexions ou tâches simultanément (réception réseau, logique de jeu, envoi des mises à jour) tout en partageant la même mémoire.} principal gère le serveur et le lobby, tandis que d’autres threads s’occupent des rooms, de la boucle de jeu, des fantômes contrôlés par l’IA et de la communication avec les clients. Cette architecture permet de traiter simultanément plusieurs interactions des joueurs et d’assurer une exécution fluide et cohérente des parties.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=1\textwidth]{images/chaine_responsabilité.png}
-    \caption{Exemple de Chaine de responsabilité}
-\end{figure}
+Nous avons par contre choisi de concevoir le serveur selon un modèle multithread avec une chaine de responsabilitée pour gérer les packets, reflétant la logique de fonctionnement du jeu : un thread\footnote{Un thread (fil d’exécution) est une unité d’exécution légère au sein d’un processus. Dans une architecture client-serveur, il permet par exemple de gérer plusieurs connexions ou tâches simultanément (réception réseau, logique de jeu, envoi des mises à jour) tout en partageant la même mémoire.} principal gère le serveur et le hall, tandis que d’autres threads s’occupent des salons, de la boucle de jeu, des fantômes contrôlés par l’IA et de la communication avec les clients. Cette architecture permet de traiter simultanément plusieurs interactions des joueurs et d’assurer une exécution fluide et cohérente des parties.
 
 \subsection{Répartition des rôles}
 
@@ -266,15 +260,15 @@ Cette architecture permet l’exécution simultanée de plusieurs parties indép
 L’architecture du serveur est organisée en plusieurs couches distinctes possédant chacune une responsabilité. 
 Cette structuration modulaire garantit lisibilité, extensibilité et maintenabilité.
 
-La couche \textit{Server} assure la gestion des connexions et le routage des messages. 
-Le \textit{Lobby} centralise l’organisation des joueurs et la création des parties. 
-Chaque partie est enfermé dans une entité \textit{Room}, responsable de son état propre et de ses joueurs. 
-Enfin, la logique complète du jeu est contenue dans la classe \textit{Game}, indépendante des mécanismes réseau.
+La couche \textit{Serveur} assure la gestion des connexions et le routage des messages. 
+Le \textit{Hall} centralise l’organisation des joueurs et la création des parties. 
+Chaque partie est enfermé dans une entité \textit{Salon}, responsable de son état propre et de ses joueurs. 
+Enfin, la logique complète du jeu est contenue dans la classe \textit{Jeu}, indépendante des mécanismes réseau.
 
 L’architecture suit ainsi une chaîne de responsabilité hiérarchique :
 
 \begin{center}
-Client $\rightarrow$ Server $\rightarrow$ Lobby $\rightarrow$ Room $\rightarrow$ Game
+Client $\rightarrow$ Serveur $\rightarrow$ Hall $\rightarrow$ Salon $\rightarrow$ Jeu
 \end{center}
 
 Chaque couche délègue les traitements spécialisés au niveau inférieur, ce qui permet d’introduire de nouvelles fonctionnalités sans modifier les composants fondamentaux du système.
@@ -318,6 +312,12 @@ L’intégralité de ces calculs étant effectuée côté serveur, toute tentati
 À la fin de chaque tick, l’état global mis à jour est diffusé à l’ensemble des clients. 
 Ces derniers ne réalisent aucun calcul logique : ils se contentent d’afficher l’état reçu. 
 Cette architecture s’inscrit dans le modèle de serveur autoritaire défini précédemment.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{UML/PacMan_UML_Server_test_loop.png}
+    \caption{Diagramme d'activité de la boucle de jeu du serveur}
+\end{figure}
 
 \subsection{Plateau et génération procédurale}
 
@@ -428,19 +428,19 @@ Un bruit aléatoire est également introduit afin d’éviter les cycles déterm
     \caption*{Rouge pour PacMan et Bleu pour les fantômes}
 \end{figure}
 
-\subsection{Rooms : gestion des parties}
+\subsection{Salons : gestion des parties}
 
-Afin de supporter plusieurs parties simultanées, le serveur repose sur un système de \textit{rooms}. 
-Une room représente une instance autonome de jeu possédant son propre état, ses propres joueurs et son propre cycle d’exécution. 
+Afin de supporter plusieurs parties simultanées, le serveur repose sur un système de \textit{salons}. 
+Une salon représente une instance autonome de jeu possédant son propre état, ses propres joueurs et son propre cycle d’exécution. 
 Cette abstraction permet d’isoler complètement les parties les unes des autres tout en gardant une architecture serveur centralisée.
 
-Chaque room maintient la liste des joueurs connectés, l’attribution des rôles (Pac-Man ou fantômes), les paramètres de la partie ainsi que son état courant (en attente, en cours, terminée). 
+Chaque salon maintient la liste des joueurs connectés, l’attribution des rôles (Pac-Man ou fantômes), les paramètres de la partie ainsi que son état courant (en attente, en cours, terminée). 
 Elle encapsule également sa propre boucle de jeu et son plateau, garantissant qu’aucune donnée n’est partagée entre deux parties distinctes.
 
 \paragraph{Création dynamique et attribution des rôles}
 
-Lorsqu’un joueur rejoint le lobby, il est dirigé vers une room existante disposant de places libres. 
-Si aucune room n’est disponible, une nouvelle room est créée dynamiquement.
+Lorsqu’un joueur rejoint le hall, il est dirigé vers une salon existante disposant de places libres. 
+Si aucune salon n’est disponible, une nouvelle salon est créée dynamiquement.
 Cette création à la demande permet au serveur d’adapter automatiquement sa structure au nombre de joueurs connectés.
 
 L’attribution des rôles est effectuée au moment du lancement de la partie selon une règle simple : un joueur incarne Pac-Man tandis que les autres deviennent des fantômes. 
@@ -449,20 +449,20 @@ En cas de conflit le server informe les clients de la règle non respectée.
 
 \paragraph{Gestion et diffusion de l’état}
 
-Chaque room possède un état centralisé comprenant les positions des joueurs, l’état des pac-gommes et les différents systèmes temporels. 
-À chaque tick, cet état est mis à jour puis diffusé uniquement aux joueurs appartenant à la room concernée.
+Chaque salon possède un état centralisé comprenant les positions des joueurs, l’état des pac-gommes et les différents systèmes temporels. 
+À chaque tick, cet état est mis à jour puis diffusé uniquement aux joueurs appartenant à la salon concernée.
 
 Ce cloisonnement garantit la cohérence interne de chaque partie et empêche toute interférence. 
 
 \paragraph{Paramétrisation des parties}
 
-Les rooms permettent d’ajuster dynamiquement certains paramètres, tels que la durée maximale d’une partie, le nombre de vies de Pac-Man, ect. 
+Les salons permettent d’ajuster dynamiquement certains paramètres, tels que la durée maximale d’une partie, le nombre de vies de Pac-Man, ect. 
 Cette capacité de configuration facilite les phases de test, l’équilibrage du gameplay et l’organisation de parties avec des règles customisées.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=1\textwidth]{images/room.png}
-    \caption{Vue de la Room}
+    \caption{Vue du Salon}
 \end{figure}
 
 \newpage
@@ -474,7 +474,7 @@ Cette capacité de configuration facilite les phases de test, l’équilibrage d
 
 Le client a pour rôle principal d’être l’interface entre l’utilisateur et le serveur.
 Il ne décide pas des règles du jeu ni de la validité des actions cela est le rôle du serveur : il capture les entrées du joueur, les transmet au serveur, reçoit les états calculés côté serveur, puis les transforme en représentation visuelle pour le joueur.
-Dans le cadre d’un Pac-Man multijoueur, le client doit gérer des contraintes spécifiques : latence réseau, cohérence des états, fluidité visuelle, transitions entre différentes phases de jeu et gestion d’une interface utilisateur complète (menu, lobby, partie, fin de jeu).
+Dans le cadre d’un Pac-Man multijoueur, le client doit gérer des contraintes spécifiques : latence réseau, cohérence des états, fluidité visuelle, transitions entre différentes phases de jeu et gestion d’une interface utilisateur complète (menu, hall, partie, fin de jeu).
 
 Le client doit également gérer l’ensemble du cycle de vie d’une session de jeu.
 Cela inclut une scène d’accueil, une scène présentant les règles afin de clarifier le fonctionnement de la version multijoueur de Pacman, une page de liste de lobbys, une scène de configuration de salle, la transition vers la partie, puis l’écran de fin affichant le résultat.
@@ -534,7 +534,7 @@ La scène correspond à un espace décisionnel : elle traite les événements, c
 \paragraph{Entité}
 
 L’entité, quant à elle, fait seulement de la représentation. Elle traduit la logique décidée par la scène en éléments graphiques concrets : sprites, tuiles, animations, positions affichées.
-Elle ne possède pas la responsabilité de déterminer ou est un joueur, ou quels sont les paramètres actuels d'un lobby.
+Elle ne possède pas la responsabilité de déterminer ou est un joueur, ou quels sont les paramètres actuels d'un hall.
 Elle reçoit un état déjà validé et le rend visible au joueur.
 
 \paragraph{Une séparation essentielle}
@@ -579,7 +579,7 @@ L’objectif est d’éviter un envoi par frame graphique tout en garantissant u
 
 \paragraph{Envoi événementiel}
 
-Dans le cas du lobby, le fonctionnement est différent.
+Dans le cas du hall, le fonctionnement est différent.
 L’entité détecte une interaction (bouton +/-, ready, changement de rôle) 
 et expose cette action via un enum \texttt{LobbyAction}.
 La scène récupère alors l'action qui vient d'être effectuée puis la transforme en message réseau et l'envoi.
@@ -624,7 +624,7 @@ Tous les événements ne sont cependant pas traités de la même manière du poi
 
 
 Certains restent purement locaux, comme le mouvement de la souris ou le redimensionnement de la fenêtre, car ils ne modifient pas l’état du jeu côté serveur.
-À l’inverse, certaines actions issues des entrées utilisateur sont envoyées au serveur, comme les déplacements en jeu ou les interactions dans le lobby (changer un paramètre, se déclarer prêt, etc.).
+À l’inverse, certaines actions issues des entrées utilisateur sont envoyées au serveur, comme les déplacements en jeu ou les interactions dans le hall (changer un paramètre, se déclarer prêt, etc.).
 Dans ces cas-là, le client n’envoie pas un état complet mais une intention, et c’est le serveur qui décide de la valider ou non en renvoyant un état mis à jour.
 Cette distinction permet de limiter les communications réseau tout en gardant un modèle cohérent où le serveur reste responsable de l’état du jeu.
 
@@ -635,7 +635,7 @@ Maintenant que la logique du jeu et les échanges réseau sont gérés, il reste
 C’est le rôle des entités (GameEntity, LobbyEntity, etc.).
 Chaque scène possède une unique entité, volontairement simple, dont le but est uniquement de traduire un état en éléments graphiques.
 Autrement dit, l’entité ne prend pas de décision : elle affiche ce que la scène lui donne.
-Par exemple, dans le lobby, si un joueur est prêt, l’entité affiche “(prêt)”, sinon “(pas prêt)”.
+Par exemple, dans le hall, si un joueur est prêt, l’entité affiche “(prêt)”, sinon “(pas prêt)”.
 Cette séparation permet de garder un rendu indépendant de la logique métier.
 
 
@@ -683,7 +683,7 @@ Pour s'échanger les données, le serveur et le client utilise des structure \te
 \begin{itemize}
 \item Les \textbf{structure communes} sont des structures contenant des données utilisé à la fois par le client et le serveur. Parmi eux, il y a, par exemple la structure \textit{PlayerData}, contenant les informations relatives à un joueur (position, points de vie, etc...).
 \end{itemize}
-\vspace{0.5cm}
+\vspace{0.3cm}
 \begin{lstlisting}[xleftmargin=.075\textwidth, xrightmargin=.075\textwidth]
 struct PlayerData
 {
@@ -697,11 +697,11 @@ struct PlayerData
     unsigned int hp = 0;
 };
 \end{lstlisting}
-\vspace{0.5cm}
+\vspace{0.3cm}
 \begin{itemize}
 \item Les \textbf{strucutes de communication} sont les structures sérialisé pour être envoyé, et reçu avant d'être désérialisé avec pour être utilisé. Ces structures contiennent la plupart du temps une ou plusieurs structures \textit{communes}, mais ils ont aussi un champs \textit{type} du type \texttt{gf::Id}, afin d'être indentifié lors de la désérialisation.
 \end{itemize}
-\vspace{0.5cm}
+\vspace{0.3cm}
 \begin{lstlisting}[xleftmargin=.075\textwidth, xrightmargin=.075\textwidth]
 struct ServerListRoomPlayers
 {
@@ -742,7 +742,7 @@ Dans la liste des salons, le joueur peut choisir de rejoindre un salon existant,
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.75\textwidth]{UML/PacMan_UML_Reseau_Connexion}
-    \caption{Échanges entre le client et le serveur lors de la connexion/lobby}
+    \caption{Échanges entre le client et le serveur lors de la connexion/hall}
 \end{figure}
 
 \paragraph{Salon}
@@ -780,7 +780,7 @@ La réalisation de ce projet nous a permis de mobiliser et d’approfondir plusi
 
 Sur le plan technique, nous avons développé des compétences en programmation réseau, notamment dans la conception d’une architecture client-serveur autoritaire, la gestion des communications et la synchronisation d’un système en temps réel.
 
-Le projet a également renforcé nos compétences en architecture logicielle. La transformation d’un prototype vers une structure plus complexes (Server, Lobby, Room, Game) nous a confrontés à des enjeux de séparation des responsabilités, de maintenabilité et d’évolutivité du code. Cette phase de conception a nécessité une réflexion approfondie sur l’organisation des composants et leurs interactions.
+Le projet a également renforcé nos compétences en architecture logicielle. La transformation d’un prototype vers une structure plus complexes (Server, Hall, Salon, Jeu) nous a confrontés à des enjeux de séparation des responsabilités, de maintenabilité et d’évolutivité du code. Cette phase de conception a nécessité une réflexion approfondie sur l’organisation des composants et leurs interactions.
 
 Enfin, le travail de conception globale du système, la génération procédurale du plateau, l'implémentation d’une intelligence artificielle, la définition des règles de synchronisation, nous a permis de développer une approche méthodique dans l’analyse des besoins, la modélisation et la résolution de problèmes complexes.
 

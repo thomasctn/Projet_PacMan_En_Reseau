@@ -58,22 +58,22 @@ class InputQueue {
 ' =======================
 
 ' Composition (l’objet appartient au parent)
-ServerNetwork "1" *-- "1" Lobby
+ServerNetwork *-- Lobby
 
-Lobby "1" *-- "0..*" Room
+Lobby *-- Room
 
-Room "1" *-- "0..1" Game
-Room "1" *-- "1" BotManager
-Room "1" *-- "1" InputQueue
+Room *-- Game
+Room *-- BotManager
+Room *-- InputQueue
 
-Game "1" *-- "1" Board
-Game "1" *-- "1..*" Player
+Game *-- Board
+Game *-- Player
 
-BotManager "1" *-- "0..*" BotController
-BotManager "1" *-- "1" GraphTraceMap
+BotManager *-- BotController
+BotManager *-- GraphTraceMap
 ' Association / dépendance
 
-BotController "0..*" --> "1" Game
+BotController --> Game
 
 
 ' Liens invisibles pour éviter étirement horizontal

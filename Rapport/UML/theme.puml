@@ -21,8 +21,9 @@ skinparam defaultFontColor #222222
 ' =========================
 !define MAIN #1F4E79
 !define GRAY #6C7A89
-!define LIGHT_BLUE #dceeff
+!define LIGHT_BLUE #DCEEFF
 !define LIGHT #EEF3F8
+!define BG #F9FBFD
 
 ' =========================
 ' TITRES
@@ -35,14 +36,22 @@ skinparam titleFontColor MAIN
 ' =========================
 skinparam ArrowColor MAIN
 skinparam ArrowThickness 1.5
+skinparam ArrowFontSize 13
+skinparam ArrowFontColor MAIN
+skinparam ArrowFontStyle bold
+
+skinparam linetype ortho
+skinparam nodesep 60
+skinparam ranksep 60
 
 ' =========================
-' CLASSES
+' CLASSES (RÉFÉRENCE VISUELLE)
 ' =========================
 skinparam classAttributeIconSize 0
+hide circle
 
 skinparam class {
-    BackgroundColor #F9FBFD
+    BackgroundColor BG
     BorderColor MAIN
     FontColor #222222
 
@@ -55,18 +64,8 @@ skinparam class {
 
     BorderThickness 1.5
     DividerColor #D0D7E2
-}
-skinparam classAttributeIconSize 0
-hide circle
-skinparam linetype ortho
-skinparam class {
     HeaderBackgroundColor LIGHT_BLUE
 }
-skinparam ArrowColor MAIN
-skinparam ArrowThickness 1.5
-skinparam ArrowFontColor #333333
-
-
 
 ' =========================
 ' SEQUENCE DIAGRAM
@@ -75,36 +74,76 @@ skinparam sequence {
     ArrowColor MAIN
     LifeLineBorderColor MAIN
     LifeLineBackgroundColor LIGHT_BLUE
+
     ParticipantBorderColor MAIN
     ParticipantBackgroundColor LIGHT_BLUE
     ParticipantFontColor #222222
+
     ActorBorderColor MAIN
     ActorBackgroundColor LIGHT_BLUE
+
+    ActivationBackgroundColor #E6EEF8
+    ActivationBorderColor MAIN
 }
+
 ' =========================
-' COMPONENT / RECTANGLE
+' STYLE UNIFIÉ (comme classes)
 ' =========================
 skinparam component {
-    BackgroundColor #FFFFFF
+    BackgroundColor BG
     BorderColor MAIN
+    FontColor #222222
+    BorderThickness 1.5
 }
 
 skinparam rectangle {
-    BackgroundColor #FFFFFF
+    BackgroundColor BG
     BorderColor MAIN
+    FontColor #222222
+    BorderThickness 1.5
 }
 
-' =========================
-' NODE / DATABASE
-' =========================
 skinparam node {
-    BackgroundColor #FFFFFF
+    BackgroundColor BG
     BorderColor MAIN
+    FontColor #222222
+    BorderThickness 1.5
 }
 
 skinparam database {
-    BackgroundColor #FFFFFF
+    BackgroundColor BG
     BorderColor MAIN
+    FontColor #222222
+    BorderThickness 1.5
+}
+
+skinparam usecase {
+    BackgroundColor BG
+    BorderColor MAIN
+    FontColor #222222
+    BorderThickness 1.5
+}
+
+' =========================
+' PACKAGES
+' =========================
+skinparam package {
+    BorderColor MAIN
+    BackgroundColor LIGHT
+    FontColor MAIN
+    BorderThickness 1.5
+}
+
+' =========================
+' ACTIVITY DIAGRAM
+' =========================
+skinparam activity {
+    BackgroundColor BG
+    BorderColor MAIN
+    FontColor #222222
+
+    DiamondBackgroundColor LIGHT
+    DiamondBorderColor MAIN
 }
 
 ' =========================
@@ -114,32 +153,6 @@ skinparam note {
     BackgroundColor LIGHT
     BorderColor GRAY
     FontColor #222222
-}
-
-' =========================
-' PACKAGES
-' =========================
-skinparam package {
-    BorderColor MAIN
-    BackgroundColor #F8FAFC
-}
-
-' =========================
-' ACTIVITY DIAGRAM
-' =========================
-skinparam activity {
-    BackgroundColor #FFFFFF
-    BorderColor MAIN
-    DiamondBackgroundColor LIGHT
-    DiamondBorderColor MAIN
-}
-
-' =========================
-' USECASE
-' =========================
-skinparam usecase {
-    BackgroundColor #FFFFFF
-    BorderColor MAIN
 }
 
 ' =========================

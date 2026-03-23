@@ -40,11 +40,11 @@ class BotManager {
 ' =======================
 
 ' Composition (l’objet appartient au parent)
-ServerNetwork "1" *-- "1" Lobby
+ServerNetwork *-- Lobby
 
-Lobby "1" *-- "0..*" Room
-Room "1" *-- "0..1" Game
-Room "1" *-- "1" BotManager
-Room "1" *-- "1" InputQueue
+Lobby *-- Room
+Room *-- Game
+Room *-- BotManager
+Room *-- InputQueue
 
 @enduml
