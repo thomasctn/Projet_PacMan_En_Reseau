@@ -707,8 +707,8 @@ $\rightarrow$ Met aussi en place le réseau
 \textbf{Messages : Structures C++}
 \begin{itemize}
     \item Connues par le client et le serveur
-    \item Contiennent des données souvent regroupées dans des structures \textit{communes}
-    \item Un champ \textcolor{blue}{\texttt{gf::id}} pour les identifier lors de la désérialisation
+    \item Contiennent des structures \textit{communes}
+    \item Un champ \textcolor{blue}{\textit{type}} pour les identifier lors de la désérialisation
     \item Nomenclature spécifique :
     \begin{itemize}
             \item \textit{ServerXXX} = envoyée par le serveur
@@ -719,7 +719,7 @@ $\rightarrow$ Met aussi en place le réseau
 \textbf{Sérialisation/désérialisation}
 \begin{itemize}
     \item Nécessaire pour l'envoi/réception
-    \item \textbf{Opétateur |} avec un type \textit{Archive} pour chaque structure
+    \item \textbf{Opétateur |} avec un type \textit{Archive}
 \end{itemize}
 
 \column{0.35\textwidth}
@@ -759,12 +759,20 @@ Archive &operator|(Archive &ar, ServerListRoomPlayers &data)
     \textbf{Connexion}
     \begin{itemize}
         \item \textbf{Client} : Demande de connexion
-        \item \textbf{Serveur} : Assignation d'un id et renvoi de l'id + liste des salons
+        \item \textbf{Serveur} :
+        \begin{itemize}
+            \item Assignation d'un id
+            \item Envoi l'id + liste des salons
+        \end{itemize}
     \end{itemize}
     \textbf{Lobby}
     \begin{itemize}
         \item \textbf{Client} : Demande de création/connexion à un salon
-        \item \textbf{Serveur} : Traitement et envoi de la réponse et \textbf{broadcast} de la liste des joueurs/paramètres
+        \item \textbf{Serveur} :
+        \begin{itemize}
+            \item Traitement + envoi de la réponse
+            \item \textbf{Broadcast} liste des joueurs/paramètres
+        \end{itemize}
     \end{itemize}
     \column{0.4\textwidth}
     \includegraphics[width=\textwidth]{UML/PacMan_UML_Reseau_connexion.png}
@@ -777,17 +785,25 @@ Archive &operator|(Archive &ar, ServerListRoomPlayers &data)
     \column{0.55\textwidth}
     \textbf{Salon}
     \begin{itemize}
-        \item \textbf{Client} : Demande de changement de rôle/status/paramètres
-        \item \textbf{Serveur} : Traitement et \textbf{broadcast} de la liste des joueurs/paramètres
+        \item \textbf{Client} : Demande de changement de rôle/statut/paramètres
+        \item \textbf{Serveur} :
+        \begin{itemize}
+            \item Vérifie la validité
+            \item \textbf{Broadcast} liste des joueurs ou paramètres
+        \end{itemize}
+        
     \end{itemize}
-        Si tous les joueurs son prêt : \textbf{Broadcast} début de partie ou erreur\\
+        Tous les Joueurs prêt ?: \textbf{broadcast} début de partie/erreur\\
     \textbf{En jeu}
     \begin{itemize}
         \item \textbf{Client} : Demande de déplacement
-        \item \textbf{Serveur} : Vérifie la validité, gère les conséquences puis \textbf{broadcast} de l'état du jeu
+        \item \textbf{Serveur} :
+        \begin{itemize}
+            \item Vérifie, gère les conséquences
+            \item \textbf{Broadcast} état du jeu
+        \end{itemize}
     \end{itemize}
-     Si fin de jeu : \textbf{Broadcast} de la fin du jeu et de la raison
-
+     Si fin de jeu : \textbf{broadcast} fin du jeu
     \column{0.375\textwidth}
     \includegraphics[width=\textwidth]{UML/PacMan_UML_Reseau_salon_jeu.png}
 

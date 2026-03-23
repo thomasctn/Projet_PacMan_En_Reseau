@@ -20,7 +20,7 @@ deactivate Client
 Client -> Serveur : rejoindre salon
 activate Serveur
 Serveur -> Serveur : traiter demande
-Serveur --> Client : paramètes, liste des joueurs
+Serveur --> Client : paramètres, liste des joueurs
 deactivate Serveur
 Client -> Client : changer scène
 activate Client
