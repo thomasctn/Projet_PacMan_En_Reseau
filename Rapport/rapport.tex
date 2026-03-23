@@ -203,7 +203,7 @@ Nous avons par contre choisi de concevoir le serveur selon un modèle multithrea
 
 La réalisation de ce projet a été organisée de manière collaborative entre les trois membres du groupe. 
 
-Thomas Coutant a principalement travaillé sur le développement du serveur, ainsi que sur la conception de la logique du jeu. Il a également développé un prototype minimal de démarrage, permettant de tester la communication client–serveur avec un simple cube représentant un joueur en mouvement.
+Thomas Coutant a principalement travaillé sur le développement du serveur, ainsi que sur la conception de la logique du jeu. Il a également développé un prototype minimal, permettant de tester la communication client–serveur avec un simple cube représentant un joueur en mouvement.
 
 Auriane Peter s’est concentrée sur le développement du client, en implémentant l’interface et la gestion des interactions côté joueur.
 
@@ -360,7 +360,7 @@ Une zone centrale fixe de taille $3 \times 3$, appelée « hut », est réservé
 Elle est protégée durant l’exécution de l’algorithme afin de préserver sa structure. 
 Une fonction dédiée vérifie ensuite son raccordement au labyrinthe principal par au moins une ouverture, comme visible à la figure~\ref{fig:hut}.
 
-Les coins du plateau, destinés aux positions initiales des joueurs, sont également vérifiés après la génération. 
+Les coins du plateau sont destinés aux positions initiales des joueurs et sont également vérifiés après la génération. 
 Si l’un d’eux se retrouve isolé, une ouverture contrôlée est créée pour garantir son accessibilité.
 
 \begin{figure}[H]
@@ -398,8 +398,8 @@ La génération procédurale contribue à la rejouabilité et à la diversité s
 
 \subsection{Intelligence artificielle des fantômes}
 
-L’intelligence artificielle des fantômes repose sur une architecture hybride qui mélange pathfinding classique, système d’influence local et prise de décision hiérarchique. 
-L’objectif n’est pas uniquement de poursuivre efficacement Pac-Man, mais de produire une intelligences artificielle adaptable et collective.
+L’intelligence artificielle des fantômes repose sur une architecture hybride qui mélange un pathfinding classique et un système à influence local avec une prise de décision hiérarchique. 
+L’objectif n’est pas de poursuivre efficacement Pac-Man, mais plutôt de produire une intelligences artificielle adaptable et collective.
 
 \paragraph{Architecture décisionnelle hiérarchique}
 
@@ -409,9 +409,9 @@ Lorsque Pac-Man est en mode chasseur, la priorité absolue devient la fuite stra
 Le plus court chemin est alors calculé à l’aide d’un algorithme de Breadth First Search (BFS), garantissant une trajectoire optimale dans un graphe non pondéré.
 Ce choix permet la compatibilité avec les labyrinthes générés procéduralement.
 
-En situation normale, si Pac-Man est détecté dans un rayon de vision défini, le fantôme active un mode de poursuite. 
+En situation normale, si Pac-Man est détecté dans un rayon de vision défini, le fantôme active un mode de traque. 
 Un BFS à profondeur limitée est exécuté afin de simuler une perception réduite de l’environnement. 
-Cette limitation réduit le coût tout en conservant un comportement crédible et conforme aux regles du jeu.
+Cela permet réduit le coût tout en conservant un comportement crédible et conforme aux regles du jeu.
 
 En l’absence de menace ou de cible visible, le fantôme adopte un comportement autonome fondé sur un système de trace.
 
@@ -430,7 +430,7 @@ Ce mécanisme s’inspire des modèles de colonies de fourmis, où l’informati
 
 \paragraph{Comportement émergent}
 
-L’interaction entre attraction vers la cible et répulsion inter-bots produit des comportements collectifs sans coordination explicite. 
+L’interaction entre attraction vers la cible et répulsion inter-IA produit des comportements collectifs sans une coordination explicite. 
 Les fantômes tendent naturellement à se disperser, à éviter les regroupements inutiles et à converger progressivement vers Pac-Man en exploitant différentes trajectoires.
 
 \paragraph{Choix algorithmiques}
@@ -455,7 +455,7 @@ Afin de supporter plusieurs parties simultanées, le serveur repose sur un syst�
 Une salon représente une instance autonome de jeu possédant son propre état, ses propres joueurs et son propre cycle d’exécution. 
 Cette abstraction permet d’isoler complètement les parties les unes des autres tout en gardant une architecture serveur centralisée.
 
-Chaque salon maintient la liste des joueurs connectés, l’attribution des rôles (Pac-Man ou fantômes), les paramètres de la partie ainsi que son état courant (en attente, en cours, terminée). 
+Chaque salon maintient la liste des joueurs connectés, l’attribution des rôles (Pac-Man ou fantômes), les paramètres de la partie ainsi que son état actuel (en attente, en cours, terminée). 
 Elle encapsule également sa propre boucle de jeu et son plateau, garantissant qu’aucune donnée n’est partagée entre deux parties distinctes.
 
 \paragraph{Création dynamique et attribution des rôles}
@@ -473,7 +473,7 @@ En cas de conflit le server informe les clients de la règle non respectée.
 Chaque salon possède un état centralisé comprenant les positions des joueurs, l’état des pac-gommes et les différents systèmes temporels. 
 À chaque tick, cet état est mis à jour puis diffusé uniquement aux joueurs appartenant à la salon concernée.
 
-Ce cloisonnement garantit la cohérence interne de chaque partie et empêche toute interférence. 
+Cette séparation garantit la cohérence interne de chaque partie et empêche toute interférence exterieur. 
 
 \paragraph{Paramétrisation des parties}
 
