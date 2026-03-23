@@ -1,0 +1,22 @@
+@startuml
+top to bottom direction
+
+[*] --> Welcome
+
+Welcome --> Rules
+Welcome --> LobbyList
+
+Rules --> Welcome
+
+LobbyList --> Welcome
+LobbyList --> Lobby
+
+Lobby --> LobbyList
+Lobby --> Game
+
+
+Game --> End
+
+End --> Lobby
+
+@enduml
