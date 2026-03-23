@@ -736,9 +736,9 @@ Une fois les opérateurs implémentés, les structures peuvent être empaquetée
 \subsection{Protocole}
 \paragraph{Connexion}
 Lors de son exécution, le client cherche à se connecter au serveur à l'adresse IP et au port passés en paramètre. Le serveur, s'il existe, reçoit cette demande, et associe au client un identifiant, sous la forme d'un entier positif, avant de répondre au client avec cette identifiant et la liste des salons disponible.
-Une fois la réponse du serveur reçu, le client sauvegarde son identifiant, afin de savoir qui il est parmi la liste des jouers, puis affiche la scène du début du jeu.
-\paragraph{Liste des salons}
-Dans la liste des salons, le joueur peut choisir de rejoindre un salon existant, ou un en crée un nouveau. Lorsque l'une des deux options est choisi, le client envoi une demande de création ou de jointe d'un salon au serveur. Le serveur traite cette demande, en ajoutant le joueur dans le salon créé/rejoint, et envoi au client la liste des joueurs et les paramètres du salon. Dans le cas où le joueur rejoind un salon, le serveur envoi aussi à tous les autres clients du salon la nouvelle liste des joueurs pour les tenir à jour. Si le client tente de rejoindre un salon qui n'existe pas ou qui est plein le serveur en crée un nouveau. Une fois la réponse du serveur reçu, le client change de scène (vers la scène du salon), et affiche les informations reçues.
+Une fois la réponse du serveur reçu, le client sauvegarde son identifiant, afin de savoir qui il est parmi la liste des joueurs, puis affiche la scène du début du jeu.
+\paragraph{Hall}
+Dans le Hall, le joueur peut choisir de rejoindre un salon existant, ou un en crée un nouveau. Lorsque l'une des deux options est choisi, le client envoi une demande de création ou d'entré d'un salon au serveur. Le serveur traite cette demande, en ajoutant le joueur dans le salon créé/rejoint, et envoi au client la liste des joueurs et les paramètres du salon. Dans le cas où le joueur rejoint un salon, le serveur envoi aussi à tous les autres clients du salon la nouvelle liste des joueurs pour les tenir à jour. Si le client tente de rejoindre un salon qui n'existe pas ou qui est plein le serveur en crée un nouveau. Une fois la réponse du serveur reçu, le client change de scène (vers la scène du salon), et affiche les informations reçues.
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.75\textwidth]{UML/PacMan_UML_Reseau_Connexion}
@@ -754,9 +754,9 @@ Dans le cas où les rôles ne sont pas valide, le serveur envoi aux clients l'er
 
 
 \paragraph{En jeu}
-En jeu, l'unique action que peut réaliser le client est le déplacement de son personnage. Pour chaque déplacement, le client envoi une demande au serveur. Le serveur reçoit cette demande, et vérifie si la position souhaitée par le client est valide (Pas un mur). Si c'est le cas, le serveur traite ensuite les conséquences du déplacement, notamment si le personnage entre en collision avec un autre. Après cela, le serveur envoi à tous les clients l' état du jeu.\\
-Le client reçoit l'état du jeu, et l'affiche\\
-Le serveur envoi aussi periodiquement aux clients le temps restant, afin de les tenir informé\\
+En jeu, l'unique action que peut réaliser le client est le déplacement de son personnage. Pour chaque déplacement, le client envoi une demande au serveur. Le serveur reçoit cette demande, et vérifie si la position souhaitée par le client est valide (Pas un mur). Si c'est le cas, le serveur traite ensuite les conséquences du déplacement, notamment si le personnage entre en collision avec un autre. Après cela, le serveur envoi à tous les clients l' état du jeu.
+Le client reçoit l'état du jeu, et l'affiche.
+Le serveur envoi aussi periodiquement aux clients le temps restant, afin de les tenir informé.
 Lorsqu'une des conditions de fin de jeu est atteinte (Temps écoulé, Le Pac-Man n'a plus de vie, les fantômes n'ont plus de vie, ou toutes les pacgommes ont été mangées), le serveur informe tout les clients, en leur précisant la raison, et met fin à la partie\\
 En reçevant le message de fin, le client change de scène, et affiche la raison de la fin du jeu.
 
