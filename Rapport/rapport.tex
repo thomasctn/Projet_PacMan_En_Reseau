@@ -140,18 +140,20 @@
 
 \subsection{Présentation générale du jeu \texttt{Pac-Man}}
 
-Le jeu \texttt{Pac-Man}, apparu au début des années 1980, est un jeu d’arcade dans lequel le joueur contrôle un personnage évoluant dans un labyrinthe. L’objectif principal est de parcourir l’ensemble du labyrinthe afin de consommer toutes les \texttt{pac-gommes} qui s’y trouvent, tout en évitant d’entrer en contact avec des fantômes. Ces derniers constituent les adversaires du joueur et cherchent à bloquer ou intercepter ses déplacements. Certaines \texttt{pac-gommes} spéciales permettent temporairement à \texttt{Pac-Man} d’inverser les rôles en devenant capable de manger les fantômes, ajoutant ainsi une dimension stratégique au gameplay.
+Le jeu \texttt{Pac-Man}, apparu au début des années 1980, est un jeu d’arcade dans lequel le joueur contrôle un personnage évoluant dans un labyrinthe. L’objectif principal est de parcourir l’ensemble du labyrinthe afin de manger toutes les \texttt{pac-gommes} qui s’y trouvent, tout en évitant d’entrer en contact avec des fantômes. Ces derniers sont les adversaires du joueur et cherchent à le bloquer et le manger. Certaines \texttt{pac-gommes} spéciales permettent temporairement à \texttt{Pac-Man} d’inverser les rôles en devenant capable de manger les fantômes, ajoutant ainsi une dimension stratégique au gameplay.
+
+Comme illustré à la figure \ref{fig:pacman_original}, le jeu repose sur un labyrinthe fixe dans lequel le joueur doit optimiser ses déplacements tout en anticipant le comportement des ennemis.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.8\textwidth]{images/pac_man_original.png}
-    \caption{PacMan : le jeu original}
+    \caption{Pac-Man : le jeu original}
+    \label{fig:pacman_original}
 \end{figure}
 
+Dans le cadre de ce projet, le jeu a été adapté pour le multijoueur. Une partie oppose un joueur \texttt{Pac-Man} à plusieurs joueurs fantômes. Lorsque le nombre de joueurs est insuffisant, certains fantômes sont contrôlés par des intelligences artificielles afin de ne pas déséquilibrer la partie.
 
-Dans le cadre de ce projet, le jeu a été adapté pour le multijoueur. Une partie oppose un joueur \texttt{Pac-Man} à plusieurs joueurs fantômes. Lorsque le nombre de joueurs est insuffisant, certains fantômes sont controlés par des intelligences artificielles afin de ne pas déséquilibrer la partie.
-
-Le choix de \texttt{Pac-Man} comme sujet pour une version en réseau est stratégique car ses règles simples et très connues, ce qui permet une facilité d'implémentation par rapport a d'autre jeux. De plus, le gameplay se prête à une séparation des rôles entre plusieurs joueurs.
+Le choix de \texttt{Pac-Man} comme sujet pour une version en réseau est stratégique car ses règles sont simples et très connues, ce qui permet une facilité d'implémentation par rapport à d'autres jeux. De plus, le gameplay se prête naturellement à une séparation des rôles entre plusieurs joueurs.
 
 \subsection{Contexte académique}
 
@@ -247,13 +249,15 @@ Cette organisation assure une séparation claire entre la  communication et la l
 La file de messages agit comme un tampon entre le réseau et la boucle de jeu à tick\footnote{Un tick désigne une unité de temps discrète utilisée par le moteur du jeu pour mettre à jour l’état du monde. À chaque tick, le serveur traite les entrées des joueurs, met à jour la logique de jeu (physique, collisions, scores, etc.) puis envoie les nouvelles informations aux clients.} fixe. 
 Ainsi, les mises à jour périodiques du monde restent indépendantes des variations de latence ou du débit des clients.
 
-Cette architecture permet l’exécution simultanée de plusieurs parties indépendantes au sein d’un même serveur.
+Cette architecture permet l’exécution simultanée de plusieurs parties indépendantes au sein d’un même serveur, comme illustré à la figure~\ref{fig:archi_multithread}.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.6\textwidth]{UML/PacMan_UML_Server_chaine.png}
     \caption{Chaîne de responsabilité côté serveur}
+    \label{fig:archi_multithread}
 \end{figure}
+
 
 \subsection{Architecture modulaire}
 
@@ -271,20 +275,21 @@ L’architecture suit ainsi une chaîne de responsabilité hiérarchique :
 Client $\rightarrow$ Serveur $\rightarrow$ Hall $\rightarrow$ Salon $\rightarrow$ Jeu
 \end{center}
 
-Chaque couche délègue les traitements spécialisés au niveau inférieur, ce qui permet d’introduire de nouvelles fonctionnalités sans modifier les composants fondamentaux du système.
-
+Chaque couche délègue les traitements spécialisés au niveau inférieur, ce qui permet d’introduire de nouvelles fonctionnalités sans modifier les composants fondamentaux du système, comme illustré à la figure~\ref{fig:archi_modulaire}.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=1\textwidth]{UML/PacMan_UML_Server_Reseau.png}
     \caption{Diagrammes de classe de l'architecture réseau}
     \caption*{Vue côté serveur - Gestion des packets, des parties, des salles (sans geter et seter)}
-
+    \label{fig:archi_modulaire}
 \end{figure}
+
+
 
 \subsection{Boucle de jeu}
 
-La boucle de jeu constitue le cœur du serveur et repose sur un modèle à mise à jour périodique, appelé \textit{tick serveur}. 
+La boucle de jeu constitue le c\oe ur du serveur et repose sur un modèle à mise à jour périodique, appelé \textit{tick serveur}. 
 Contrairement à une architecture purement événementielle, l’état du monde est recalculé à intervalle régulier selon une fréquence fixe. 
 Ce fonctionnement garantit un comportement déterministe et centralisé.
 
@@ -311,13 +316,15 @@ L’intégralité de ces calculs étant effectuée côté serveur, toute tentati
 
 À la fin de chaque tick, l’état global mis à jour est diffusé à l’ensemble des clients. 
 Ces derniers ne réalisent aucun calcul logique : ils se contentent d’afficher l’état reçu. 
-Cette architecture s’inscrit dans le modèle de serveur autoritaire défini précédemment.
+Cette architecture reste dans le modèle de serveur autoritaire défini avant, comme illustré à la figure~\ref{fig:boucle_jeu}.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{UML/PacMan_UML_Server_test_loop.png}
     \caption{Diagramme d'activité de la boucle de jeu du serveur}
+    \label{fig:boucle_jeu}
 \end{figure}
+
 
 \subsection{Plateau et génération procédurale}
 
@@ -331,19 +338,20 @@ Ses murs adjacents sont ajoutés à une liste dite \textit{frontier}.
 S’il sépare une case déjà accessible d’une case encore murale, il est supprimé, la nouvelle case devient traversable, et ses propres murs sont ajoutés à la frontier. 
 Le processus se poursuit jusqu’à épuisement de cette liste.
 
-Ce mécanisme produit un arbre couvrant avec un labyrinthe connexe sans zones isolées.
+Ce mécanisme produit un arbre couvrant avec un labyrinthe connexe sans zones isolées, comme illustré à la figure~\ref{fig:prim}.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=1\textwidth]{images/plateau_42_1.png}
     \caption{Plateau apès l'algorithme de Prim}
+    \label{fig:prim}
 \end{figure}
 
 Afin d’adapter cette structure aux contraintes du gameplay, plusieurs transformations supplémentaires sont appliquées.
 
 Une zone centrale fixe de taille $3 \times 3$, appelée « hut », est réservée avant la génération. 
 Elle est protégée durant l’exécution de l’algorithme afin de préserver sa structure. 
-Une fonction dédiée vérifie ensuite son raccordement au labyrinthe principal par au moins une ouverture.
+Une fonction dédiée vérifie ensuite son raccordement au labyrinthe principal par au moins une ouverture, comme visible à la figure~\ref{fig:hut}.
 
 Les coins du plateau, destinés aux positions initiales des joueurs, sont également vérifiés après la génération. 
 Si l’un d’eux se retrouve isolé, une ouverture contrôlée est créée pour garantir son accessibilité.
@@ -352,30 +360,34 @@ Si l’un d’eux se retrouve isolé, une ouverture contrôlée est créée pour
     \centering
     \includegraphics[width=1\textwidth]{images/plateau_42_2.png}
     \caption{Plateau apès génération de la hut}
+    \label{fig:hut}
 \end{figure}
 
 L’algorithme de Prim produisant un arbre sans cycles, des ouvertures supplémentaires sont ajoutées de manière aléatoire afin d'ajouter des chemins.
-Cette étape améliore la poursuite par les fantômes et évite des trajectoires trop prévisibles.
+Cette étape améliore la poursuite par les fantômes et évite des trajectoires trop prévisibles, comme montré à la figure~\ref{fig:cycles}.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=1\textwidth]{images/plateau_42_3.png}
     \caption{Plateau apès ajout de cycles}
+    \label{fig:cycles}
 \end{figure}
 
 Enfin, certains culs-de-sac sont supprimés en identifiant les cases ne possédant qu’un unique voisin accessible. 
 La suppression partielle de ces impasses améliore la fluidité des déplacements et limite les situations punitives.
 
-Des portails latéraux sont également intégrés sur les bords du plateau, ce qui permet à une entité de réapparaître du côté opposé. 
+Des portails latéraux sont également intégrés sur les bords du plateau, ce qui permet à une entité de réapparaître du côté opposé, comme illustré à la figure~\ref{fig:final}.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=1\textwidth]{images/plateau_42_4.png}
     \caption{Plateau apès suppression des culs-de-sac et ajout des portails}
+    \label{fig:final}
 \end{figure}
 
 Le plateau est une structure centrale du système : il sert de support aux collisions, au placement des pac-gommes, ainsi qu’aux algorithmes de poursuite des fantômes. 
 La génération procédurale contribue à la rejouabilité et à la diversité stratégique des parties.
+
 
 \subsection{Intelligence artificielle des fantômes}
 
@@ -421,11 +433,14 @@ L’implémentation combine plusieurs techniques complémentaires :
 le BFS pour le calcul de chemins optimaux, une version limitée pour la simulation de vision, une recherche locale pour l’exploration autonome.
 Un bruit aléatoire est également introduit afin d’éviter les cycles déterministes et les oscillations.
 
+Une visualisation de ce système de traces est présentée à la figure~\ref{fig:traces}.
+
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.8\textwidth]{images/trace.png}
     \caption{Vue des traces}
     \caption*{Rouge pour PacMan et Bleu pour les fantômes}
+    \label{fig:traces}
 \end{figure}
 
 \subsection{Salons : gestion des parties}
