@@ -495,9 +495,9 @@ Cette capacité de configuration facilite les phases de test, l’équilibrage d
 \subsection{Bases et Objectifs du Client}
 
 Le client a pour rôle principal d’être l’interface entre l’utilisateur et le serveur.
-Il ne décide pas des règles du jeu ni de la validité des actions cela est le rôle du serveur : il capture les entrées du joueur, les transmet au serveur, reçoit les états calculés côté serveur, puis les transforme en représentation visuelle pour le joueur.
+Il ne décide pas des règles du jeu ni de la validité des actions, cela est le rôle du serveur : il capture les entrées du joueur, les transmet au serveur, reçoit les états calculés côté serveur, puis les transforme en représentation visuelle pour le joueur. 
 Comme il est possible de voir sur la figure \ref{fig:boucle_jeu_client}, ce fonctionnement repose sur la boucle de jeu du client qui se répète en continu.
-À chaque itération, le client récupère les paquets envoyés par le serveur, traite les entrées du joueur, met à jour son état interne (selon les pacquets reçu et les entrées joueur ne nécesitant pas de validation du serveur), puis affiche le résultat à l’écran.
+À chaque itération de sa boucle de jeu, le client récupère les paquets envoyés par le serveur, traite les entrées du joueur, met à jour son état interne (selon les pacquets reçu et les entrées joueur ne nécesitant pas de validation du serveur), puis affiche le résultat à l’écran.
 Enfin, si nécessaire, il envoie au serveur les actions du joueur sous forme d’intentions.
 
 \begin{figure}[H]
@@ -507,27 +507,27 @@ Enfin, si nécessaire, il envoie au serveur les actions du joueur sous forme d�
     \label{fig:boucle_jeu_client}
 \end{figure}
 
-Dans le cadre d’un Pac-Man multijoueur, le client doit gérer des contraintes spécifiques : latence réseau, cohérence des états, fluidité visuelle, transitions entre différentes phases de jeu et gestion d’une interface utilisateur complète (menu, hall, partie, fin de jeu).
+Dans le cadre d’un Pac-Man multijoueur, le client doit gérer des contraintes spécifiques : latence réseau, cohérence des états, fluidité visuelle, transitions entre différentes phases de jeu et gestion d’une interface utilisateur complète.
 
 Le client doit également gérer l’ensemble du cycle de vie d’une session de jeu.
 Cela inclut une scène d’accueil, une scène présentant les règles afin de clarifier le fonctionnement de la version multijoueur de Pacman, une page de liste de lobbys, une scène de configuration de salle, la transition vers la partie, puis l’écran de fin affichant le résultat.
 Le client constitue ainsi une interface complète permettant au joueur de naviguer entre différents contextes sans jamais interagir directement avec la logique serveur.
 
-Tout en accomplissant ces objectifs variés, le client doit maintenir une séparation nette entre les différents éléments nécessaires à ces objectifs comme l'acquisition des entrées, la communication réseau (réception et envoi) ainsi que le rendu graphique.
+Tout en accomplissant ces objectifs variés, le client doit maintenir une séparation nette entre les différents éléments nécessaires à ces objectifs comme l'obtention des entrées, la communication réseau (réception et envoi) ainsi que le rendu graphique.
 En séparant proprement les différents éléments du client, une organisation modulaire est mise en place qui facilite les changements et les évolutions du projet.
 
 
-\subsection{Architecture logicielle et SceneManager}
+\subsection{Architecture logicielle et \texttt{SceneManager}}
 
-L’architecture du client repose sur une classe centrale ClientGame héritant de \texttt{gf::SceneManager}. 
+L’architecture du client repose sur une classe centrale \texttt{ClientGame} héritant de \texttt{gf::SceneManager}. 
 Ce choix structure l’application autour d’un gestionnaire de scènes qui va à lui seul piloter le cycle de vie complet du jeu.
-Le SceneManager maintient une pile de scènes actives et délègue à la scène courante la gestion des événements, des mises à jour en fonction des packets réseau reçus et du rendu.
+Gestionnaire de scène maintient une pile de scènes actives et délègue à la scène courante la gestion des événements, des mises à jour en fonction des packets réseau reçus et du rendu.
 
-Chaque scène représente un contexte fonctionnel distinct : WelcomeScene, LobbyListScene, LobbyScene, RulesScene, GameScene, EndScene.
+Chaque scène représente un contexte fonctionnel distinct : \texttt{WelcomeScene}, \texttt{LobbyListScene}, \texttt{LobbyScene}, \texttt{RulesScene}, \texttt{GameScene} et \texttt{EndScene}.
 Chacune encapsule sa propre logique, ses entités graphiques et ses traitements d’événements. Cette organisation permet une séparation nette des responsabilités : une scène gère son état, son affichage et ses interactions, sans dépendre d’un état global centralisé.
 
-Le SceneManager permet de remplacer ou empiler des scènes via des méthodes comme replaceAllScenes, pushScene ou popAllScenes. 
-Le cycle de vie devient explicite : on entre dans la scène, intéragit avec elle, puis sortons proprement. 
+Le gestionnaire de scène permet de remplacer ou empiler des scènes via des méthodes comme \texttt{replaceAllScenes} (remplacer toute la pile de scène par une autre), \texttt{pushScene} (mettre une scène sur le haut de la pile) ou \texttt{popAllScenes} (retirer toutes les scènes de la pile). 
+Le cycle de vie est ainsi explicite : on entre dans la scène, intéragit avec elle, puis sortons proprement. 
 Il est possible de voir les chemins empruntables à travers les scènes pour le joueur dans la figure \ref{fig:diagramme_et_scenes}.
 
 \begin{figure}[H]
@@ -538,44 +538,32 @@ Il est possible de voir les chemins empruntables à travers les scènes pour le 
 \end{figure}
 
 La base du programme reflète cette structuration. 
-La fonction main ne contient aucune logique métier ni aucun traitement graphique.
-Elle instancie simplement ClientGame, récupère éventuellement les paramètres réseau (IP et port), puis appelle run.
+La fonction \texttt{main} ne contient aucune logique métier ni aucun traitement graphique.
+Elle instancie simplement \texttt{ClientGame}, récupère éventuellement les paramètres réseau (IP et port), puis appelle \texttt{run}.
 Ainsi, toute la logique applicative est déléguée à l’architecture interne du client.
-Le main devient un simple déclencheur, ce qui confirme que l’organisation repose entièrement sur le SceneManager et ses scènes.
+Le \texttt{main} devient un simple déclencheur, ce qui confirme que l’organisation repose entièrement sur le \texttt{SceneManager} et ses scènes.
 
 \paragraph{Interaction avec le réseau et les actions}
 
-Bien que Le SceneManager n’intègre pas directement la logique réseau, il permet aux scène d'exploiter proprement et indépendamment cette dernières.
+Bien que le gestionnaire de scène n’intègre pas directement la logique réseau, il permet aux scènes d'exploiter proprement et indépendamment cette dernières.
 Le thread réseau alimente une file de paquets partagée.
 Chaque scène peut consommer ces paquets selon ses besoins et envoie ses packets, en fonctions des actions réalisées par le joueur.
 
 Les actions sont également gérées par leur scènes respectives, permettant une clareté vis-à-vis de leur utilité.
 
-\paragraph{Comparaison brève avec l’architecture initiale}
-
-La première implémentation centralisait l’ensemble du rendu dans un unique module renderer.cc
-Une variable d’état globale déterminait quelle portion de code exécuter grâce à une structure conditionnelle de type "Si".
-
-Cette solution fonctionnait pour un prototype, mais montrait rapidement ses limites. L'affichage, logique partielle et la gestion d’événements étaient centralisées dans un seul fichier.
-Tout le système réseau également.
-L’ajout d’une nouvelle scène impliquait de modifier un fichier déjà volumineux, ce qui réduisait grandement la lisibilité.
-Avec l’augmentation du nombre de scènes, la structure conditionnelle devenait difficile à maintenir.
-
-Le passage au SceneManager apporte de nombreuses améliorations comme une séparation claire des responsabilitées (chaque scène gère ses actions, interactions réseau et affichage), facilité d'ajout de nouvelles scènes, un cycle de vie géré par une seule entité et des transitions "automatiquement" gérées par les scènes.
-
 \subsection{Scènes et Entités}
 
 La conception du client repose sur une séparation claire entre la logique et la représentation visuelle.
-Cette distinction se matérialise par la relation entre GameScene et GameEntity.
+Cette distinction se matérialise par la relation entre \texttt{GameScene} et \texttt{GameEntity}.
 
 \paragraph{Scène}
 
-La scène correspond à un espace décisionnel : elle traite les événements, consomme les paquets réseau, met à jour les structures de données représentant l’état courant de la partie et déclenche les transitions vers une autre scène si nécessaire. Elle est responsable de la cohérence logique.
+La scène correspond à un espace de décision : elle traite les événements, consomme les paquets réseau, met à jour les structures de données représentant l’état courant de la partie et déclenche les transitions vers une autre scène si nécessaire. Elle est responsable de la logique.
 
 \paragraph{Entité}
 
 L’entité, quant à elle, fait seulement de la représentation. Elle traduit la logique décidée par la scène en éléments graphiques concrets : sprites, tuiles, animations, positions affichées.
-Elle ne possède pas la responsabilité de déterminer ou est un joueur, ou quels sont les paramètres actuels d'un hall.
+Elle ne possède pas la responsabilité de déterminer où est un joueur, ou quels sont les paramètres actuels d'un salon.
 Elle reçoit un état déjà validé et le rend visible au joueur.
 
 \paragraph{Une séparation essentielle}
@@ -588,7 +576,7 @@ Elle reçoit un état déjà interprété par la scène.
 Ensuite, cette séparation améliore la maintenabilité : modifier le rendu n’implique pas de toucher à la logique réseau, et inversement.
 
 Enfin, elle rend le système plus évolutif. Il serait possible d’adapter le rendu (par exemple changer une animation ou le style graphique) sans impacter la gestion des paquets ou la synchronisation.
-C'est ensuite au SceneManager, qui possède toutes les scènes, de choisir quelle scène mettre en avant. 
+C'est ensuite au gestionnaire de scène, qui possède toutes les scènes, de choisir quelle scène mettre en avant. 
 La relation entre ces trois classes est illustrée dans la figure \ref{fig:diagramme_scenemanager}.
 
 \begin{figure}[H]
@@ -598,20 +586,23 @@ La relation entre ces trois classes est illustrée dans la figure \ref{fig:diagr
     \label{fig:diagramme_scenemanager}
 \end{figure}
 
+
+
 \subsection{Réseau coté Client : réception}
 
 La réception réseau côté client repose sur une architecture volontairement séparée de la boucle principale.
-Le socket TCP est configuré en mode non bloquant, puis un thread dédié est lancé via startNetworkReceiver.
-Ce thread exécute en continu recvPacket, récupère les paquets entrants et les insère dans une file partagée (m packetQueue) protégée par mutex.Cette séparation garantit que la boucle principale du SceneManager ne sera jamais bloquée par une attente réseau.
+Le socket TCP est configuré en mode non bloquant, puis un thread dédié est lancé via \texttt{startNetworkReceiver}.
+Ce thread exécute en continu \texttt{recvPacket}, récupère les paquets entrants et les insère dans une file partagée (\texttt{m packetQueue}) protégée par un mutex.
+Cette séparation garantit que la boucle principale du gestionnaire de scène ne sera jamais bloquée par une attente réseau.
 
 
 Le choix d’un thread distinct permet d’isoler les opérations d’entrée/sortie (I/O) du rendu graphique et du traitement logique.
-La scène active, dans sa méthode doUpdate, consomme ensuite les paquets disponibles via tryPopPacket.
+La scène active, dans sa méthode \texttt{doUpdate}, consomme ensuite les paquets disponibles via \texttt{tryPopPacket}.
 
 \paragraph{Autonomie des scènes}
 
 Chaque scène décide explicitement quels types de paquets elle traite. 
-Par exemple, comme illustré dans la figure \ref{fig:file_reseau_recu}, LobbyListScene interprète ServerListRooms, tandis que Lobby traite ServerRoomSettings, ServerListRoomPlayers puis le démarrage du jeu avec ServerListGameStart.
+Par exemple, comme illustré dans la figure \ref{fig:file_reseau_recu}, \texttt{LobbyListScene} interprète \texttt{ServerListRooms}, tandis que \texttt{Lobby} traite \texttt{ServerRoomSettings}, \texttt{ServerListRoomPlayers} puis le démarrage du jeu avec \texttt{ServerListGameStart}.
 Ce modèle offre un contrôle précis : une scène ne traite que les messages pertinents à son contexte, aucun autre.
 
 \begin{figure}[H]
@@ -621,7 +612,7 @@ Ce modèle offre un contrôle précis : une scène ne traite que les messages pe
     \label{fig:file_reseau_recu}
 \end{figure}
 
-La synchronisation est assurée par un std::mutex protégeant l’accès à la file. Cette précaution évite toute condition de course entre le thread réseau (producteur) et la scène active (consommateur).
+La synchronisation est assurée par un \texttt{std::mutex} protégeant l’accès à la file. Ceci évite toute condition de course entre le thread réseau (producteur) et la scène active (consommateur).
 L’ordonnancement des paquets est préservé naturellement par la structure FIFO de la file, tandis que TCP garantit l’ordre et la fiabilité de livraison.
 
 
@@ -630,27 +621,27 @@ L’ordonnancement des paquets est préservé naturellement par la structure FIF
 Les envois côté client sont volontairement limités et contrôlés.
 Contrairement à la réception asynchrone, l’émission dépend du contexte et du rythme de jeu.
 Autrement dit, ce sont les scènes qui décident quand et quoi envoyer.
-Chaque scène est donc responsable des messages correspondant à son domaine fonctionnel.
+Chaque scène est donc responsable des messages correspondant à son domaine.
 
 
 \paragraph{Envoi périodique}
-Dans GameScene par exemple, un horodatage (m lastSend) régule la fréquence des transmissions.
-L’envoi d’un ClientMove n’a lieu que si une touche directionnelle est active et si l’intervalle minimal est respecté.
+Dans la scène du jeu par exemple, un horodatage (\texttt{m lastSend}) régule la fréquence des transmissions.
+L’envoi d’un \texttt{ClientMove} n’a lieu que si une touche directionnelle est active et si l’intervalle minimal est respecté.
 L’objectif est d’éviter un envoi par frame graphique tout en garantissant une fréquence stable compatible avec la logique serveur.
 
 \paragraph{Envoi événementiel}
 
 Dans le cas du hall, le fonctionnement est différent.
-L’entité détecte une interaction (bouton +/-, ready, changement de rôle) 
-et expose cette action via un enum \texttt{LobbyAction}.
+L’entité détecte une interaction (bouton +/-, prêt, changement de rôle) 
+et expose cette action via une énumération \texttt{LobbyAction}.
 La scène récupère alors l'action qui vient d'être effectuée puis la transforme en message réseau et l'envoi.
 L'envoi est donc déclenché uniquement quand une action de la part du joueur à lieu.
 
 \paragraph{Principe d'envoi}
 
-Que ce soit en envoi périodique ou événementiel, le principe d'envoie est toujours le même. 
-Quand on détecte une action utilisateur et/ou une période écoulée, on paramètre d'abord notre envoi, puis on crée un gf::Packet qu'on encapsule dans une structure crée spécifiquement pour la communication client -> serveur,
-et on appelle sendPacket pour l'envoyer au serveur (voir figure \ref{fig:code_envoi}). 
+Que ce soit en envoi périodique ou événementiel, le principe d'envoi est toujours le même. 
+Quand on détecte une action utilisateur et/ou une période écoulée, on paramètre d'abord notre envoi, puis on crée un \texttt{gf::Packet} qu'on encapsule dans une structure crée spécifiquement pour la communication client $\rightarrow$ serveur,
+et on appelle \texttt{sendPacket} pour l'envoyer au serveur (voir figure \ref{fig:code_envoi}). 
 Ce sera ensuite au serveur de gérer notre envoi.
 
 \vspace{0.3cm}
@@ -672,42 +663,43 @@ case LobbyAction::RoomDec:
 \label{fig:code_envoi}
 \end{figure}
 
-C'est uniquement ce qui est reçu par le Client et donc décidé par le Serveur qui sera effectivement affiché.
+C'est uniquement ce qui est reçu par le client et donc décidé par le serveur qui sera effectivement affiché.
 L'envoi permet uniquement de transmettre au serveur une intention du client.
 
-\subsection{Input, Actions, et EventTypes}
+\subsection{\texttt{Input, Actions}, et \texttt{EventTypes}}
 
 La gestion des entrées repose sur une idée simple : ne pas manipuler directement les touches clavier ou les clics, mais passer par des actions plus claires. 
-Plutôt que de tester partout si une touche est pressée, on définit des actions comme upAction, downAction, leftAction ou rightAction, qui représentent directement ce que le joueur veut faire. 
-Cela rend le code plus facile à lire et évite de disperser la gestion des entrées dans toute l’application.
+Plutôt que de tester partout si une touche est pressée, on définit des actions comme \texttt{upAction}, \texttt{downAction}, \texttt{leftAction} ou \texttt{rightAction}, qui représentent directement ce que le joueur veut faire. 
+Cela rend le code plus facile à lire et évite de disperser la gestion des entrées dans tout le jeu.
 
 \paragraph{Les différents types d'entrées}
 
 Les événements manipulés côté client sont de plusieurs types.
-On retrouve d’abord les entrées clavier, utilisées principalement pendant la partie pour les déplacements.
-Les événements souris sont plutôt utilisés dans les menus et les lobbys, par exemple pour gérer le survol ou les clics sur des boutons.
-Enfin, certains événements système comme Resized ou Closed permettent de gérer respectivement l’adaptation de l’affichage et la fermeture propre du client.
+On retrouve d’abord les entrées clavier, utilisées pendant la partie pour les déplacements.
+Les événements souris sont plutôt utilisés dans les menus et les salons, par exemple pour gérer le survol ou les clics sur des boutons.
+Enfin, certains événements système comme \texttt{Resized} ou \texttt{Closed} permettent de gérer respectivement l’adaptation de l’affichage et la fermeture propre du client.
 Chaque type d’événement a donc un rôle différent selon la scène active.
 
 \paragraph{Entrées clavier}
 
 Pour les entrées clavier, le système d’actions permet de simplifier la gestion des touches.
-Chaque action est liée à une touche via un Keycode, puis marquée comme continue avec setContinuous().
+Chaque action est liée à une touche, puis utilisée directement dans la boucle de mise à jour.
+Il suffit de tester si une action est active (avec \texttt{isActive()}) pour savoir si une touche est actuellement enfoncée.
 Cela permet de gérer naturellement le maintien d’une touche : tant qu’elle est enfoncée, l’action reste active et peut être utilisée à chaque mise à jour.
-On évite ainsi de devoir gérer manuellement les répétitions ou les états des touches, ce qui rend le comportement plus régulier et le code plus simple à maintenir.
+On évite ainsi de devoir gérer manuellement les événements clavier ou les répétitions, ce qui rend le comportement plus régulier et le code plus simple à maintenir.
 
 \paragraph{Traitement des événements}
 
-Le traitement des événements se ensuite fait au niveau des scènes, dans doProcessEvent. 
-Chaque scène récupère l’événement reçu et décide ce qu’elle en fait. 
+Le traitement des événements se ensuite fait au niveau des scènes, dans \texttt{doProcessEvent} et \texttt{doUpdate}. 
+Chaque scène récupère les événements reçu et décide ce qu’elle en fait. 
 Certaines scènes réagissent surtout à la souris, d’autres au clavier, mais toutes peuvent gérer le redimensionnement de manière cohérente.
-Par exemple, dans GameScene, les événements clavier sont transmis au conteneur d’actions via actions.processEvent(event), tandis que l’événement Resized déclenche resizeYourself() pour recalculer la vue. 
-Cette logique locale évite d’avoir un gestionnaire global qui mélange tous les cas possibles et d'augmenter l'autonomie des scènes car les scènes décident si font quelque chose avec l'événement ou non si l'événement ne la concerne pas..
+Par exemple, dans la scène du jeu, les événements clavier sont transmis au conteneur d’actions via \texttt{processEvent(event)}, tandis que l’événement \texttt{Resized} déclenche simpelment \texttt{resizeYourself()} pour recalculer la vue. 
+Cette logique locale évite d’avoir un gestionnaire global qui mélange tous les cas possibles et d'augmenter l'autonomie des scènes car les scènes décident si elles font quelque chose avec l'événement ou non si l'événement ne la concerne pas.
 Tous les événements ne sont cependant pas traités de la même manière du point de vue réseau.
 
 
 Certains restent purement locaux, comme le mouvement de la souris ou le redimensionnement de la fenêtre, car ils ne modifient pas l’état du jeu côté serveur.
-À l’inverse, certaines actions issues des entrées utilisateur sont envoyées au serveur, comme les déplacements en jeu ou les interactions dans le hall (changer un paramètre, se déclarer prêt, etc.).
+À l’inverse, certaines actions issues des entrées utilisateur sont envoyées au serveur, comme les déplacements en jeu ou les interactions dans un salon (changer un paramètre, se déclarer prêt, etc.).
 Dans ces cas-là, le client n’envoie pas un état complet mais une intention, et c’est le serveur qui décide de la valider ou non en renvoyant un état mis à jour.
 Cette distinction permet de limiter les communications réseau tout en gardant un modèle cohérent où le serveur reste responsable de l’état du jeu.
 
@@ -715,29 +707,47 @@ Cette distinction permet de limiter les communications réseau tout en gardant u
 \subsection{Rendu des Entités}
 
 Maintenant que la logique du jeu et les échanges réseau sont gérés, il reste une dernière étape côté client : afficher l’état du jeu.
-C’est le rôle des entités (GameEntity, LobbyEntity, etc.).
+C’est le rôle des entités.
 Chaque scène possède une unique entité, volontairement simple, dont le but est uniquement de traduire un état en éléments graphiques.
 Autrement dit, l’entité ne prend pas de décision : elle affiche ce que la scène lui donne.
-Par exemple, dans le hall, si un joueur est prêt, l’entité affiche “(prêt)”, sinon “(pas prêt)”.
+Par exemple, dans le salon, si un joueur est prêt, l’entité affiche “(prêt)”, sinon “(pas prêt)”. Ce n'est pas elle qui gère si le joueur est prêt.
 Cette séparation permet de garder un rendu indépendant de la logique métier.
 
 \paragraph{Organisation du rendu}
-Dans la plupart des entités, le rendu est organisé en plusieurs fonctions distinctes, chacune responsable d’un élément précis : pour le jeu, on a
-renderMap pour la carte, renderPacGommes pour les objets, renderSprites pour les joueurs, et d’autres fonctions pour l’interface (timer, points de vie, effets).
+Dans la plupart des entités, le rendu est organisé en plusieurs fonctions distinctes, chacune responsable d’un élément précis.
 Ce découpage permet de garder un code lisible et de modifier facilement une partie du rendu sans impacter le reste.
-La fonction principale render orchestre simplement ces appels dans le bon ordre.
+La fonction principale render orchestre simplement ces appels dans le bon ordre. Pour le jeu par example, l'ordre d'appel est le suivant :
 
-\paragraph{Interpolaion pour le rendu du déplacement}
+\begin{itemize}
+    \item \texttt{renderMap}
+    \item \texttt{renderPacGommes}
+    \item \texttt{renderSprites}
+    \item Differents appels pour affichage de texte
+\end{itemize}
+
+Cela est simplement du au fait que les pacgommes sont visuellement devant le labyrinthe (voir figure \ref{fig:screenshot_jeu}), tout comme les sprites. 
+Il faut donc que les pacgommes et sprites soient dessinés après le labyrinthe, sinon ils seraient recouvert.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{images/screenshot_jeu.png}
+    \caption{Le labyrinthe en jeu}
+    \label{fig:screenshot_jeu}
+\end{figure}
+
+
+\paragraph{Interpolation pour le rendu du déplacement}
 Un point important a mentionner concerne le déplacement des joueurs.
 Le serveur envoie des positions selon un interval de temps choisi, ce qui pourrait produire un mouvement visuellement saccadé si on affichait directement ces positions.
-Pour éviter cela, une interpolation est utilisée entre la position de départ (startPos) et la destination (destPos).
-Le temps attendu entre deux mises à jour (expectedDuration) permet de calculer une position intermédiaire fluide à chaque frame.
-Ce mécanisme, implémenté dans renderSprites, permet d’obtenir un rendu visuellement continu même si les mises à jour réseau sont espacées.
+Pour éviter cela, une interpolation est utilisée entre la position de départ et la destination.
+Le temps attendu entre deux mises à jour permet de calculer une position intermédiaire fluide à chaque frame.
+Ce mécanisme, implémenté dans \texttt{renderSprites}, permet d’obtenir un rendu visuellement continu même si les mises à jour réseau sont espacées.
 
 \paragraph{Spritesheets et textures}
 Le rendu repose également sur l’utilisation de textures et de spritesheets.
-Les personnages utilisent des animations basées sur des tilesets, par exemple Pacman avec plusieurs frames selon la direction (voir figure \ref{fig:pacman_spritesheet}), tandis que la carte utilise un tileset avec des RectF pour sélectionner la bonne portion de texture selon le type de mur.
+Pac-Man utilise des animations basées sur des tilesets, par exemple Pacman avec plusieurs frames différentes selon la direction (voir figure \ref{fig:pacman_spritesheet}), tandis que la carte utilise un tileset avec des RectF pour sélectionner la bonne portion de texture selon le type de mur.
 Cela permet de réutiliser une seule image pour représenter de nombreux éléments, ce qui est à la fois plus efficace et plus simple à maintenir.
+Les fantomes eux, sont simplement des \texttt{gf::Texture} car ils n'ont pas d'animation.
 
 \vspace{0.3cm}
 \begin{figure}[H]
@@ -749,7 +759,7 @@ Cela permet de réutiliser une seule image pour représenter de nombreux éléme
 \vspace{0.3cm}
 
 
-Le rendu est effectué dans un espace logique fixe (par exemple 1280×720), puis simplement adapté à la fenêtre via le système de vue (resizeYourself).
+Le rendu est effectué dans un espace logique fixe  (1280×720), puis simplement adapté à la fenêtre via le système de vue (\texttt{resizeYourself}).
 Cela permet de garder des proportions cohérentes quel que soit le format d’affichage.
 
 \newpage
@@ -761,9 +771,9 @@ Les échanges de données entre le client et le serveur s'effectue via des socke
 
 \textit{GamedevFramework} offre le choix entre deux protocoles de transport :\\
 \begin{itemize}
-  \item Le \textbf{TCP} avec \texttt{gf::TcpSocket} et \texttt{gf::TcpListener}
-  \item Le \textbf{UDP} avec \texttt{gf::UdpSocket}\\
-\end{itemize}
+    \item Le \textbf{TCP} avec \texttt{gf::TcpSocket} et \texttt{gf::TcpListener}
+    \item Le \textbf{UDP} avec \texttt{gf::UdpSocket}\\
+  \end{itemize}
 
 Pour ce projet, le protocole \textbf{TCP} est préféré au protocole \textbf{UDP} pour sa fiabilité.
 
