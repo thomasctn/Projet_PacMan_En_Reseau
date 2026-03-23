@@ -1,0 +1,18 @@
+@startuml
+
+!include theme.puml
+
+class SceneManager {
+}
+
+class Scene {
+}
+
+class Entity {
+}
+
+SceneManager "1" *-- "0..*" Scene
+
+Scene "0..1" o-- "1" Entity
+
+@enduml
