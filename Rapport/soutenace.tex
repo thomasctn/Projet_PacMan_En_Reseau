@@ -667,11 +667,6 @@ $\rightarrow$ Met aussi en place le réseau
 \end{frame}
 
 
-
-
-
-
-
 \section{Réseau}
 
 \begin{frame}[fragile]{Architecture générale}
@@ -689,7 +684,7 @@ $\rightarrow$ Met aussi en place le réseau
     \vspace{0.3cm}
     \textbf{Multi-Threading}
     \begin{itemize}
-            \item Code de \textbf{ServerNetwork} et \textbf{ClientNetwork} excécutés en parrallèle de la boucle principale
+            \item Code de \textbf{ServerNetwork} et \textbf{ClientNetwork} excécutés en parallèle de la boucle principale
     \end{itemize}
     
 
@@ -704,8 +699,8 @@ $\rightarrow$ Met aussi en place le réseau
 \begin{itemize}
     \item Connues par le client et le serveur
     \item Contiennent des structures \textit{communes}
-    \item Un champ \textcolor{blue}{\textit{type}} pour les identifier lors de la désérialisation
-    \item Nomenclature spécifique :
+    \item Contiennent un champ \textcolor{blue}{\textit{type}} pour les identifier lors de la désérialisation
+    \item Ont une nomenclature spécifique :
     \begin{itemize}
             \item \textit{ServerXXX} = envoyée par le serveur
             \item \textit{ClientXXX} = envoyée par le client
@@ -715,7 +710,7 @@ $\rightarrow$ Met aussi en place le réseau
 \textbf{Sérialisation/désérialisation}
 \begin{itemize}
     \item Nécessaire pour l'envoi/réception
-    \item \textbf{Opétateur |} avec un type \textit{Archive}
+    \item \textbf{Opérateur |} avec un type \textit{Archive}
 \end{itemize}
 
 \column{0.35\textwidth}
@@ -761,7 +756,7 @@ Archive &operator|(Archive &ar, ServerListRoomPlayers &data)
             \item Envoi l'id + liste des salons
         \end{itemize}
     \end{itemize}
-    \textbf{Lobby}
+    \textbf{Hall}
     \begin{itemize}
         \item \textbf{Client} : Demande de création/connexion à un salon
         \item \textbf{Serveur} :
@@ -789,7 +784,7 @@ Archive &operator|(Archive &ar, ServerListRoomPlayers &data)
         \end{itemize}
         
     \end{itemize}
-        Tous les Joueurs prêt ?: \textbf{Diffusion} début de partie/erreur\\
+        Tous les joueurs prêts ?: \textbf{diffusion} début de partie/erreur\\
     \textbf{En jeu}
     \begin{itemize}
         \item \textbf{Client} : Demande de déplacement
@@ -799,7 +794,7 @@ Archive &operator|(Archive &ar, ServerListRoomPlayers &data)
             \item \textbf{Diffusion} état du jeu
         \end{itemize}
     \end{itemize}
-     Si fin de jeu : \textbf{Diffusion} fin du jeu
+     Si fin de jeu : \textbf{diffusion} fin du jeu
     \column{0.375\textwidth}
     \includegraphics[width=\textwidth]{UML/PacMan_UML_Reseau_salon_jeu.png}
 
@@ -817,7 +812,7 @@ Archive &operator|(Archive &ar, ServerListRoomPlayers &data)
         \item Intelligence artificielle des fantômes
         \item Génération procédural de la carte
     \end{itemize}
-    \textbf{Aquisition et renforcement des compétences}
+    \textbf{Acquisition et renforcement des compétences}
     \begin{itemize}
         \item Programmation réseau, multi-threadé
         \item Modélisation des systèmes
