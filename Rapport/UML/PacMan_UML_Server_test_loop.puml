@@ -3,9 +3,9 @@ start
 !include theme.puml
 
 
-while (running ?) is (oui)
+while (tourne ?) is (oui)
 
-  :Update bots;
+  :Mettre à jour bots;
   note right
     updateTraces()
     update(dt)
@@ -13,12 +13,12 @@ while (running ?) is (oui)
 
 
 
-  if (gameStarted ?) then (non)
+  if (Jeu commencé ?) then (non)
 
     if (temps écoulé ?) then (oui)
       :Démarrer partie;
     else (non)
-      :Broadcast timer;
+      :Diffusion du timer;
     endif
 
   else (oui)
@@ -29,12 +29,12 @@ while (running ?) is (oui)
 
   endif
 
-  if (gameStarted ?) then (oui)
-    :Update mouvements joueurs;
-    :Broadcast state;
+  if (Jeu commencé ?) then (oui)
+    :Mise a jour des mouvements joueurs;
+    :Diffusion des états;
   endif
 
-  :Sleep (tick);
+  :Pause (tick);
 
 endwhile (non)
 
