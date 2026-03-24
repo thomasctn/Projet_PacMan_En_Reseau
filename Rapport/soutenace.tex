@@ -699,7 +699,7 @@ $\rightarrow$ Met aussi en place le réseau
 \begin{itemize}
     \item Connues par le client et le serveur
     \item Contiennent des structures \textit{communes}
-    \item Contiennent un champ \textcolor{blue}{\textit{type}} pour les identifier lors de la désérialisation
+    \item Ont un champ \textcolor{blue}{\textit{type}} pour les identifier lors de la désérialisation
     \item Ont une nomenclature spécifique :
     \begin{itemize}
             \item \textit{ServerXXX} = envoyée par le serveur
@@ -761,7 +761,7 @@ Archive &operator|(Archive &ar, ServerListRoomPlayers &data)
         \item \textbf{Client} : Demande de création/connexion à un salon
         \item \textbf{Serveur} :
         \begin{itemize}
-            \item Traitement + envoi de la réponse
+            \item Traitement + envoi de la confirmation
             \item \textbf{Diffusion} liste des joueurs/paramètres
         \end{itemize}
     \end{itemize}
