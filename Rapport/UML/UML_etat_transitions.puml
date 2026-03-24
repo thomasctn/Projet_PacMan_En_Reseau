@@ -2,23 +2,24 @@
 
 !include theme.puml
 
+' Layout plus propre
 top to bottom direction
+skinparam linetype ortho
 
 [*] --> Welcome
 
-Welcome --> Rules : bouton règles
-Welcome --> LobbyList : bouton entrer
+Welcome --> Rules : règles
+Rules --> Welcome :retour
 
-Rules --> Welcome : bouton retour
+Welcome --> LobbyList :entrer
+LobbyList --> Welcome : \n\n   retour
 
-LobbyList --> Welcome : bouton retour
-LobbyList --> Lobby : bouton créer / joindre
+LobbyList --> Lobby : créer / joindre
+Lobby --> LobbyList : \n\n   quitter
 
-Lobby --> LobbyList : bouton quitter
-Lobby --> Game : bouton prêt et tous prêts
+Lobby --> Game : prêt
+Game --> End : fin
 
-Game --> End : fin de partie
-
-End --> Lobby : bouton retour au lobby
+End --> Lobby : retour
 
 @enduml
