@@ -6,20 +6,19 @@ top to bottom direction
 
 [*] --> Welcome
 
-Welcome --> Rules
-Welcome --> LobbyList
+Welcome --> Rules : bouton règles
+Welcome --> LobbyList : bouton entrer
 
-Rules --> Welcome
+Rules --> Welcome : bouton retour
 
-LobbyList --> Welcome
-LobbyList --> Lobby
+LobbyList --> Welcome : bouton retour
+LobbyList --> Lobby : bouton créer / joindre
 
-Lobby --> LobbyList
-Lobby --> Game
+Lobby --> LobbyList : bouton quitter
+Lobby --> Game : bouton prêt et tous prêts
 
+Game --> End : fin de partie
 
-Game --> End
-
-End --> Lobby
+End --> Lobby : bouton retour au lobby
 
 @enduml
