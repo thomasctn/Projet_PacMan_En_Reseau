@@ -85,7 +85,7 @@
 % Infos présentation
 % =====================
 
-\author{Thomas Coutant | Benoît Litampha | Auriane Peter}
+\author{Thomas \textsc{Coutant} | Benoît \textsc{Litampha} | \textsc{Auriane Peter}}
 \institute{
 Université Marie \& Louis Pasteur, UFR Sciences et Techniques
 }
@@ -134,9 +134,7 @@ Encadrant : Julien Bernard\\
 % ---------------------
 \setbeamertemplate{footline}[frame number]
 
-\section*{Introduction}
-
-
+\section{Présentation et organisation}
 
 \begin{frame}{Introduction}
 
@@ -146,7 +144,7 @@ Encadrant : Julien Bernard\\
 
 \textbf{Contexte}
 \begin{itemize}
-    \item Années 1980
+    \item Années 80
     \item Jeu d’arcade
 \end{itemize}
 
@@ -194,12 +192,10 @@ Encadrant : Julien Bernard\\
 \vspace{0.5cm}
     \textbf{Déroulement d'une partie :}
 
-    Connexion > Liste des Salons > Salon > Jeu > Fin de jeu
+    Connexion $\rightarrow$ Liste des Salons $\rightarrow$ Salon $\rightarrow$ Jeu $\rightarrow$ Fin de jeu
 
 
 \end{frame}
-
-\section{Présentation et organisation}
 
 \begin{frame}{Outils et méthode}
 
@@ -208,13 +204,13 @@ Encadrant : Julien Bernard\\
 \column{0.6\textwidth}
 
 \begin{itemize}
-    \item \textbf{Git}
-    \vspace{0.5cm}
-    \item \textbf{C++} avec le framework \textbf{GameDev}
+    \item \textbf{C++} avec le framework \textbf{GameDev Framework}
+    \vspace{0.3cm}
+    \item \textbf{Git} via GitHub
     \vspace{0.3cm}   
     \item \textbf{Réunions régulières} : toutes les 1 à 2 semaines
     \vspace{0.3cm}
-    \item \textbf{Communication quotidienne} avec \textbf{Discord}
+    \item Communication quotidienne avec \textbf{Discord}
 \end{itemize}
 
 \column{0.4\textwidth}
@@ -236,19 +232,19 @@ Encadrant : Julien Bernard\\
 
 \begin{itemize}
 
-    \item \textbf{Auriane Peter}
+    \item Auriane \textsc{Peter}
     \begin{itemize}
         \item Développement du client
-        \item Interface et interactions joueur
+        \item Interface et interactions du joueur
     \end{itemize}
     \vspace{0.5cm}
-    \item \textbf{Benoît Litampha}
+    \item Benoît \textsc{Litampha}
     \begin{itemize}
         \item Communication client--serveur
         \item Support sur client et serveur
     \end{itemize}
     \vspace{0.5cm}
-    \item \textbf{Thomas Coutant}
+    \item Thomas \textsc{Coutant}
     \begin{itemize}
         \item Développement du serveur
         \item Conception de la logique du jeu
@@ -292,15 +288,15 @@ Client $\rightarrow$ Serveur $\rightarrow$ Hall $\rightarrow$ Salon $\rightarrow
 \textbf{Couches}
 
 \begin{itemize}
-    \item Réseau : Serveur
-    \item Organisation : Hall
-    \item Partie : Salon
-    \item Logique : Jeu
+    \item Réseau $\rightarrow$ Serveur
+    \item Organisation $\rightarrow$ Hall
+    \item Partie $\rightarrow$ Salon
+    \item Logique $\rightarrow$ Jeu
 \end{itemize}
 
 \vspace{0.3cm}
 
-\textbf{Rôle central}
+\textbf{Rôle central du salon}
 
 \begin{itemize}
     \item Coordination des composants
@@ -434,7 +430,7 @@ struct Trace {
 
 \column{0.5\textwidth}
 
-\textbf{Score}
+\textbf{Calcul du score}
 \[
 Score = \textcolor{red}{Attraction} - \textcolor{blue}{Répulsions}
 \]
@@ -443,11 +439,11 @@ Score = \textcolor{red}{Attraction} - \textcolor{blue}{Répulsions}
 
 \textbf{Influences}
 \begin{itemize}
-    \item \textbf{Pac-Man} -> \textcolor{red}{Attraction}
-    \item \textbf{Fantômes} -> \textcolor{blue}{Répulsion}
+    \item \textbf{Pac-Man} $\rightarrow$ \textcolor{red}{Attraction}
+    \item \textbf{Fantômes} $\rightarrow$ \textcolor{blue}{Répulsion}
     \item Répulsion ++ pour lui-même
-    \item \textbf{Vision} -> priorité Pac-Man
-    \item Tracking -> BFS
+    \item \textbf{Vision} $\rightarrow$ priorité Pac-Man
+    \item Tracking $\rightarrow$ BFS
 \end{itemize}
 
 \vspace{0.4cm}
@@ -456,7 +452,7 @@ Score = \textcolor{red}{Attraction} - \textcolor{blue}{Répulsions}
 \begin{itemize}
     \item Bots = joueurs
     \item Envoi d’inputs
-    \item \textbf{InputQueue} -> Salon
+    \item \textbf{InputQueue} $\rightarrow$ Salon
 \end{itemize}
 
 \column{0.5\textwidth}
@@ -515,7 +511,7 @@ Score = \textcolor{red}{Attraction} - \textcolor{blue}{Répulsions}
 \textbf{Contraintes}
 \begin{itemize}
     \item Zone centrale : hut $3\times3$
-    \item Accès -> coins de départ
+    \item Accès $\rightarrow$ coins de départ
 \end{itemize}
 
 \vspace{0.4cm}
@@ -612,10 +608,10 @@ $\rightarrow$ Met aussi en place le réseau
     Système d'\textbf{Événements} :
 \vspace{0.3cm}
         \begin{itemize}
-        \item Mapping clavier -> actions (up, down, left, right)
+        \item Mapping clavier $\rightarrow$ actions (up, down, left, right)
         \item Passage de la souris 
         \item Clics de la souris 
-        \item Redimmension de la fenêtre
+        \item Redimension de la fenêtre
     \end{itemize}
 \vspace{0.3cm}
 
@@ -686,7 +682,7 @@ $\rightarrow$ Met aussi en place le réseau
             \item Choix entre UDP et TCP : TCP choisit pour sa fiabilité
         \end{itemize}
     \vspace{0.3cm}
-    \textbf{Classes Spécialisées}
+    \textbf{Classes spécialisées}
         \begin{itemize}
             \item \textbf{ServerNetwork} et \textbf{ClientNetwork} pour la réception des paquets
         \end{itemize}
@@ -701,10 +697,10 @@ $\rightarrow$ Met aussi en place le réseau
     \end{columns}
 \end{frame}
 
-\begin{frame}[fragile]{Format des Messages}
+\begin{frame}[fragile]{Format des messages}
 \begin{columns}
 \column{0.60\textwidth}
-\textbf{Messages : Structures C++}
+\textbf{Messages : structures C++}
 \begin{itemize}
     \item Connues par le client et le serveur
     \item Contiennent des structures \textit{communes}
@@ -771,7 +767,7 @@ Archive &operator|(Archive &ar, ServerListRoomPlayers &data)
         \item \textbf{Serveur} :
         \begin{itemize}
             \item Traitement + envoi de la réponse
-            \item \textbf{Broadcast} liste des joueurs/paramètres
+            \item \textbf{Diffusion} liste des joueurs/paramètres
         \end{itemize}
     \end{itemize}
     \column{0.4\textwidth}
@@ -789,21 +785,21 @@ Archive &operator|(Archive &ar, ServerListRoomPlayers &data)
         \item \textbf{Serveur} :
         \begin{itemize}
             \item Vérifie la validité
-            \item \textbf{Broadcast} liste des joueurs ou paramètres
+            \item \textbf{Diffusion} liste des joueurs ou paramètres
         \end{itemize}
         
     \end{itemize}
-        Tous les Joueurs prêt ?: \textbf{broadcast} début de partie/erreur\\
+        Tous les Joueurs prêt ?: \textbf{Diffusion} début de partie/erreur\\
     \textbf{En jeu}
     \begin{itemize}
         \item \textbf{Client} : Demande de déplacement
         \item \textbf{Serveur} :
         \begin{itemize}
             \item Vérifie, gère les conséquences
-            \item \textbf{Broadcast} état du jeu
+            \item \textbf{Diffusion} état du jeu
         \end{itemize}
     \end{itemize}
-     Si fin de jeu : \textbf{broadcast} fin du jeu
+     Si fin de jeu : \textbf{Diffusion} fin du jeu
     \column{0.375\textwidth}
     \includegraphics[width=\textwidth]{UML/PacMan_UML_Reseau_salon_jeu.png}
 
@@ -811,9 +807,9 @@ Archive &operator|(Archive &ar, ServerListRoomPlayers &data)
 
 \end{frame}
 
-\section*{Conclusion}
+\section{Bilan et conclusion}
 
-\begin{frame}{Conclusion}
+\begin{frame}{Bilan et conclusion}
 
     \textbf{Objectif principal atteint}
     \begin{itemize}
