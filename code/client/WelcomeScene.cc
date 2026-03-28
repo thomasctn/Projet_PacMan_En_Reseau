@@ -29,7 +29,7 @@ void WelcomeScene::doProcessEvent(gf::Event& event) {
             break;
 
         case gf::EventType::Closed: 
-            gf::Log::info("Fenêtre fermée (LobbyListScene)\n");
+            gf::Log::info("Fenêtre fermée (welcome)\n");
             m_game.shutdown();
             break;
         case gf::EventType::Resized: {
@@ -70,10 +70,7 @@ void WelcomeScene::doUpdate(gf::Time time) {
         m_entity.resetClick();
 
         gf::Log::info("lobby clicked!\n");
-        //faut envoyer en reseau notre requete et changer la scene...
-        //enft non ici y a pas besoin de reseau, juste demander le schangement de scene et donc recup et affichage lobbylist
-        //mais pr dautres scene ici y aura surement besoin de dire a scenemanager/gamemamaner d'envoyer des trucs!!!
-        m_game.requestScene(SceneRequest::GoToLobbyList);
+        m_game.requestScene(SceneRequest::GoToLobbyList); //on va simplement dans lobbylist
     }
 
 
@@ -81,7 +78,7 @@ void WelcomeScene::doUpdate(gf::Time time) {
         gf::Log::info("rules clicked!\n");
 
         m_entity.resetRulesClick();
-        m_game.requestScene(SceneRequest::GoToRules); 
+        m_game.requestScene(SceneRequest::GoToRules); //ou dans les règles
     }
 }
 

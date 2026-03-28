@@ -29,7 +29,7 @@ void RulesScene::doProcessEvent(gf::Event& event) {
             break;
 
         case gf::EventType::Closed: 
-            gf::Log::info("Fenêtre fermée (LobbyListScene)\n");
+            gf::Log::info("Fenêtre fermée (rules))\n");
             m_game.shutdown();
             break;
         case gf::EventType::Resized: {

@@ -201,13 +201,3 @@ void ClientGame::handleResize(unsigned int winW, unsigned int winH)
 const gf::View& ClientGame::getMainView() const {
     return m_view;
 }
-
-
-
-/*comment le resize fonctionnait:
-if (event.type == gf::EventType::Resized) { //changement taille
-                    auto size = renderer.getWindow().getSize();
-                    renderer.handleResize(size.x, size.y);
-                    //gf::Log::info("Handleresize appelé\n");
-
-                }*/

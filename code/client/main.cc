@@ -17,7 +17,6 @@
 #include <queue>
 #include "../common/Types.h"
 #include "../common/Constants.h"
-#include "Renderer.h"
 #include "WelcomeScene.h"
 #include "WelcomeEntity.h"
 #include "LobbyScene.h"

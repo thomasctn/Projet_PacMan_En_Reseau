@@ -285,6 +285,7 @@ void GameEntity::renderPacGommes(gf::RenderTarget &target, const gf::RenderState
 
     int posX = abs(floor(m_clientData.x)) / 50;
     int posY = abs(floor(m_clientData.y)) / 50;
+    //pour chaque pacgomme, on la place
     for (auto &[pos, type] : pacgommes)
     {
         if (!posIsInRange(posX, posY, pos.x, pos.y, VISION_RANGE_PLAYER) && m_clientData.role == PlayerRole::Ghost)
@@ -355,7 +356,7 @@ void GameEntity::renderSprites(gf::RenderTarget &target, const gf::RenderStates 
             continue;
         }
 
-        // --- rendu Pac-Man / fantômes ---
+        //rendu du pac-man et des fantômes
         if (s.role == PlayerRole::PacMan)
         {
             gf::Vector2f moveVec = m.destPos - m.startPos;

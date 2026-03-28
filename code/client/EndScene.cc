@@ -12,7 +12,7 @@ EndScene::EndScene(ClientGame& game)
     addWorldEntity(m_entity);
 }
 
-void EndScene::initEnd(GameEndReason reason, int lastScore){ //appelé par le clientgame
+void EndScene::initEnd(GameEndReason reason, int lastScore){ //appelé par le clientgame, pour qu'on ai la raison et le dernier score
     m_entity.setEndData(reason, lastScore);
 }
 

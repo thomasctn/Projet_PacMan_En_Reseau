@@ -30,7 +30,7 @@ public:
 
 private:
     gf::Font m_font;
-    gf::Font m_font_motion_control;
+    gf::Font m_font_motion_control; //font de texte autre que le bouton
     gf::Font m_font_mc_italic;
     
 
@@ -39,6 +39,6 @@ private:
 
     EndAction m_lastAction = EndAction::None;
 
-    GameEndReason m_endReason = GameEndReason::TIME_OUT; //vl par defaut
+    GameEndReason m_endReason = GameEndReason::TIME_OUT; //raison par defaut
     int m_lastScore = 0;
 };

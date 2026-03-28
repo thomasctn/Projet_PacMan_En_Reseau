@@ -26,12 +26,6 @@ void LobbyScene::doProcessEvent(gf::Event &event)
     switch (event.type)
     {
 
-        /*case gf::EventType::Resized: {
-            auto size = m_game.getRenderer().getWindow().getSize();
-            m_game.getRenderer().handleResize(size.x, size.y);
-            break;
-        }*/
-
     case gf::EventType::MouseMoved:
         m_entity.pointTo(
             m_game.computeWindowToGameCoordinates(event.mouseCursor.coords, getWorldView()));
@@ -63,7 +57,7 @@ void LobbyScene::doUpdate(gf::Time)
 
     gf::Packet packet;
 
-    // --- Réception réseau ---
+    //packets réseau
     while (m_game.tryPopPacket(packet))
     {
         switch (packet.getType())
@@ -87,7 +81,6 @@ void LobbyScene::doUpdate(gf::Time)
         case ServerStartGameRefused::type:
         {
             auto data = packet.as<ServerStartGameRefused>();
-            // data.reason
             m_entity.startRefused();
             break;
         }

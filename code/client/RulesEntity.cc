@@ -37,9 +37,9 @@ void RulesEntity::render(gf::RenderTarget& target, const gf::RenderStates& state
     const float LOGICAL_H = 720.f;
     const float padding = 40.f;
 
-    //    float q1 = LOGICAL_W * 0.25f; // 320
+    //float q1 = LOGICAL_W * 0.25f; // 320
     float q1 = 280.f;
-//    float q3 = LOGICAL_W * 0.75f; // 960
+    //float q3 = LOGICAL_W * 0.75f; // 960
     float q3 = 970.f; // 960
 
     float lineSpacing = 30.f;
