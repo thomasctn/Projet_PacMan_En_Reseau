@@ -133,6 +133,8 @@ Le prototype initial se limitait à une connexion simple avec échanges de messa
 
 L’introduction du lobby a nécessité une réorganisation des états serveur (connecté, lobby, en partie) et l’isolation complète des instances de jeu, chaque room disposant de sa propre boucle et de son propre état. La boucle serveur, le c\oe ur de l’architecture autoritaire, centralisait les décisions logiques et la synchronisation. Malgré des difficultés liées aux transitions d’états et à la synchronisation lors de créations simultanées de rooms, les itérations successives ont permis de stabiliser l’ensemble. À la fin du sprint, l’architecture était modulaire, le lobby fonctionnel et les bases techniques solidement établies pour la suite du développement.
 
+En parallèle des aspects techniques, ce premier sprint a été fortement guidé par les réunions de projet hebdomadaires avec notre tuteur de projet ainsi que des communications via Discord. Ces échanges réguliers ont permis de cadrer les premières décisions d’architecture et d’éviter de partir dans de mauvaises directions dès le départ. Le fait de commencer par une base simple puis de la faire évoluer progressivement correspondait bien à une approche Agile, avec des itérations courtes et validées régulièrement. Les retours du tuteur ont notamment aidé à prioriser les éléments essentiels et à structurer proprement le serveur dès les premières étapes.
+
 \subsection{Sprint 2 : Développement du client et intégration des bots}
 
 Le second sprint avait pour objectif de rendre le système réellement jouable. Après la stabilisation de l’architecture serveur, cette phase s’est concentrée sur la conception d’un client structuré et sur l’intégration de bots contrôlés par intelligence artificielle. Les priorités étaient la mise en place d’une architecture client claire, l’implémentation d’un gestionnaire de scènes (menu, lobby, room, partie), la synchronisation fiable avec l’état autoritaire du serveur et le développement de comportements autonomes pour les bots. Cette étape renforçait l’interdépendance entre client et serveur, rendant la communication réseau centrale.
@@ -142,6 +144,8 @@ Le client a été organisé en trois couches distinctes : réseau, logique local
 La synchronisation a constitué un enjeu majeur : le client envoyait uniquement les intentions du joueur et affichait les états validés par le serveur. Les ajustements réguliers du format des messages ont permis d’assurer une compatibilité stable. Les bots, intégrés côté serveur, étaient mis à jour dans la boucle principale, assurant une cohérence totale entre entités humaines et artificielles.
 
 Malgré des difficultés liées au gestionnaire de scènes et aux adaptations continues du protocole réseau, les itérations courtes ont permis de stabiliser l’ensemble. À la fin du sprint, le projet disposait d’un client fonctionnel, de bots intégrés et d’un système jouable de bout en bout, marquant le passage à une expérience interactive complète.
+
+Étant donné que nous étions encore en janvier au début de ce sprint, les réunions de projet hebdomadaires de ce mois ont également joué un rôle important durant ce dernier. Le passage d’une première version fonctionnelle à une version plus structurée du client (notamment avec l’introduction du gestionnaire de scènes) a été encouragé et expliqué par le tuteur. Ce changement de conception, passant d’un système assez basique à une organisation plus modulaire, illustre bien une évolution Agile du projet. Ces réunions ont aussi permis de mieux comprendre certains aspects plus complexes d'un jeu en réseau et de les implémenter plus efficacement grâce aux explications et retours réguliers.
 
 \subsection{Sprint 3 : Stabilisation, amélioration visuelle et débogage intensif}
 
@@ -154,6 +158,10 @@ Côté client, l’accent a été mis sur la fluidité et la cohérence : optimi
 La communication réseau a été simplifiée pour réduire la complexité côté client et limiter les erreurs de parsing, aboutissant à un protocole plus stable et cohérent. L’interface graphique a été améliorée avec un affichage du plateau optimisé, des menus réorganisés et une navigation dans le lobby plus intuitive, renforçant la qualité perçue du projet.
 
 L’approche Agile a permis de consolider progressivement les corrections plutôt que de les accumuler en fin de projet. Les validations hebdomadaires avec le tuteur ont confirmé la stabilité générale et orienté les derniers ajustements. À l’issue de ce sprint, le projet disposait d’une architecture client-serveur stable, d’un lobby fonctionnel, d’une gestion fiable des rooms, d’une boucle de jeu robuste, d’une interface finalisée et d’une expérience de jeu complète, prête à être présentée et évaluée.
+
+Durant ce dernier sprint les réunions avec le tuteur se sont aussi concentrées sur le suivi du rapport de projet : le plan a pu être présenté au tuteur, puis ajusté selon ses retours, tout comme certains éléments de la soutenance (notamment lors d’une soutenance blanche). Cela a permis d’avancer de manière plus sereine sur la finalisation du projet, aussi bien sur le plan technique que sur la présentation de ce dernier.
+
+Globalement, les réunions de projet et les comptes-rendus associés ont été un élément clé du bon déroulement du projet. Elles ont permis de garder une progression régulière, de corriger rapidement les erreurs et de mieux comprendre les choix techniques importants. Cette organisation s’inscrit pleinement dans une démarche Agile, avec un suivi continu et des ajustements progressifs tout au long du développement pour diriger un projet simple et basique au début vers un projet complètement developpé et terminé à la fin.
 
 \section{Analyse critique de l’approche Agile adoptée}
 
