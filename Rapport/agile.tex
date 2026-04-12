@@ -163,6 +163,15 @@ Durant ce dernier sprint les réunions avec le tuteur se sont aussi concentrées
 
 Globalement, les réunions de projet et les comptes-rendus associés ont été un élément clé du bon déroulement du projet. Elles ont permis de garder une progression régulière, de corriger rapidement les erreurs et de mieux comprendre les choix techniques importants. Cette organisation s’inscrit pleinement dans une démarche Agile, avec un suivi continu et des ajustements progressifs tout au long du développement pour diriger un projet simple et basique au début vers un projet complètement developpé et terminé à la fin.
 
+\section{Gestion des tests}
+
+Pour ce projet, il a été choisi de ne pas implémenter de tests unitaires, car l'architecture choisie pour le client et le serveur n'est pas idéale pour la mise en place de tests sur un composant précis : beaucoup de composants dépendent les uns des autres, et donc tester le bon fonctionnement d'un composant revient, dans la plupart des cas, à tester le bon fonctionnement d'un autre composant, ce qui demanderait un temps considérable, jugé trop précieux pour cela.
+
+Le bon fonctionnement du code produit durant le projet a donc été assuré par des tests fonctionnels : à chaque modification du code d'un composant, l'entièreté du code du projet était recompilé, puis exécuté, afin de voir si le logiciel résultant fonctionne conformément aux exigences définies sans avoir de comportements inattendus.
+
+Ces tests fonctionnels ont permis une progression rapide et efficace du projet, en identifiant rapidement les comportements inattendus du logiciel, puis en isolant et corrigeant la ou les portions de code à l'origine des problèmes.
+
+
 \section{Analyse critique de l’approche Agile adoptée}
 
 L’organisation inspirée des méthodes Agile s’est révélée particulièrement pertinente au regard de la nature du projet. Le développement d’un jeu multijoueur en réseau implique de fortes interdépendances entre le client, le serveur, le protocole de communication, la logique de jeu et l’interface graphique, chacun de ces éléments devant évoluer de manière coordonnée. Le découpage en sprints courts a permis de valider progressivement les choix d’architecture, de détecter rapidement les erreurs structurelles, de limiter l’accumulation de dette technique et d’assurer une montée en complexité maîtrisée. Chaque fin de sprint correspondait à une version fonctionnelle, même partielle, offrant une visibilité concrète sur l’avancement du projet.
